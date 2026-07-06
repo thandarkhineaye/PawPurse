@@ -1,0 +1,917 @@
+:root {
+    --bg-base: #121212;
+    --text-primary: #ffffff;
+    --text-muted: #888888;
+    --input-bg: #1e1e1e;
+    --input-border: #333333;
+    
+    --color-red: #E53E3E;
+    --color-yellow: #DD6B20;
+    --color-green: #38A169;
+    
+    --transition-speed: 400ms;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: background-color var(--transition-speed) ease;
+}
+
+#app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Animations */
+@keyframes pulseRed {
+    0% { opacity: 0.85; }
+    50% { opacity: 1; }
+    100% { opacity: 0.85; }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* State management */
+.screen-state {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+    padding-bottom: 24px;
+}
+
+.screen-state.active {
+    display: flex;
+    opacity: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Landing State Elements */
+header.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 0 12px 0;
+    flex-shrink: 0;
+}
+
+.logo {
+    color: var(--text-muted);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lang-selector {
+    display: flex;
+    gap: 8px;
+}
+
+.lang-btn {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    border-radius: 8px;
+    cursor: pointer;
+    min-height: auto;
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    color: var(--text-primary);
+    border-color: #555;
+}
+
+.lang-btn.active {
+    background-color: var(--text-primary);
+    color: var(--bg-base);
+    border-color: var(--text-primary);
+}
+
+body.state-red .lang-btn,
+body.state-yellow .lang-btn,
+body.state-green .lang-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: inherit;
+    opacity: 0.8;
+}
+
+body.state-red .lang-btn:hover,
+body.state-yellow .lang-btn:hover,
+body.state-green .lang-btn:hover {
+    opacity: 1;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+body.state-red .lang-btn.active {
+    background-color: #ffffff;
+    color: var(--color-red);
+    border-color: #ffffff;
+    opacity: 1;
+}
+
+body.state-yellow .lang-btn.active {
+    background-color: #121212;
+    color: var(--color-yellow);
+    border-color: #121212;
+    opacity: 1;
+}
+
+body.state-green .lang-btn.active {
+    background-color: #ffffff;
+    color: var(--color-green);
+    border-color: #ffffff;
+    opacity: 1;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.prompt-header {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 24px;
+    line-height: 1.2;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+textarea {
+    width: 100%;
+    background-color: var(--input-bg);
+    border: 2px solid var(--input-border);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+textarea:focus {
+    border-color: #555;
+}
+
+textarea:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#char-warning {
+    color: var(--color-yellow);
+    font-size: 14px;
+    position: absolute;
+    bottom: -20px;
+    right: 0;
+}
+
+#error-banner {
+    background-color: rgba(229, 62, 62, 0.2);
+    border-left: 4px solid var(--color-red);
+    padding: 16px;
+    margin-bottom: 24px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+button {
+    background-color: var(--text-primary);
+    color: var(--bg-base);
+    border: none;
+    border-radius: 12px;
+    padding: 18px;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 64px;
+}
+
+button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(0,0,0,0.2);
+    border-top-color: var(--bg-base);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+footer {
+    padding: 24px 0;
+    text-align: center;
+}
+
+.disclaimer {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* Result State Elements */
+.result-content {
+    animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    padding-top: 40px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.directive-text {
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 40px;
+}
+
+.instructions-card {
+    background-color: rgba(0,0,0,0.15);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 40px;
+}
+
+ul {
+    list-style-position: inside;
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+li {
+    margin-bottom: 12px;
+}
+li:last-child {
+    margin-bottom: 0;
+}
+
+.secondary-btn {
+    background-color: transparent;
+    border: 2px solid currentColor;
+    color: inherit;
+}
+
+/* Global Modifiers applied to body */
+body.state-red {
+    background-color: var(--color-red);
+    color: #ffffff;
+    animation: pulseRed 3s infinite ease-in-out;
+}
+
+body.state-yellow {
+    background-color: var(--color-yellow);
+    color: #121212;
+}
+
+body.state-green {
+    background-color: var(--color-green);
+    color: #ffffff;
+}
+
+/* Clinics Section Styles */
+#clinics-section {
+    margin-top: 32px;
+    margin-bottom: 32px;
+    border-top: 2px solid rgba(255, 255, 255, 0.25);
+    padding-top: 24px;
+    animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+body.state-yellow #clinics-section {
+    border-top-color: rgba(18, 18, 18, 0.25);
+}
+
+.clinics-header {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.clinics-prompt {
+    margin-bottom: 16px;
+}
+
+.clinics-prompt p {
+    font-size: 16px;
+    margin-bottom: 12px;
+    opacity: 0.9;
+}
+
+.clinics-prompt button {
+    font-size: 16px;
+    padding: 10px 20px;
+    min-height: 48px;
+    display: inline-flex;
+}
+
+.clinics-loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.spinner-small {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+body.state-yellow .spinner-small {
+    border: 3px solid rgba(18, 18, 18, 0.2);
+    border-top-color: currentColor;
+}
+
+.clinics-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.clinic-card {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.clinic-card:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+}
+
+body.state-yellow .clinic-card {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.state-yellow .clinic-card:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.clinic-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.clinic-name {
+    font-weight: 700;
+    font-size: 17px;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.clinic-distance {
+    font-size: 14px;
+    opacity: 0.85;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.clinic-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.clinic-address {
+    color: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.4;
+    transition: opacity 0.2s ease;
+}
+
+.clinic-address:hover {
+    text-decoration: underline;
+    opacity: 0.95;
+}
+
+.clinic-doctor {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+}
+
+.doc-icon {
+    font-size: 16px;
+}
+
+.clinic-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.phone-link {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 700;
+    transition: opacity 0.2s ease;
+}
+
+.phone-link:hover {
+    opacity: 0.8;
+}
+
+.phone-na {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.clinics-fallback {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+body.state-yellow .clinics-fallback {
+    background-color: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.clinics-fallback p {
+    font-size: 15px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.maps-btn-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    padding: 12px 24px;
+    min-height: 48px;
+    border-radius: 10px;
+    border: 2px solid currentColor;
+    background: transparent;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.maps-btn-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+body.state-yellow .maps-btn-link:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Map Container Styles */
+#map-container {
+    height: 280px;
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 5;
+}
+
+body.state-yellow #map-container {
+    border-color: rgba(18, 18, 18, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    background-color: #1a202c;
+}
+
+body.state-yellow #map {
+    background-color: #f7fafc;
+}
+
+/* Enhanced Clinic Card - Verified Desks */
+.clinic-card.verified-desk {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.1);
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.16);
+    cursor: pointer;
+}
+
+body.state-yellow .clinic-card.verified-desk {
+    border-color: rgba(18, 18, 18, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+.clinic-card.verified-desk:hover {
+    background-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-2px);
+}
+
+body.state-yellow .clinic-card.verified-desk:hover {
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Verified Triage Desk Badge */
+.verified-badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background-color: #38a169;
+    color: #ffffff;
+    margin-bottom: 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+body.state-yellow .verified-badge {
+    background-color: #276749;
+}
+
+/* Clinic Status pill */
+.clinic-status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+}
+
+.status-dot.active {
+    background-color: #48bb78;
+}
+
+.status-dot.busy {
+    background-color: #ecc94b;
+}
+
+.status-dot.high {
+    background-color: #f56565;
+}
+
+.status-dot::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: inherit;
+    animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+.wait-time {
+    opacity: 0.9;
+}
+
+/* Custom CSS Markers for Leaflet */
+.custom-user-marker {
+    background: transparent;
+    border: none;
+}
+
+.user-marker-pin {
+    width: 14px;
+    height: 14px;
+    background-color: #3182ce;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(49, 130, 206, 0.8);
+    position: relative;
+}
+
+.user-marker-pin::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #3182ce;
+    border-radius: 50%;
+    animation: pulse-ring 1.8s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+}
+
+.custom-verified-marker {
+    background: transparent;
+    border: none;
+}
+
+.verified-marker-container {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verified-marker-pin {
+    width: 22px;
+    height: 22px;
+    background-color: #e53e3e;
+    border: 2px solid #ffffff;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.verified-marker-pin::after {
+    content: '✚';
+    color: white;
+    font-size: 11px;
+    transform: rotate(45deg);
+    font-weight: bold;
+}
+
+.verified-marker-container.status-active .verified-marker-pin {
+    background-color: #38a169;
+}
+
+.verified-marker-container.status-busy .verified-marker-pin {
+    background-color: #dd6b20;
+}
+
+.verified-marker-container.status-high .verified-marker-pin {
+    background-color: #e53e3e;
+}
+
+.verified-marker-pulse {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #e53e3e;
+    animation: pulse-ring 1.8s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+    pointer-events: none;
+}
+
+.verified-marker-container.status-active .verified-marker-pulse {
+    border-color: #38a169;
+}
+
+.verified-marker-container.status-busy .verified-marker-pulse {
+    border-color: #dd6b20;
+}
+
+.custom-standard-marker {
+    background: transparent;
+    border: none;
+}
+
+.standard-marker-pin {
+    width: 16px;
+    height: 16px;
+    background-color: #4a5568;
+    border: 2px solid #ffffff;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Animations */
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.6);
+        opacity: 1;
+    }
+    80%, 100% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse-dot {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.85);
+        opacity: 0.6;
+    }
+}
+
+/* Leaflet Popup overrides to match dark mode and colors */
+.leaflet-popup-content-wrapper {
+    background: #1a202c !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    font-family: 'Outfit', sans-serif !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.state-yellow .leaflet-popup-content-wrapper {
+    background: #ffffff !important;
+    color: #121212 !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.leaflet-popup-tip {
+    background: #1a202c !important;
+}
+
+body.state-yellow .leaflet-popup-tip {
+    background: #ffffff !important;
+}
+
+.leaflet-popup-content {
+    margin: 12px 14px !important;
+    line-height: 1.4 !important;
+}
+
+.leaflet-popup-content h4 {
+    margin: 0 0 4px 0 !important;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.leaflet-popup-content p {
+    margin: 0 !important;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+    color: rgba(255, 255, 255, 0.6) !important;
+    padding: 6px 8px 0 0 !important;
+}
+
+body.state-yellow .leaflet-container a.leaflet-popup-close-button {
+    color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Pet Selector Layout & Styling */
+.pet-selector-container {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+}
+
+.select-pet-label {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.pet-buttons-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.pet-buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.pet-select-btn {
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-primary);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.pet-select-btn:hover {
+    border-color: #555;
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.pet-select-btn.active {
+    background-color: var(--color-yellow);
+    border-color: var(--color-yellow);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(221, 107, 32, 0.25);
+}
+
+.pet-emoji {
+    font-size: 16px;
+}
+
+.pet-name {
+    font-size: 14px;
+}
+

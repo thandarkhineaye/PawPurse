@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: pawpurse-triage-prototype
+    env: docker
+    plan: free
+    region: oregon
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+        placeholder: "Enter your Gemini API Key here (or leave blank to use basic mock mode)"
