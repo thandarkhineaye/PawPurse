@@ -115,21 +115,67 @@ class TriageEngine:
             is_yellow = False
 
             # English keywords
-            if any(w in lower_symptoms for w in ["bleed", "chok", "breath", "unconscious"]):
-                is_red = True
-            elif any(w in lower_symptoms for w in ["vomit", "diarrhea", "pain"]):
-                is_yellow = True
+            red_en = [
+                "bleed", "blood", "chok", "breath", "unconscious", "collapse", "seizure", "convulsion", "paralyz", 
+                "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "stasis", "limp", 
+                "fracture", "broken", "unresponsive", "gasp", "pant", "blue", "pale", "bloat", "fit",
+                "accident", "hit by car", "run over", "fell from", "dog attack", "animal attack", "trauma", "crash", "collision", "hit by", "struck by",
+                "eye bleed", "bleeding eye", "eye bleeding", "proptosis", "eye pop", "eyeball pop", "eye puncture", "blindness",
+                "ear torn", "torn ear", "ear bleeding", "bleeding ear", "ear cut off",
+                "nosebleed", "nose bleed", "bleeding nose", "epistaxis",
+                "severe burn", "chemical burn", "deep wound", "skin torn", "torn skin", "deep puncture", "laceration"
+            ]
+            yellow_en = [
+                "vomit", "diarrhea", "pain",
+                "eye scratch", "scratched eye", "swollen eye", "eye discharge", "eye squint", "squinting eye", "eye red", "red eye", "cloudy eye", "watery eye", "eye shut", "closed eye",
+                "ear discharge", "head shaking", "shaking head", "scratching ear", "ear scratch", "ear hematoma", "smelly ear", "ear smell", "ear red", "red ear", "swollen ear", "ear infection",
+                "nasal discharge", "nose discharge", "sneezing blood", "bloody sneeze", "nose swelling", "swollen nose", "yellow snot", "green snot",
+                "skin cut", "wound", "hot spot", "rash", "hives", "minor burn", "skin burn", "abscess", "skin swelling", "swollen skin", "severe itch", "skin red", "red skin", "dermatitis"
+            ]
 
             # Japanese keywords
-            if any(w in symptoms for w in ["出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり"]):
-                is_red = True
-            elif any(w in symptoms for w in ["嘔吐", "吐く", "下痢", "痛み", "痛い"]):
-                is_yellow = True
+            red_ja = [
+                "出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり", "血", "吐血", "呼吸困難", 
+                "息苦しい", "気絶", "倒れる", "反応がない", "けいれん", "痙攣", "発作", "麻痺", "まひ", "動けない", 
+                "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "うっ滞", 
+                "骨折", "折れる", "ハアハア", "あえぎ呼吸", "蒼白", "胃拡張",
+                "事故", "車にひかれた", "ひかれた", "転落", "犬に噛まれた", "噛まれた", "動物に襲われた", "外傷", "衝突", "はねられた",
+                "眼球突出", "目が飛び出る", "目が飛び出た", "眼の出血", "目の出血", "失明", "眼に刺さる",
+                "耳がちぎれた", "耳の出血", "耳から血",
+                "鼻血", "鼻の出血",
+                "重度の火傷", "大やけど", "深い創傷", "深い傷", "皮膚が裂けた", "裂傷", "化学やけど"
+            ]
+            yellow_ja = [
+                "嘔吐", "吐く", "下痢", "痛み", "痛い",
+                "眼の傷", "目の傷", "目の腫れ", "目やに", "目をこする", "目を気にする", "結膜炎", "目が赤い", "白濁", "涙目", "目が開かない", "閉じた目",
+                "耳だれ", "耳垢", "耳アカ", "頭を振る", "耳をかく", "耳の腫れ", "耳血腫", "耳が臭い", "耳が赤い", "外耳炎",
+                "鼻水", "鼻汁", "くしゃみと血", "血混じりの鼻水", "鼻の腫れ", "黄色い鼻水",
+                "切り傷", "創傷", "ホットスポット", "湿疹", "じんましん", "軽度のやけど", "膿瘍", "皮膚の腫れ", "激しい痒み", "皮膚の赤み", "皮膚炎"
+            ]
 
             # Burmese keywords
-            if any(w in symptoms for w in ["သွေးထွက်", "နင်", "အသက်ရှူ", "သတိလစ်"]):
+            red_my = [
+                "သွေးထွက်", "နင်", "အသက်ရှူ", "သတိလစ်", "သွေး", "သီး", "လည်ပင်းနင်", "အသက်ရှူကျပ်", "မေ့မြော", 
+                "တက်", "အတက်ရောဂါ", "ဆွဲတက်", "လေဖြတ်", "လှုပ်မရ", "အဆိပ်", "အဆိပ်သင့်", "ချောကလက်", "လီလီ", 
+                "လီလီပန်း", "တက်ဖလွန်", "မီးခိုး", "အပူလျှပ်", "အစာအိမ်လှုပ်ရှားမှုရပ်", "လေပွ", "အရိုးကျိုး", "ကျိုး", 
+                "ဟောဟဲ", "အသက်ရှူပြင်း", "ဖြူဖျော့", "ပြာနှမ်း", "ဗိုက်ပွ", "လေထိုး",
+                "မတော်တဆ", "ကားတိုက်", "ပြုတ်ကျ", "ခွေးကိုက်", "အခြားတိရစ္ဆာန်ကိုက်", "ဒဏ်ရာရ", "တိုက်မိ", "ဆောင့်မိ",
+                "မျက်လုံးပြူးထွက်", "မျက်လုံးပြူး", "မျက်လုံးမှသွေးထွက်", "မျက်စိကွယ်", "မျက်လုံးစူး", "မျက်စိပေါက်",
+                "နားရွက်ပြတ်", "နားရွက်ပြဲ", "နားမှသွေးထွက်",
+                "နှာခေါင်းသွေးယို", "နှာခေါင်းသွေးကျ", "နှာခေါင်းမှသွေးထွက်",
+                "မီးလောင်ဒဏ်ရာပြင်းထန်", "ဒဏ်ရာအနက်ကြီး", "အရေပြားပြဲထွက်", "ဓာတုမီးလောင်"
+            ]
+            yellow_my = [
+                "အော့အန်", "အန်", "ဝမ်းလျှော", "ဝမ်းပျက်", "နာကျင်", "ကိုက်",
+                "မျက်လုံးခြစ်မိ", "မျက်လုံးနာ", "မျက်လုံးရောင်", "မျက်စိနာ", "မျက်စိအချွဲထွက်", "မျက်လုံးမှိတ်ထား", "မျက်လုံးနီ", "မျက်စိမှုံ", "မျက်ရည်အဆက်မပြတ်ထွက်",
+                "နားပြည်ထွက်", "နားကုတ်", "နားယား", "ခေါင်းခါ", "နားရောင်", "နားရွက်သွေးစု", "နားနံ", "နားနီ", "နားပိုးဝင်",
+                "နှာရည်ယို", "နှာစေး", "နှာချေပြီးသွေးပါ", "နှာခေါင်းရောင်", "နှာရည်ဝါ", "နှာရည်စိမ်း",
+                "ရှနာ", "အရေပြားအနာ", "အင်ပြင်", "မီးလောင်ဖု", "ပြည်တည်နာ", "အရေပြားရောင်", "အရေပြားယားယံ", "အရေပြားနီ", "အရေပြားပိုးဝင်"
+            ]
+
+            if any(w in lower_symptoms for w in red_en) or                any(w in symptoms for w in red_ja) or                any(w in symptoms for w in red_my):
                 is_red = True
-            elif any(w in symptoms for w in ["အော့အန်", "အန်", "ဝမ်းလျှော", "ဝမ်းပျက်", "နာကျင်", "ကိုက်"]):
+            elif any(w in lower_symptoms for w in yellow_en) or                  any(w in symptoms for w in yellow_ja) or                  any(w in symptoms for w in yellow_my):
                 is_yellow = True
 
             if is_red:

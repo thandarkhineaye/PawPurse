@@ -863,16 +863,9 @@ body.state-yellow .leaflet-container a.leaflet-popup-close-button {
     font-weight: 500;
 }
 
-.pet-buttons-col {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-    width: 100%;
-}
-
 .pet-buttons-row {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
     width: 100%;
@@ -914,4 +907,583 @@ body.state-yellow .leaflet-container a.leaflet-popup-close-button {
 .pet-name {
     font-size: 14px;
 }
+
+/* First Aid & CPR Guide Styles */
+.first-aid-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-top: 32px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    text-align: left;
+}
+
+body.state-yellow .first-aid-card {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.first-aid-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.first-aid-tabs-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.first-aid-tabs-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.first-aid-tab {
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    min-height: auto;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.first-aid-tab:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--text-primary);
+}
+
+.first-aid-tab.active {
+    background-color: var(--text-primary);
+    color: var(--bg-base);
+    border-color: var(--text-primary);
+}
+
+body.state-yellow .first-aid-tab {
+    background-color: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #4a5568;
+}
+
+body.state-yellow .first-aid-tab:hover {
+    border-color: rgba(0, 0, 0, 0.3);
+    color: #121212;
+}
+
+body.state-yellow .first-aid-tab.active {
+    background-color: #121212;
+    color: #ffffff;
+    border-color: #121212;
+}
+
+.first-aid-content {
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.state-yellow .first-aid-content {
+    color: #2d3748;
+}
+
+.first-aid-content p {
+    margin-bottom: 12px;
+}
+
+.first-aid-content strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+body.state-yellow .first-aid-content strong {
+    color: #121212;
+}
+
+.first-aid-content ul {
+    list-style-type: none;
+    margin: 8px 0 16px 0;
+    padding-left: 0;
+    font-size: 15px;
+}
+
+.first-aid-content li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 10px;
+    line-height: 1.45;
+}
+
+.first-aid-content li::before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+    color: var(--color-yellow);
+    font-weight: 900;
+}
+
+.first-aid-content .first-aid-sub {
+    font-weight: 700;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 16px;
+    color: var(--color-yellow);
+}
+
+.first-aid-content .warning-box {
+    border-left: 3px solid var(--color-red);
+    background-color: rgba(229, 62, 62, 0.08);
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+}
+
+body.state-yellow .first-aid-content .warning-box {
+    background-color: rgba(229, 62, 62, 0.05);
+}
+
+/* Toxins Table Styling */
+.toxins-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+.toxins-table th, .toxins-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: left;
+}
+
+.toxins-table th {
+    font-weight: 700;
+    color: var(--color-yellow);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+body.state-yellow .toxins-table th {
+    color: #c2410c;
+    border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+body.state-yellow .toxins-table td {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.impact-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    letter-spacing: 0.3px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.impact-badge.high {
+    background-color: rgba(229, 62, 62, 0.15);
+    color: #feb2b2;
+    border: 1px solid rgba(229, 62, 62, 0.3);
+}
+
+.impact-badge.moderate {
+    background-color: rgba(221, 107, 32, 0.15);
+    color: #fbd38d;
+    border: 1px solid rgba(221, 107, 32, 0.3);
+}
+
+.impact-badge.mild {
+    background-color: rgba(49, 151, 149, 0.15);
+    color: #81e6d9;
+    border: 1px solid rgba(49, 151, 149, 0.3);
+}
+
+body.state-yellow .impact-badge.high {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+
+body.state-yellow .impact-badge.moderate {
+    background-color: #ffedd5;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+
+body.state-yellow .impact-badge.mild {
+    background-color: #ccfbf1;
+    color: #0f766e;
+    border-color: #99f6e4;
+}
+
+/* Header Navigation & Left layout */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.app-nav {
+    display: flex;
+    gap: 8px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-btn.active {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.state-red .nav-btn,
+body.state-yellow .nav-btn,
+body.state-green .nav-btn {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+body.state-red .nav-btn.active {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+body.state-yellow .nav-btn.active {
+    background-color: rgba(0, 0, 0, 0.15);
+    color: #000;
+}
+
+body.state-green .nav-btn.active {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+/* My Pets Page Layout */
+.my-pets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.my-pets-header h1 {
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.empty-pets-message {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 48px 0;
+    font-size: 16px;
+    border: 2px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+.pets-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media(min-width: 480px) {
+    .pets-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+}
+
+.pet-card {
+    background: rgba(30, 30, 30, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.pet-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.pet-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pet-card-name {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.pet-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.pet-detail-item {
+    display: flex;
+    justify-content: space-between;
+    line-height: 1.4;
+}
+
+.pet-detail-label {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.pet-detail-val {
+    color: var(--text-primary);
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.pet-remove-btn {
+    background: rgba(229, 62, 62, 0.1);
+    border: 1px solid rgba(229, 62, 62, 0.3);
+    color: #feb2b2;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pet-remove-btn:hover {
+    background: rgba(229, 62, 62, 0.25);
+    border-color: rgba(229, 62, 62, 0.5);
+}
+
+/* Registration Form Layout */
+#new-pet-state h1 {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 24px;
+}
+
+#pet-register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input {
+    background-color: var(--input-bg);
+    border: 2px solid var(--input-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    width: 100%;
+}
+
+.form-group input:focus {
+    border-color: #555;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.form-actions button {
+    flex: 1;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.form-actions button.primary-btn {
+    background-color: var(--text-primary);
+    color: var(--bg-base);
+    border: none;
+}
+
+.form-actions button.primary-btn:hover {
+    opacity: 0.9;
+}
+
+.form-actions button.secondary-btn {
+    background-color: transparent;
+    border: 2px solid var(--input-border);
+    color: var(--text-primary);
+}
+
+.form-actions button.secondary-btn:hover {
+    border-color: #555;
+}
+
+/* Select dropdown style overrides */
+.form-group select {
+    background-color: var(--input-bg);
+    border: 2px solid var(--input-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    width: 100%;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+.form-group select:focus {
+    border-color: #555;
+}
+
+/* Select dropdown option styles for dark background compatibility */
+.form-group select option {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+/* Photo Upload Layout */
+.photo-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.photo-preview-container {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.photo-preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-remove-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: #fff;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+    transition: background-color 0.2s;
+}
+
+.photo-remove-btn:hover {
+    background-color: rgba(229, 62, 62, 0.85);
+}
+
+/* Pet Card Avatar layout update */
+.pet-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pet-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.pet-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
 

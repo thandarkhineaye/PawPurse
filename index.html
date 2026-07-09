@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PawPurse Triage</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=6">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="app">
         <header class="app-header">
-            <div class="logo">PawPurse</div>
+            <div class="header-left">
+                <div class="logo" id="logo-home" style="cursor: pointer;">PawPurse</div>
+                <nav class="app-nav">
+                    <button id="nav-triage-btn" class="nav-btn active">Triage</button>
+                    <button id="nav-pets-btn" class="nav-btn">My Pets</button>
+                </nav>
+            </div>
             <div class="lang-selector">
                 <button class="lang-btn active" data-lang="en">EN</button>
                 <button class="lang-btn" data-lang="ja">JA</button>
@@ -27,26 +33,19 @@
                 <!-- Pet Selector Menu -->
                 <div class="pet-selector-container">
                     <span id="select-pet-label" class="select-pet-label">Select Pet:</span>
-                    <div class="pet-buttons-col">
-                        <div class="pet-buttons-row">
-                            <button type="button" class="pet-select-btn active" data-pet="dog">
-                                <span class="pet-emoji">🐶</span> <span class="pet-name" id="pet-dog">Dog</span>
-                            </button>
-                            <button type="button" class="pet-select-btn" data-pet="cat">
-                                <span class="pet-emoji">🐱</span> <span class="pet-name" id="pet-cat">Cat</span>
-                            </button>
-                        </div>
-                        <div class="pet-buttons-row">
-                            <button type="button" class="pet-select-btn" data-pet="bird">
-                                <span class="pet-emoji">🐦</span> <span class="pet-name" id="pet-bird">Bird</span>
-                            </button>
-                            <button type="button" class="pet-select-btn" data-pet="rabbit">
-                                <span class="pet-emoji">🐰</span> <span class="pet-name" id="pet-rabbit">Rabbit</span>
-                            </button>
-                            <button type="button" class="pet-select-btn" data-pet="others">
-                                <span class="pet-emoji">🐾</span> <span class="pet-name" id="pet-others">Others</span>
-                            </button>
-                        </div>
+                    <div class="pet-buttons-row">
+                        <button type="button" class="pet-select-btn active" data-pet="dog">
+                            <span class="pet-emoji">🐶</span> <span class="pet-name" id="pet-dog">Dog</span>
+                        </button>
+                        <button type="button" class="pet-select-btn" data-pet="cat">
+                            <span class="pet-emoji">🐱</span> <span class="pet-name" id="pet-cat">Cat</span>
+                        </button>
+                        <button type="button" class="pet-select-btn" data-pet="bird">
+                            <span class="pet-emoji">🐦</span> <span class="pet-name" id="pet-bird">Bird</span>
+                        </button>
+                        <button type="button" class="pet-select-btn" data-pet="rabbit">
+                            <span class="pet-emoji">🐰</span> <span class="pet-name" id="pet-rabbit">Rabbit</span>
+                        </button>
                     </div>
                 </div>
 
@@ -64,6 +63,28 @@
                     <span id="btn-text" class="btn-text">Check Urgency</span>
                     <div class="spinner hidden"></div>
                 </button>
+
+                <!-- First Aid & CPR Guide Section -->
+                <div id="first-aid-section" class="first-aid-card">
+                    <div class="first-aid-header">
+                        <h2 id="first-aid-title"><span id="first-aid-pet-emoji">🐶</span> <span id="first-aid-pet-name">Dog</span> First Aid & CPR</h2>
+                    </div>
+                    
+                    <div class="first-aid-tabs-col" id="first-aid-tabs">
+                        <div class="first-aid-tabs-row">
+                            <button type="button" class="first-aid-tab active" data-category="cpr">❤️ CPR</button>
+                            <button type="button" class="first-aid-tab" data-category="bleeding">🩸 Bleeding</button>
+                            <button type="button" class="first-aid-tab" data-category="choking">🫁 Choking</button>
+                        </div>
+                        <div class="first-aid-tabs-row">
+                            <button type="button" class="first-aid-tab" data-category="heatstroke">🌡️ Heat</button>
+                            <button type="button" class="first-aid-tab" data-category="poisoning">⚠️ Poison</button>
+                            <button type="button" class="first-aid-tab" data-category="shock">⚡ Shock</button>
+                        </div>
+                    </div>
+                    
+                    <div class="first-aid-content" id="first-aid-content"></div>
+                </div>
             </main>
             <footer>
                 <p id="disclaimer" class="disclaimer">This tool does not diagnose diseases. It helps you evaluate the urgency of a vet visit.</p>
@@ -113,9 +134,75 @@
                 <button id="reset-btn" class="secondary-btn">Start New Check</button>
             </main>
         </div>
+
+        <!-- My Pets State -->
+        <div id="my-pets-state" class="screen-state hidden">
+            <main>
+                <div class="my-pets-header">
+                    <h1 id="my-pets-title">My Registered Pets</h1>
+                    <button id="add-pet-btn" class="primary-btn">+ Add Pet</button>
+                </div>
+                <div id="pets-list-container" class="pets-list-container">
+                    <div id="empty-pets-message" class="empty-pets-message">
+                        No pets registered yet.
+                    </div>
+                    <div id="pets-grid" class="pets-grid"></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- New Pet Registration State -->
+        <div id="new-pet-state" class="screen-state hidden">
+            <main>
+                <h1 id="register-pet-title">Register New Pet</h1>
+                <form id="pet-register-form" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="reg-pet-name" id="label-pet-name">Pet Name</label>
+                        <input type="text" id="reg-pet-name" required placeholder="Pet Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-pet-type" id="label-pet-type">Pet Type</label>
+                        <select id="reg-pet-type" required>
+                            <option value="dog" id="opt-dog">Dog</option>
+                            <option value="cat" id="opt-cat">Cat</option>
+                            <option value="bird" id="opt-bird">Bird</option>
+                            <option value="rabbit" id="opt-rabbit">Rabbit</option>
+                            <option value="other" id="opt-other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-pet-address" id="label-pet-address">Address</label>
+                        <input type="text" id="reg-pet-address" required placeholder="Owner's Address">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-pet-chip" id="label-pet-chip">Chip Number</label>
+                        <input type="text" id="reg-pet-chip" placeholder="Chip Number (Microchip)">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-pet-vaccine" id="label-pet-vaccine">Last Vaccinated Date</label>
+                        <input type="date" id="reg-pet-vaccine">
+                    </div>
+                    <div class="form-group">
+                        <label id="label-pet-photo">Pet Photo</label>
+                        <div class="photo-upload-container">
+                            <input type="file" id="reg-pet-photo" accept="image/*" style="display: none;">
+                            <button type="button" id="photo-upload-btn" class="secondary-btn">Choose Photo</button>
+                            <div id="photo-preview-container" class="photo-preview-container hidden">
+                                <img id="photo-preview" src="" alt="Pet Preview">
+                                <button type="button" id="photo-remove-btn" class="photo-remove-btn">×</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" id="register-submit-btn" class="primary-btn">Register Pet</button>
+                        <button type="button" id="register-cancel-btn" class="secondary-btn">Cancel</button>
+                    </div>
+                </form>
+            </main>
+        </div>
     </div>
     
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html>

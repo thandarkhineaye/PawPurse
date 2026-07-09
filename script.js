@@ -20,16 +20,81 @@ function classifySymptomsLocally(symptoms, language) {
     let isYellow = false;
 
     // English keywords
-    const redEn = ["bleed", "chok", "breath", "unconscious"];
-    const yellowEn = ["vomit", "diarrhea", "pain"];
+    const redEn = [
+        "bleed", "blood", "chok", "breath", "unconscious", "collapse", "seizure", "convulsion", "paralyz", 
+        "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "stasis", "limp", 
+        "fracture", "broken", "unresponsive", "gasp", "pant", "blue", "pale", "bloat", "fit",
+        "accident", "hit by car", "run over", "fell from", "dog attack", "animal attack", "trauma", "crash", "collision", "hit by", "struck by",
+        "eye bleed", "bleeding eye", "eye bleeding", "proptosis", "eye pop", "eyeball pop", "eye puncture", "blindness",
+        "ear torn", "torn ear", "ear bleeding", "bleeding ear", "ear cut off",
+        "nosebleed", "nose bleed", "bleeding nose", "epistaxis",
+        "severe burn", "chemical burn", "deep wound", "skin torn", "torn skin", "deep puncture", "laceration"
+    ];
+    const yellowEn = [
+        "vomit", "diarrhea", "pain",
+        "eye scratch", "scratched eye", "swollen eye", "eye discharge", "eye squint", "squinting eye", "eye red", "red eye", "cloudy eye", "watery eye", "eye shut", "closed eye",
+        "ear discharge", "head shaking", "shaking head", "scratching ear", "ear scratch", "ear hematoma", "smelly ear", "ear smell", "ear red", "red ear", "swollen ear", "ear infection",
+        "nasal discharge", "nose discharge", "sneezing blood", "bloody sneeze", "nose swelling", "swollen nose", "yellow snot", "green snot",
+        "skin cut", "wound", "hot spot", "rash", "hives", "minor burn", "skin burn", "abscess", "skin swelling", "swollen skin", "severe itch", "skin red", "red skin", "dermatitis"
+    ];
+    const greenEn = [
+        "mild tearing", "sleep crust", "eye booger",
+        "mild wax", "ear wax", "ear dirt",
+        "dry nose", "clear nasal", "occasional sneeze",
+        "minor scratch", "dry skin", "dandruff", "mild itch", "flaky skin"
+    ];
 
     // Japanese keywords
-    const redJa = ["出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり"];
-    const yellowJa = ["嘔吐", "吐く", "下痢", "痛み", "痛い"];
+    const redJa = [
+        "出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり", "血", "吐血", "呼吸困難", 
+        "息苦しい", "気絶", "倒れる", "反応がない", "けいれん", "痙攣", "発作", "麻痺", "まひ", "動けない", 
+        "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "うっ滞", 
+        "骨折", "折れる", "ハアハア", "あえぎ呼吸", "蒼白", "胃拡張",
+        "事故", "車にひかれた", "ひかれた", "転落", "犬に噛まれた", "噛まれた", "動物に襲われた", "外傷", "衝突", "はねられた",
+        "眼球突出", "目が飛び出る", "目が飛び出た", "眼の出血", "目の出血", "失明", "眼に刺さる",
+        "耳がちぎれた", "耳の出血", "耳から血",
+        "鼻血", "鼻の出血",
+        "重度の火傷", "大やけど", "深い創傷", "深い傷", "皮膚が裂けた", "裂傷", "化学やけど"
+    ];
+    const yellowJa = [
+        "嘔吐", "吐く", "下痢", "痛み", "痛い",
+        "眼の傷", "目の傷", "目の腫れ", "目やに", "目をこする", "目を気にする", "結膜炎", "目が赤い", "白濁", "涙目", "目が開かない", "閉じた目",
+        "耳だれ", "耳垢", "耳アカ", "頭を振る", "耳をかく", "耳の腫れ", "耳血腫", "耳が臭い", "耳が赤い", "外耳炎",
+        "鼻水", "鼻汁", "くしゃみと血", "血混じりの鼻水", "鼻の腫れ", "黄色い鼻水",
+        "切り傷", "創傷", "ホットスポット", "湿疹", "じんましん", "軽度のやけど", "膿瘍", "皮膚の腫れ", "激しい痒み", "皮膚の赤み", "皮膚炎"
+    ];
+    const greenJa = [
+        "軽い涙目", "少量の目やに",
+        "軽度の耳垢", "耳の汚れ",
+        "鼻の乾燥", "透明な鼻水", "たまにくしゃみ",
+        "軽い引っかき傷", "小さな傷", "乾燥肌", "フケ", "軽い痒み"
+    ];
 
     // Burmese keywords
-    const redMy = ["သွေးထွက်", "နင်", "အသက်ရှူ", "သတိလစ်"];
-    const yellowMy = ["အော့အန်", "အန်", "ဝမ်းလျှော", "ဝမ်းပျက်", "နာကျင်", "ကိုက်"];
+    const redMy = [
+        "သွေးထွက်", "နင်", "အသက်ရှူ", "သတိလစ်", "သွေး", "သီး", "လည်ပင်းနင်", "အသက်ရှူကျပ်", "မေ့မြော", 
+        "တက်", "အတက်ရောဂါ", "ဆွဲတက်", "လေဖြတ်", "လှုပ်မရ", "အဆိပ်", "အဆိပ်သင့်", "ချောကလက်", "လီလီ", 
+        "လီလီပန်း", "တက်ဖလွန်", "မီးခိုး", "အပူလျှပ်", "အစာအိမ်လှুদ্ধားမှုရပ်", "လေပွ", "အရိုးကျိုး", "ကျိုး", 
+        "ဟောဟဲ", "အသက်ရှူပြင်း", "ဖြူဖျော့", "ပြာနှမ်း", "ဗိုက်ပွ", "လေထိုး",
+        "မတော်တဆ", "ကားတိုက်", "ပြုတ်ကျ", "ခွေးကိုက်", "အခြားတိရစ္ဆာန်ကိုက်", "ဒဏ်ရာရ", "တိုက်မိ", "ဆောင့်မိ",
+        "မျက်လုံးပြူးထွက်", "မျက်လုံးပြူး", "မျက်လုံးမှသွေးထွက်", "မျက်စိကွယ်", "မျက်လုံးစူး", "မျက်စိပေါက်",
+        "နားရွက်ပြတ်", "နားရွက်ပြဲ", "နားမှသွေးထွက်",
+        "နှာခေါင်းသွေးယို", "နှာခေါင်းသွေးကျ", "နှာခေါင်းမှသွေးထွက်",
+        "မီးလောင်ဒဏ်ရာပြင်းထန်", "ဒဏ်ရာအနက်ကြီး", "အရေပြားပြဲထွက်", "ဓာတုမီးလောင်"
+    ];
+    const yellowMy = [
+        "အော့အန်", "အန်", "ဝမ်းလျှော", "ဝမ်းပျက်", "နာကျင်", "ကိုက်",
+        "မျက်လုံးခြစ်မိ", "မျက်လုံးနာ", "မျက်လုံးရောင်", "မျက်စိနာ", "မျက်စိအချွဲထွက်", "မျက်လုံးမှိတ်ထား", "မျက်လုံးနီ", "မျက်စိမှုံ", "မျက်ရည်အဆက်မပြတ်ထွက်",
+        "နားပြည်ထွက်", "နားကုတ်", "နားယား", "ခေါင်းခါ", "နားရောင်", "နားရွက်သွေးစု", "နားနံ", "နားနီ", "နားပိုးဝင်",
+        "နှာရည်ယို", "နှာစေး", "နှာချေပြီးသွေးပါ", "နှာခေါင်းရောင်", "နှာရည်ဝါ", "နှာရည်စိမ်း",
+        "ရှနာ", "အရေပြားအနာ", "အင်ပြင်", "မီးလောင်ဖု", "ပြည်တည်နာ", "အရေပြားရောင်", "အရေပြားယားယံ", "အရေပြားနီ", "အရေပြားပိုးဝင်"
+    ];
+    const greenMy = [
+        "မျက်ရည်အနည်းငယ်ထွက်", "မျက်စိကပ်", "မျက်ချေးထွက်",
+        "နားဖာချေးအနည်းငယ်", "နားညစ်ပတ်",
+        "နှာခေါင်းခြောက်", "နှာရည်ကြည်ယို", "ရံဖန်ရံခါနှာချေ",
+        "အစင်းရာအနည်းငယ်", "အရေပြားခြောက်", "ဗောက်ထ", "ယားယံရုံတင်"
+    ];
 
     if (redEn.some(w => lowerSymptoms.includes(w)) || 
         redJa.some(w => symptoms.includes(w)) || 
@@ -46,19 +111,37 @@ function classifySymptomsLocally(symptoms, language) {
             return {
                 urgency: "RED",
                 action_directive: "ただちに最寄りの夜間・救急動物病院を受診してください。待たずにすぐ行動してください。",
-                key_instructions: ["ペットを落ち着かせる", "ただちに搬送する"]
+                key_instructions: [
+                    "ペットを落ち着かせ、安静にして二次被害を防ぎます",
+                    "フード、水、経口薬は一切与えないでください",
+                    "ただちに最寄りの夜間救急病院へ搬送する準備をします",
+                    "到着後すぐに対応できるよう、事前に病院へ電話連絡してください",
+                    "誤飲が疑われる製品のパッケージや毒物を持参してください"
+                ]
             };
         } else if (lang === "my") {
             return {
                 urgency: "RED",
                 action_directive: "နီးစပ်ရာ အရေးပေါ် တိရစ္ဆာန်ဆေးကုခန်းသို့ ချက်ချင်း သွားပါ။ မစောင့်ဆိုင်းပါနှင့်။",
-                key_instructions: ["အိမ်မွေးတိရစ္ဆာန်ကို တည်ငြိမ်အောင်ထားပါ", "ချက်ချင်း သယ်ယူပို့ဆောင်ပါ"]
+                key_instructions: [
+                    "အိမ်မွေးတိရစ္ဆာန်ကို ငြိမ်ဝပ်အောင်ထားပြီး ဒဏ်ရာမတိုးစေရန် လှုပ်ရှားမှုကို ကန့်သတ်ပါ",
+                    "အစာ၊ ရေ နှင့် ပါးစပ်မှတိုက်သော ဆေးဝါးများကို လုံးဝမကျွေးပါနှင့်",
+                    "အနီးဆုံး ညဉ့်နက်ပိုင်း အရေးပေါ်ဆေးခန်းသို့ ချက်ချင်းသွားရန် ပြင်ဆင်ပါ",
+                    "သင်ရောက်ရှိမည့်အကြောင်းကို ဆေးခန်းသို့ ကြိုတင်ဖုန်းဆက် အကြောင်းကြားပါ",
+                    "မျိုချမိသည်ဟု သံသယရှိသော အဆိပ်အတောက် သို့မဟုတ် ထုပ်ပိုးမှုများကို ယူဆောင်လာပါ"
+                ]
             };
         } else {
             return {
                 urgency: "RED",
                 action_directive: "Go to the nearest emergency clinic immediately. Do not wait.",
-                key_instructions: ["Keep the pet calm", "Transport immediately"]
+                key_instructions: [
+                    "Keep the pet calm and restrict movement to prevent further injury",
+                    "Do not give any food, water, or oral medications",
+                    "Prepare for immediate transport to the nearest 24/7 emergency clinic",
+                    "Call the clinic ahead of time to alert their staff of your arrival",
+                    "Bring any suspected toxins, packaging, or swallowed items with you"
+                ]
             };
         }
     } else if (isYellow) {
@@ -66,19 +149,37 @@ function classifySymptomsLocally(symptoms, language) {
             return {
                 urgency: "YELLOW",
                 action_directive: "かかりつけの獣医師に連絡するか、今日中に救急対応の動物病院を受診してください。",
-                key_instructions: ["状態を注意深く観察する", "食事を与えない"]
+                key_instructions: [
+                    "症状（嘔吐、元気がない等）が悪化しないか注意深く観察します",
+                    "12時間は食事を控え、新鮮な水を少量ずつ飲めるようにします",
+                    "今日中にかかりつけ医または近隣のクリニックの予約を確保します",
+                    "他のペットから離し、静かで暖かく快適な場所に休ませます",
+                    "獣医師に伝えるために、症状が起きた頻度や時間を記録します"
+                ]
             };
         } else if (lang === "my") {
             return {
                 urgency: "YELLOW",
                 action_directive: "သင့်တိရစ္ဆာန်ဆရာဝန်ထံ ဆက်သွယ်ပါ သို့မဟုတ် ယနေ့အတွင်း အရေးပေါ်ဆေးခန်းသို့ သွားရောက်ပါ။",
-                key_instructions: ["အနီးကပ် စောင့်ကြည့်ပါ", "အစာမကျွေးပါနှင့်"]
+                key_instructions: [
+                    "ရောဂါလက္ခဏာများ (အန်ခြင်း၊ နုံးခြင်း စသည်) ပိုဆိုးလာသလား အနီးကပ် စောင့်ကြည့်ပါ",
+                    "၁၂ နာရီခန့် အစာမကျွေးဘဲ ထားပါ (ရေသန့်အနည်းငယ်စီကိုသာ လျက်စေပါ)",
+                    "ယနေ့အတွင်း ပြသနိုင်ရန် သင့်ပုံမှန် တိရစ္ဆာန်ဆရာဝန် သို့မဟုတ် ဆေးခန်းသို့ ဆက်သွယ်ပါ",
+                    "အိမ်မွေးတိရစ္ဆာန်ကို အခြားတိရစ္ဆာန်များနှင့်ခွဲပြီး တိတ်ဆိတ်နွေးထွေးသောနေရာတွင် ထားပါ",
+                    "ဆရာဝန်ပြသချိန်တွင် ပြောပြနိုင်ရန် ရောဂါဖြစ်ပွားမှုအကြိမ်ရေကို မှတ်သားထားပါ"
+                ]
             };
         } else {
             return {
                 urgency: "YELLOW",
                 action_directive: "Contact your vet or visit an urgent clinic today.",
-                key_instructions: ["Monitor closely", "Do not feed"]
+                key_instructions: [
+                    "Observe closely for progression of symptoms (vomiting, lethargy, etc.)",
+                    "Withhold food for 12 hours, but ensure access to small laps of fresh water",
+                    "Contact your primary care vet or local clinic to secure an appointment today",
+                    "Keep the pet in a quiet, warm, and comfortable space away from other animals",
+                    "Document the frequency of symptoms to share with the vet"
+                ]
             };
         }
     } else {
@@ -86,19 +187,37 @@ function classifySymptomsLocally(symptoms, language) {
             return {
                 urgency: "GREEN",
                 action_directive: "自宅で様子を見てください。緊急の受診は不要です。",
-                key_instructions: ["快適に過ごせるようにする", "変化がないか観察する"]
+                key_instructions: [
+                    "ペットがストレスを感じない快適な環境を整えます",
+                    "新鮮な水を用意し、食欲がある場合は普段のフードを与えます",
+                    "今後24〜48時間は、新たな症状や悪化がないか様子を見ます",
+                    "歯茎の色（健康ならピンク）を確認し、元気や反応があるか見ます",
+                    "軽い症状が2日以上続く場合は、念のため通常受診を行ってください"
+                ]
             };
         } else if (lang === "my") {
             return {
                 urgency: "GREEN",
                 action_directive: "အိမ်တွင် စောင့်ကြည့်ပါ။ အရေးပေါ်သွားရောက်ရန် မလိုအပ်ပါ။",
-                key_instructions: ["သက်တောင့်သက်သာဖြစ်အောင် ထားပါ", "အပြောင်းအလဲများကို စောင့်ကြည့်ပါ"]
+                key_instructions: [
+                    "အိမ်မွေးတိရစ္ဆာန်ကို သက်တောင့်သက်သာဖြစ်စေပြီး စိတ်ဖိစီးမှုကင်းသော ပတ်ဝန်းကျင်တွင် ထားပါ",
+                    "ရေသန့်ပေးထားပါ၊ အစာစားချင်စိတ်ရှိပါက ပုံမှန်အစာကို ကျွေးနိုင်သည်",
+                    "နောက်ထပ် ၂၄-၄၈ နာရီအထိ ရောဂါလက္ခဏာအသစ်များ ရှိမရှိ စောင့်ကြည့်ပါ",
+                    "သွားဖုံးအရောင် (ပန်းရောင်ဖြစ်ရမည်) နှင့် တက်ကြွနိုးကြားမှု ရှိမရှိ စစ်ဆေးပါ",
+                    "အပျော့စားလက္ခဏာများ ၂ ရက်ထက်ကျော်လွန်ပါက ပုံမှန်ဆေးခန်းပြသရန် ရက်ချိန်းယူပါ"
+                ]
             };
         } else {
             return {
                 urgency: "GREEN",
                 action_directive: "Monitor your pet at home. No urgent visit required.",
-                key_instructions: ["Keep comfortable", "Observe for changes"]
+                key_instructions: [
+                    "Keep your pet comfortable and ensure a stress-free environment",
+                    "Provide fresh water and offer their normal diet if they show appetite",
+                    "Monitor closely for the next 24-48 hours for any new or worsening symptoms",
+                    "Check gum color (should be pink) and ensure they are active and alert",
+                    "Schedule a routine vet check-up if mild symptoms persist beyond 2 days"
+                ]
             };
         }
     }
@@ -136,6 +255,49 @@ const clinicsFallback = document.getElementById('clinics-fallback');
 const clinicsFallbackText = document.getElementById('clinics-fallback-text');
 const searchMapsBtn = document.getElementById('search-maps-btn');
 
+// Navigation & My Pets DOM Elements
+const logoHome = document.getElementById('logo-home');
+const navTriageBtn = document.getElementById('nav-triage-btn');
+const navPetsBtn = document.getElementById('nav-pets-btn');
+const myPetsState = document.getElementById('my-pets-state');
+const newPetState = document.getElementById('new-pet-state');
+
+const myPetsTitle = document.getElementById('my-pets-title');
+const addPetBtn = document.getElementById('add-pet-btn');
+const emptyPetsMessage = document.getElementById('empty-pets-message');
+const petsGrid = document.getElementById('pets-grid');
+
+const registerPetTitle = document.getElementById('register-pet-title');
+const regPetForm = document.getElementById('pet-register-form');
+const regPetName = document.getElementById('reg-pet-name');
+const regPetAddress = document.getElementById('reg-pet-address');
+const regPetChip = document.getElementById('reg-pet-chip');
+const regPetVaccine = document.getElementById('reg-pet-vaccine');
+const registerSubmitBtn = document.getElementById('register-submit-btn');
+const registerCancelBtn = document.getElementById('register-cancel-btn');
+
+const labelPetName = document.getElementById('label-pet-name');
+const labelPetAddress = document.getElementById('label-pet-address');
+const labelPetChip = document.getElementById('label-pet-chip');
+const labelPetVaccine = document.getElementById('label-pet-vaccine');
+
+const labelPetType = document.getElementById('label-pet-type');
+const regPetType = document.getElementById('reg-pet-type');
+const optDog = document.getElementById('opt-dog');
+const optCat = document.getElementById('opt-cat');
+const optBird = document.getElementById('opt-bird');
+const optRabbit = document.getElementById('opt-rabbit');
+const optOther = document.getElementById('opt-other');
+
+const labelPetPhoto = document.getElementById('label-pet-photo');
+const regPetPhoto = document.getElementById('reg-pet-photo');
+const photoUploadBtn = document.getElementById('photo-upload-btn');
+const photoPreviewContainer = document.getElementById('photo-preview-container');
+const photoPreview = document.getElementById('photo-preview');
+const photoRemoveBtn = document.getElementById('photo-remove-btn');
+
+let uploadedPhotoBase64 = "";
+
 const MAX_CHARS = 1000;
 
 // Leaflet map globals
@@ -168,8 +330,7 @@ const TRANSLATIONS = {
             dog: "Dog",
             cat: "Cat",
             bird: "Bird",
-            rabbit: "Rabbit",
-            others: "Others"
+            rabbit: "Rabbit"
         },
         urgencySubtitles: {
             RED: "EXTREME URGENCY",
@@ -194,7 +355,37 @@ const TRANSLATIONS = {
             active: "Active (Accepting Emergencies)",
             busy: "Busy (15 min wait)",
             high: "High Volume (35 min wait)"
-        }
+        },
+        firstAidTitle: "{emoji} {pet} First Aid & CPR Guide",
+        firstAidTabs: {
+            cpr: "❤️ CPR",
+            choking: "🫁 Choking",
+            bleeding: "🩸 Bleeding",
+            heatstroke: "🌡️ Heatstroke",
+            poisoning: "⚠️ Poisoning",
+            shock: "⚡ Shock"
+        },
+        navTriage: "Triage",
+        navPets: "My Pets",
+        myPetsTitle: "My Registered Pets",
+        addPetBtn: "+ Add Pet",
+        registerPetTitle: "Register New Pet",
+        petNamePlaceholder: "Pet Name",
+        addressPlaceholder: "Owner's Address",
+        chipNumberPlaceholder: "Chip Number (Microchip)",
+        lastVaccinatedDateLabel: "Last Vaccinated Date",
+        registerBtn: "Register Pet",
+        cancelBtn: "Cancel",
+        noPetsMessage: "No pets registered yet.",
+        petNameLabel: "Name:",
+        petAddressLabel: "Address:",
+        petChipLabel: "Chip Number:",
+        petVaccineLabel: "Last Vaccinated:",
+        deletePetBtn: "Remove",
+        petTypeLabel: "Pet Type",
+        petPhotoLabel: "Pet Photo",
+        choosePhotoBtn: "Choose Photo",
+        optOther: "Other"
     },
     ja: {
         promptHeader: "ペットに何が起きていますか？",
@@ -209,8 +400,7 @@ const TRANSLATIONS = {
             dog: "犬",
             cat: "猫",
             bird: "鳥",
-            rabbit: "うさぎ",
-            others: "その他"
+            rabbit: "うさぎ"
         },
         urgencySubtitles: {
             RED: "極めて高い緊急性",
@@ -235,7 +425,37 @@ const TRANSLATIONS = {
             active: "稼働中（救急対応可）",
             busy: "混雑（待ち時間 15分）",
             high: "非常に混雑（待ち時間 35分）"
-        }
+        },
+        firstAidTitle: "{emoji} {pet} の応急処置・心肺蘇生法ガイド",
+        firstAidTabs: {
+            cpr: "❤️ CPR (心肺蘇生)",
+            choking: "🫁 窒息・気道異物",
+            bleeding: "🩸 出血・止血法",
+            heatstroke: "🌡️ 熱中症・暑さ",
+            poisoning: "⚠️ 誤飲・中毒",
+            shock: "⚡ ショック状態"
+        },
+        navTriage: "判定",
+        navPets: "マイペット",
+        myPetsTitle: "登録済みのペット",
+        addPetBtn: "+ ペットを追加",
+        registerPetTitle: "ペットの新規登録",
+        petNamePlaceholder: "ペットの名前",
+        addressPlaceholder: "飼い主の住所",
+        chipNumberPlaceholder: "マイクロチップ番号",
+        lastVaccinatedDateLabel: "最終ワクチン接種日",
+        registerBtn: "登録する",
+        cancelBtn: "キャンセル",
+        noPetsMessage: "登録されているペットはいません。",
+        petNameLabel: "名前:",
+        petAddressLabel: "住所:",
+        petChipLabel: "チップ番号:",
+        petVaccineLabel: "最終接種日:",
+        deletePetBtn: "削除",
+        petTypeLabel: "ペットの種類",
+        petPhotoLabel: "ペットの写真",
+        choosePhotoBtn: "写真を選択",
+        optOther: "その他"
     },
     my: {
         promptHeader: "သင့်အိမ်မွေးတိရစ္ဆာန် ဘာဖြစ်နေသလဲ။",
@@ -250,8 +470,7 @@ const TRANSLATIONS = {
             dog: "ခွေး",
             cat: "ကြောင်",
             bird: "ငှက်",
-            rabbit: "ယုန်",
-            others: "အခြား"
+            rabbit: "ယုန်"
         },
         urgencySubtitles: {
             RED: "အလွန်အရေးကြီးသော အခြေအနေ",
@@ -276,6 +495,666 @@ const TRANSLATIONS = {
             active: "အဆင်သင့်ရှိသည် (အရေးပေါ်လက်ခံနေသည်)",
             busy: "မအားလပ်ပါ (၁၅ မိနစ် စောင့်ဆိုင်းရမည်)",
             high: "လူနာအလွန်များပြား (၃၅ မိနစ် စောင့်ဆိုင်းရမည်)"
+        },
+        firstAidTitle: "{emoji} {pet} အရေးပေါ်ရှေးဦးသူနာပြုစုနည်းနှင့် CPR လမ်းညွှန်",
+        firstAidTabs: {
+            cpr: "❤️ CPR ပြုလုပ်နည်း",
+            choking: "🫁 လည်ပင်းနင်ခြင်း",
+            bleeding: "🩸 သွေးထွက်ခြင်း",
+            heatstroke: "🌡️ အပူလျှပ်ခြင်း",
+            poisoning: "⚠️ အဆိပ်သင့်ခြင်း",
+            shock: "⚡ ရှော့ခ်ရခြင်း"
+        },
+        navTriage: "စစ်ဆေးရန်",
+        navPets: "ကျွန်ုပ်၏အိမ်မွေးတိရစ္ဆာန်များ",
+        myPetsTitle: "မှတ်ပုံတင်ထားသော အိမ်မွေးတိရစ္ဆာန်များ",
+        addPetBtn: "+ အိမ်မွေးတိရစ္ဆာန်အသစ်ထည့်ရန်",
+        registerPetTitle: "အိမ်မွေးတိရစ္ဆာန်အသစ် မှတ်ပုံတင်ရန်",
+        petNamePlaceholder: "အိမ်မွေးတိရစ္ဆာန်အမည်",
+        addressPlaceholder: "ပိုင်ရှင်၏လိပ်စာ",
+        chipNumberPlaceholder: "မိုက်ခရိုချစ်ပ်နံပါတ်",
+        lastVaccinatedDateLabel: "နောက်ဆုံး ကာကွယ်ဆေးထိုးသည့်ရက်စွဲ",
+        registerBtn: "မှတ်ပုံတင်မည်",
+        cancelBtn: "ပယ်ဖျက်မည်",
+        noPetsMessage: "မှတ်ပုံတင်ထားသော အိမ်မွေးတိရစ္ဆာန် မရှိသေးပါ။",
+        petNameLabel: "အမည်:",
+        petAddressLabel: "လိပ်စာ:",
+        petChipLabel: "ချစ်ပ်နံပါတ်:",
+        petVaccineLabel: "နောက်ဆုံးထိုးနှံမှု:",
+        deletePetBtn: "ပယ်ဖျက်ရန်",
+        petTypeLabel: "အိမ်မွေးတိရစ္ဆာန်အမျိုးအစား",
+        petPhotoLabel: "အိမ်မွေးတိရစ္ဆာန်ဓာတ်ပုံ",
+        choosePhotoBtn: "ဓာတ်ပုံရွေးချယ်ရန်",
+        optOther: "အခြား"
+    }
+};
+
+const FIRST_AID_DATA = {
+    en: {
+        dog: {
+            cpr: `
+                <p><strong>Check for Breathing & Pulse:</strong> Feel for a pulse on the inner thigh (femoral artery) and watch the chest for movement.</p>
+                <p><strong>Positioning:</strong> Lay the dog on their right side on a firm surface.</p>
+                <p><strong>Compressions:</strong> Place your hands over the widest part of the chest (or directly over the heart for small dogs). Compress the chest by 1/3 to 1/2 its width at a rate of 100–120 compressions per minute (to the beat of the song "Stayin' Alive").</p>
+                <p><strong>Rescue Breaths:</strong> Close the dog's muzzle tightly with your hand. Blow into their nose until you see the chest rise.</p>
+                <p><strong>Ratio:</strong> Give 30 compressions followed by 2 rescue breaths. Repeat until the dog revives or you reach the vet.</p>
+            `,
+            choking: `
+                <p><strong>Inspect the Mouth:</strong> Open the jaws and look inside. If an object is clearly visible, carefully remove it with fingers or tweezers.</p>
+                <div class="warning-box"><strong>Do not blind-sweep</strong> as you might push it further down.</div>
+                <p class="first-aid-sub">The Heimlich Maneuver:</p>
+                <ul>
+                    <li><strong>Small Dogs:</strong> Hold them against your abdomen, head up, feet dangling. Place a fist under their ribs and push upward and forward.</li>
+                    <li><strong>Large Dogs:</strong> If standing, wrap your arms around their abdomen just below the ribs and push upward. If lying down, place one hand on their back and use the other to push upward and forward just below the ribcage.</li>
+                </ul>
+            `,
+            bleeding: `
+                <p><strong>Direct Pressure:</strong> Apply a clean cloth, towel, or sterile gauze directly over the wound. Hold firm pressure for at least 3–5 minutes without lifting to check.</p>
+                <p><strong>Elevation:</strong> If the wound is on a limb, gently elevate it above the heart if possible.</p>
+                <p><strong>Pressure Bandage:</strong> Wrap gauze firmly around the cloth to hold it in place.</p>
+                <div class="warning-box"><strong>Never use a tourniquet</strong> unless a limb is completely severed, as it can cause permanent tissue damage.</div>
+            `,
+            heatstroke: `
+                <p><strong>Cool Down Immediately:</strong> Move the dog to an air-conditioned area or shade.</p>
+                <p><strong>Lukewarm Water:</strong> Spray or pour lukewarm/cool water over their body—especially the abdomen, armpits, and paw pads.</p>
+                <div class="warning-box"><strong>What NOT to do:</strong> Never use ice or freezing cold water, as this constricts blood vessels and traps heat inside the core organs. Do not force them to drink; offer small laps of cool water instead.</div>
+            `,
+            poisoning: `
+                <p><strong>Identify the Toxin:</strong> Quickly figure out what they ate and how much. Call a vet immediately.</p>
+                <div class="warning-box"><strong>Do NOT Induce Vomiting</strong> unless explicitly instructed by a professional. If they swallowed something corrosive, vomiting will burn the esophagus a second time.</div>
+                <p class="first-aid-sub">Common Dog Toxins & Impact Levels:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>Toxin</th>
+                            <th>Type</th>
+                            <th>Impact Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Xylitol / Sweeteners</td><td>Food</td><td><span class="impact-badge high">HIGH (Fatal)</span></td></tr>
+                        <tr><td>Grapes & Raisins</td><td>Fruit</td><td><span class="impact-badge high">HIGH (Kidney Failure)</span></td></tr>
+                        <tr><td>Chocolate (Theobromine)</td><td>Food</td><td><span class="impact-badge high">HIGH (Seizures)</span></td></tr>
+                        <tr><td>Sago Palm (Cycas)</td><td>Plant</td><td><span class="impact-badge high">HIGH (Liver Failure)</span></td></tr>
+                        <tr><td>Onions & Garlic</td><td>Food</td><td><span class="impact-badge high">HIGH (Anemia)</span></td></tr>
+                        <tr><td>Macadamia Nuts</td><td>Food</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Ivy / Vine plants</td><td>Plant</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Tulips / Daffodils</td><td>Plant</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Avocado</td><td>Fruit</td><td><span class="impact-badge mild">MILD</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>Symptoms:</strong> Pale/white gums, rapid but weak pulse, cold limbs, and lethargy following trauma.</p>
+                <p><strong>Keep Warm:</strong> Wrap the dog in a warm blanket to preserve body heat.</p>
+                <p><strong>Positioning:</strong> Keep them lying down. Elevate their hindquarters slightly with a towel to direct blood flow toward the brain and heart. Keep their airway straight.</p>
+            `
+        },
+        cat: {
+            cpr: `
+                <p><strong>Check Vital Signs:</strong> Check for breathing and a pulse on the inner thigh.</p>
+                <p><strong>Positioning:</strong> Lay the cat on their right side.</p>
+                <p><strong>Compressions:</strong> Wrap one hand around the cat’s chest just behind the front elbows, squeezing the chest between your thumb and fingers. Compress 1/3 to 1/2 the width of the chest at a rate of 100–120 compressions per minute.</p>
+                <p><strong>Rescue Breaths:</strong> Cover the cat's entire nose and mouth with your mouth. Deliver gentle puffs of air—just enough to see the chest rise.</p>
+                <p><strong>Ratio:</strong> 30 compressions to 2 breaths.</p>
+            `,
+            choking: `
+                <p><strong>Gentle Check:</strong> Cats rarely choke on foreign objects compared to dogs (more often strings), but check the mouth. Be incredibly careful not to get bitten.</p>
+                <p><strong>Kitty Heimlich:</strong> Hold the cat's back against your chest. Place your fist in the soft spot just under their ribs. Give 3–4 sharp, gentle upward thrusts.</p>
+                <div class="warning-box"><strong>If string is hanging out:</strong> Do NOT pull it. If it is wrapped around the intestines, pulling it can slice through their organs. Cut it short and go to the vet.</div>
+            `,
+            bleeding: `
+                <p><strong>Apply Pressure:</strong> Use a sterile gauze pad or clean cloth and apply direct, steady pressure.</p>
+                <p><strong>Minimize Stress:</strong> Cats panic easily when hurt, increasing their blood pressure and bleeding. Wrap the cat securely in a towel (a "purrito") leaving only the injured area exposed to keep them calm.</p>
+            `,
+            heatstroke: `
+                <p><strong>Symptoms:</strong> Heavy panting (cats rarely pant unless severely stressed/overheated), drooling, red gums.</p>
+                <p><strong>Cooling:</strong> Wrap the cat in a damp, lukewarm towel. Wipe their paw pads with cool water. Set up a fan to blow air across them gently. Stop cooling once panting slows.</p>
+            `,
+            poisoning: `
+                <p><strong>Identify the Toxin:</strong> Cat kidneys are highly sensitive. Act quickly and call a vet immediately.</p>
+                <div class="warning-box"><strong>Do NOT Induce Vomiting</strong> at home; a cat's throat anatomy makes vomiting highly dangerous without vet supervision.</div>
+                <p class="first-aid-sub">Common Cat Toxins & Impact Levels:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>Toxin</th>
+                            <th>Type</th>
+                            <th>Impact Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Lilies (Easter, Tiger, etc.)</td><td>Plant</td><td><span class="impact-badge high">HIGH (Fatal)</span></td></tr>
+                        <tr><td>Garlic & Onions</td><td>Food</td><td><span class="impact-badge high">HIGH (Heinz Anemia)</span></td></tr>
+                        <tr><td>Chocolate / Caffeine</td><td>Food</td><td><span class="impact-badge high">HIGH (Heart Spikes)</span></td></tr>
+                        <tr><td>Sago Palm (Cycas)</td><td>Plant</td><td><span class="impact-badge high">HIGH (Liver Failure)</span></td></tr>
+                        <tr><td>Human Painkillers (NSAIDs)</td><td>Meds</td><td><span class="impact-badge high">HIGH (Fatal)</span></td></tr>
+                        <tr><td>Essential Oils / Minoxidil</td><td>Chemical</td><td><span class="impact-badge high">HIGH</span></td></tr>
+                        <tr><td>Grapes & Raisins</td><td>Fruit</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Tulips / Pothos</td><td>Plant</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Citrus Fruits (Lime/Lemon)</td><td>Fruit</td><td><span class="impact-badge mild">MILD</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>Symptoms:</strong> Extremely pale or blue-tinged gums, hypothermia, slow capillary refill time (press gums; they stay white).</p>
+                <p><strong>Home Care:</strong> Keep the cat entirely still and wrapped in a warm, dark blanket. Minimize noise and light to keep their stress levels low while speeding to the clinic.</p>
+            `
+        },
+        bird: {
+            cpr: `
+                <p><strong>High Risk:</strong> Bird CPR is incredibly fragile and has a low success rate, but is worth trying if they stop breathing.</p>
+                <p><strong>Compressions:</strong> Lay the bird on its back. Using one fingertip, very gently press down on the sternum (keel bone). Compress rapidly—about 120–150 times per minute. Do not crush the chest.</p>
+                <p><strong>Rescue Breaths:</strong> Carefully place your mouth over the bird's beak and nares (nostrils). Blow a tiny, gentle puff of air (like a sigh) into the beak.</p>
+                <p><strong>Ratio:</strong> Alternate 5 compressions to 1 breath.</p>
+            `,
+            choking: `
+                <p><strong>Symptoms:</strong> Gaping mouth, head shaking, wheezing, or gasping.</p>
+                <p><strong>Clear the Beak:</strong> Hold the bird firmly but gently (do not restrict chest movement). Open the beak and see if a seed or toy part is stuck. Use a flat toothpick or blunt tweezers to carefully dislodge it if visible.</p>
+                <p><strong>Gravity:</strong> Turn the bird upside down for a brief second to let gravity assist in dropping the item out of the airway.</p>
+            `,
+            bleeding: `
+                <div class="warning-box"><strong>Birds have very little blood:</strong> A few drops of blood loss can be fatal. Broken blood feathers act like an open straw.</div>
+                <p><strong>Remedy:</strong> Apply styptic powder, cornstarch, or flour to the bleeding site and apply firm pressure for 2 minutes. If it's a blood feather, it may ultimately need to be plucked from the base with needle-nose pliers by a vet or experienced owner.</p>
+            `,
+            heatstroke: `
+                <p><strong>Symptoms:</strong> Panting (open-mouth breathing), wings held away from the body, anxiety.</p>
+                <p><strong>Cooling:</strong> Mist the bird gently with a fine spray of cool water. Do not soak them. Move them to a cool, dark room. Ensure they are out of direct sunlight immediately.</p>
+            `,
+            poisoning: `
+                <div class="warning-box"><strong>Inhaled Toxins (Deadly):</strong> Teflon/PTFE fumes (from overheated pans), aerosol sprays, smoke, perfume. Immediately move the bird into fresh outdoor air.</div>
+                <p class="first-aid-sub">Common Bird Toxins & Impact Levels:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>Toxin</th>
+                            <th>Type</th>
+                            <th>Impact Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Teflon / PTFE fumes</td><td>Inhaled</td><td><span class="impact-badge high">HIGH (Instant Death)</span></td></tr>
+                        <tr><td>Avocado (Persin)</td><td>Fruit</td><td><span class="impact-badge high">HIGH (Fatal)</span></td></tr>
+                        <tr><td>Chocolate / Caffeine</td><td>Food</td><td><span class="impact-badge high">HIGH (Cardiac Arrest)</span></td></tr>
+                        <tr><td>Heavy Metals (Lead/Zinc)</td><td>Metal</td><td><span class="impact-badge high">HIGH</span></td></tr>
+                        <tr><td>Lily of the Valley</td><td>Plant</td><td><span class="impact-badge high">HIGH</span></td></tr>
+                        <tr><td>Apple / Cherry Seeds</td><td>Fruit</td><td><span class="impact-badge moderate">MODERATE (Cyanide)</span></td></tr>
+                        <tr><td>Onion & Garlic</td><td>Food</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Philodendron / Ivy</td><td>Plant</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Salt / Salty snacks</td><td>Food</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>Symptoms:</strong> Sitting fluffed up at the bottom of the cage, eyes closed, weak gripping.</p>
+                <p><strong>The "Sick Box":</strong> Place the bird in a small, padded box or travel carrier. Keep it dark, quiet, and warm (around 85°F / 29°C) using a heating pad set to low underneath half of the box.</p>
+            `
+        },
+        rabbit: {
+            cpr: `
+                <div class="warning-box"><strong>Fragile Anatomy:</strong> Rabbits have incredibly delicate skeletons; use extreme caution.</div>
+                <p><strong>Positioning:</strong> Lay the rabbit on their side.</p>
+                <p><strong>Compressions:</strong> Use two or three fingers on the side of the chest wall directly behind the front legs. Compress gently at a fast rate of 100–120 compressions per minute.</p>
+                <p><strong>Rescue Breaths:</strong> Close the mouth and blow gently into the nostrils every 5–6 compressions.</p>
+            `,
+            choking: `
+                <p><strong>Symptoms:</strong> Head extended upward, blue tongue/gums, thrashing.</p>
+                <p><strong>The "Rabbit Maneuver":</strong> Support the rabbit's head and body firmly against you. Lift them up and bring them down in a smooth, swift, downward arc (centrifugal motion) to help dislodge the item from the throat.</p>
+                <p><strong>Inspect:</strong> Open the mouth gently to see if the blockage has moved to where you can safely sweep it out.</p>
+            `,
+            bleeding: `
+                <p><strong>Pressure:</strong> Use clean gauze and apply direct pressure. Rabbits panic easily, so hold them securely to prevent them from kicking and fracturing their spine.</p>
+                <p><strong>Nail Bleeding:</strong> If a nail is cut too short, use cornstarch or styptic powder to pack the tip.</p>
+            `,
+            heatstroke: `
+                <div class="warning-box"><strong>Rabbits easily overheat above 80°F (26°C).</strong></div>
+                <p><strong>Remedy:</strong> Do not submerge a rabbit in water—this can trigger fatal shock. Instead, mist their ears with cool water (rabbits regulate temperature through their ears) or wrap them gently in a cool, damp towel. Place a frozen water bottle wrapped in a cloth next to them.</p>
+            `,
+            poisoning: `
+                <div class="warning-box"><strong>No Vomiting:</strong> Rabbits physically cannot vomit. Do not attempt to make them throw up. Give fresh water to flush systems.</div>
+                <p class="first-aid-sub">Common Rabbit Toxins & Impact Levels:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>Toxin</th>
+                            <th>Type</th>
+                            <th>Impact Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Lilies / Foxglove</td><td>Plant</td><td><span class="impact-badge high">HIGH (Heart/GI Failure)</span></td></tr>
+                        <tr><td>Rhubarb Leaves</td><td>Plant</td><td><span class="impact-badge high">HIGH (Kidney Damage)</span></td></tr>
+                        <tr><td>Avocado (Persin)</td><td>Fruit</td><td><span class="impact-badge high">HIGH (Heart Failure)</span></td></tr>
+                        <tr><td>Chocolate</td><td>Food</td><td><span class="impact-badge high">HIGH (Fatal)</span></td></tr>
+                        <tr><td>Onions & Garlic</td><td>Food</td><td><span class="impact-badge high">HIGH (Anemia)</span></td></tr>
+                        <tr><td>Ivy / Rhododendron</td><td>Plant</td><td><span class="impact-badge moderate">MODERATE</span></td></tr>
+                        <tr><td>Apple Seeds</td><td>Fruit</td><td><span class="impact-badge moderate">MODERATE (Cyanide)</span></td></tr>
+                        <tr><td>Bread / Grains / Seeds</td><td>Food</td><td><span class="impact-badge moderate">MODERATE (GI Stasis)</span></td></tr>
+                        <tr><td>Citrus Peel</td><td>Fruit</td><td><span class="impact-badge mild">MILD</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>Symptoms:</strong> Cold ears, limp body, pale gums, hypothermia. Shock in rabbits quickly leads to fatal GI Stasis.</p>
+                <p><strong>Warmth & Quiet:</strong> Warmth is vital. Wrap them in a warm towel or place a wrapped heating pad underneath them. Keep them in total darkness and silence during transport to eliminate stress.</p>
+            `
+        }
+    },
+    ja: {
+        dog: {
+            cpr: `
+                <p><strong>呼吸と脈拍の確認:</strong> 後ろ足の付け根の内側（大腿動脈）で脈拍を確認し、胸が動いているか観察します。</p>
+                <p><strong>姿勢:</strong> 犬を右側を下にして、固い台の上に寝かせます。</p>
+                <p><strong>圧迫:</strong> 胸の最も太い部分（小型犬の場合は心臓の真上）に手を置きます。胸の厚さの1/3から1/2が沈む強さで、1分間に100〜120回のペース（「ステイン・アライヴ」のテンポ）で圧迫します。</p>
+                <p><strong>人工呼吸:</strong> 犬の口を手でしっかりと閉じます。胸が膨らむのを確認するまで鼻に息を吹き込みます。</p>
+                <p><strong>回数比:</strong> 30回の胸部圧迫の後に2回人工呼吸を行います。犬が息を吹き返すか、獣医師に引き渡すまでこれを繰り返します。</p>
+            `,
+            choking: `
+                <p><strong>口内の確認:</strong> 顎を開けて中を確認します。異物がはっきりと見える場合は、指やピンセットで注意深く取り除きます。</p>
+                <div class="warning-box"><strong>見えない状態で手探りでかき出さないでください。</strong> 異物をさらに奥に押し込んでしまう可能性があります。</div>
+                <p class="first-aid-sub">ハイムリック法:</p>
+                <ul>
+                    <li><strong>小型犬:</strong> 犬の背中をお腹に当てて、頭を上、両足をだらんとさせた状態で抱えます。肋骨の下に拳を当て、上かつ前に向かって押し上げます。</li>
+                    <li><strong>大型犬:</strong> 立っている場合は、肋骨のすぐ下の腹部に腕を回し、上に向かって押し上げます。横たわっている場合は、片手をご自身の背中に添え、もう片方の手で肋骨のすぐ下を上かつ前に向かって押し上げます。</li>
+                </ul>
+            `,
+            bleeding: `
+                <p><strong>直接圧迫:</strong> 清潔な布やタオル、または滅菌ガーゼを傷口に直接当てます。傷口の様子を確認するために途中で布を持ち上げたりせず、少なくとも3〜5分間はしっかりと圧迫し続けます。</p>
+                <p><strong>挙上:</strong> 傷口が手足にある場合は、可能であれば心臓より高い位置にそっと持ち上げます。</p>
+                <p><strong>圧迫包帯:</strong> ガーゼの上に布をしっかりと巻き、固定します。</p>
+                <div class="warning-box"><strong>止血帯は決して使用しないでください</strong>（手足が完全に切断されている場合を除く）。組織に永久的な損傷を与える可能性があります。</div>
+            `,
+            heatstroke: `
+                <p><strong>すぐに冷やす:</strong> エアコンの効いた部屋や日陰に犬を移動させます。</p>
+                <p><strong>ぬるま湯:</strong> 犬の体（特にお腹、脇の下、肉球）にぬるま湯または常温の水をスプレーするか、優しくかけます。</p>
+                <div class="warning-box"><strong>やってはいけないこと:</strong> 氷や冷水は決して使用しないでください。血管が収縮し、体内の熱が中心臓器に閉じ込められてしまいます。水を無理に飲ませず、代わりに少量の冷水を舐めさせてください。</div>
+            `,
+            poisoning: `
+                <p><strong>毒物の特定:</strong> 何を（例: チョコレート、ブドウ、キシリトール、殺鼠剤など）、どのくらいの量食べたのかをすぐに確認します。</p>
+                <div class="warning-box"><strong>無理に吐かせないでください</strong>（専門医の指示がある場合を除く）。腐食性のものを飲み込んだ場合、吐かせることで食道が再び損傷します。</div>
+                <p class="first-aid-sub">主な犬の毒物と影響度:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>毒物名</th>
+                            <th>種類</th>
+                            <th>影響度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>キシリトール（甘味料）</td><td>食品</td><td><span class="impact-badge high">高（致命的・肝不全）</span></td></tr>
+                        <tr><td>ブドウ・レーズン</td><td>果物</td><td><span class="impact-badge high">高（急性腎不全）</span></td></tr>
+                        <tr><td>チョコレート（テオブロミン）</td><td>食品</td><td><span class="impact-badge high">高（心臓・神経毒性）</span></td></tr>
+                        <tr><td>ソテツ（サゴヤシ）</td><td>植物</td><td><span class="impact-badge high">高（肝不全）</span></td></tr>
+                        <tr><td>タマネギ・ニンニク</td><td>食品</td><td><span class="impact-badge high">高（貧血・溶血）</span></td></tr>
+                        <tr><td>マカダミアナッツ</td><td>食品</td><td><span class="impact-badge moderate">中（脱力・関節痛）</span></td></tr>
+                        <tr><td>アイビー・ツタ類</td><td>植物</td><td><span class="impact-badge moderate">中（胃腸炎）</span></td></tr>
+                        <tr><td>チューリップ・スイセン</td><td>植物</td><td><span class="impact-badge moderate">中（心毒性・嘔吐）</span></td></tr>
+                        <tr><td>アボカド</td><td>果物</td><td><span class="impact-badge mild">低（胃腸の不調）</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>症状:</strong> 歯茎が白くなる、脈が速くて弱い、手足が冷たい、外傷後の無気力。</p>
+                <p><strong>温める:</strong> 体温を維持するために、犬を温かい毛布で包みます。</p>
+                <p><strong>姿勢:</strong> 横たわらせた状態を維持します。後ろ足をタオルなどで少し高くし、脳と心臓への血流を促します。気道がまっすぐになるように保ちます。</p>
+            `
+        },
+        cat: {
+            cpr: `
+                <p><strong>バイタルサインの確認:</strong> 呼吸と脈拍（後ろ足の付け根の内側）を確認します。</p>
+                <p><strong>姿勢:</strong> 猫を右側を下にして寝かせます。</p>
+                <p><strong>圧迫:</strong> 片手で猫の胸を前肢の肘のすぐ後ろで包み込み、親指と他の指で胸を挟んで絞るように圧迫します。胸の厚さの1/3から1/2を、1分間に100〜120回のペースで圧迫します。</p>
+                <p><strong>人工呼吸:</strong> 猫の鼻と口全体をご自身の口で覆い、胸が膨らむのが見える程度の強さで優しく息を吹き込みます。</p>
+                <p><strong>回数比:</strong> 30回の胸部圧迫の後に2回人工呼吸を行います。</p>
+            `,
+            choking: `
+                <p><strong>優しく確認:</strong> 猫は犬に比べて異物（紐が多い）で窒息することは稀ですが、口内を確認します。噛まれないよう十分に注意してください。</p>
+                <p><strong>キャット・ハイムリック:</strong> 猫の背中をご自身の胸に当てて抱きます。拳を肋骨のすぐ下の柔らかい部分に当てます。優しく、かつ鋭く上に向かって3〜4回押し上げます。</p>
+                <div class="warning-box"><strong>紐が口から出ている場合:</strong> 決して引っ張らないでください。腸に巻き付いている場合、引っ張ることで内臓を切り裂く恐れがあります。短く切って、すぐに獣医師のもとへ連れて行ってください。</div>
+            `,
+            bleeding: `
+                <p><strong>圧迫:</strong> 滅菌ガーゼパッドや清潔な布を使用し、直接しっかりと圧迫し続けます。</p>
+                <p><strong>ストレスの軽減:</strong> 猫は怪我をするとパニックになりやすく、血圧が上がって出血が増加します。タオルで猫をしっかりと包み（「プリット」状態）、怪我をした部分だけを露出させて落ち着かせます。</p>
+            `,
+            heatstroke: `
+                <p><strong>症状:</strong> 激しいハアハアという呼吸（猫は極度のストレスや過熱状態でない限り滅多にハアハアしません）、よだれ、赤い歯茎。</p>
+                <p><strong>冷却:</strong> 水で湿らせたぬるいタオルで猫を包みます。肉球を冷水で拭きます。扇風機の風を優しく当てます。呼吸が落ち着いたら冷却を止めます。</p>
+            `,
+            poisoning: `
+                <p><strong>毒物の特定:</strong> 猫の腎臓は極めて敏感です。迅速に行動し、ただちに獣医師に連絡してください。</p>
+                <div class="warning-box"><strong>自宅で無理に吐かせないでください。</strong> 猫の喉の解剖学的構造上、非常に危険です。</div>
+                <p class="first-aid-sub">主な猫の毒物と影響度:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>毒物名</th>
+                            <th>種類</th>
+                            <th>影響度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>ユリ（テッポウユリ、オニユリ等）</td><td>植物</td><td><span class="impact-badge high">高（致命的・腎不全）</span></td></tr>
+                        <tr><td>ニンニク・タマネギ</td><td>食品</td><td><span class="impact-badge high">高（重度の貧血）</span></td></tr>
+                        <tr><td>チョコレート・カフェイン</td><td>食品</td><td><span class="impact-badge high">高（不整脈・興奮）</span></td></tr>
+                        <tr><td>ソテツ（サゴヤシ）</td><td>植物</td><td><span class="impact-badge high">高（致命的・肝不全）</span></td></tr>
+                        <tr><td>人間用の痛み止め（NSAIDs）</td><td>医薬品</td><td><span class="impact-badge high">高（胃潰瘍・腎不全）</span></td></tr>
+                        <tr><td>精油（アロマ）・ミノキシジル</td><td>化学物質</td><td><span class="impact-badge high">高（臓器不全）</span></td></tr>
+                        <tr><td>ブドウ・レーズン</td><td>果物</td><td><span class="impact-badge moderate">中（腎不全リスク）</span></td></tr>
+                        <tr><td>チューリップ・ポトス</td><td>植物</td><td><span class="impact-badge moderate">中（よだれ・嘔吐）</span></td></tr>
+                        <tr><td>柑橘類（レモン・ライムの皮）</td><td>果物</td><td><span class="impact-badge mild">低（皮膚炎・嘔吐）</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>症状:</strong> 極めて白い、または青みがかった歯茎、低体温、毛細血管再充満時間の遅延（歯茎を押しても白いまま）。</p>
+                <p><strong>自宅ケア:</strong> 猫を完全に安静にさせ、温かく暗い毛布に包みます。クリニックへ急行する間、ストレスレベルを低く保つために騒音や光を最小限に抑えてください。</p>
+            `
+        },
+        bird: {
+            cpr: `
+                <p><strong>高リスク:</strong> 鳥のCPRは極めて繊細で成功率が低いですが、呼吸が停止した場合は試みる価値があります。</p>
+                <p><strong>圧迫:</strong> 鳥を仰向けに寝かせます。指先を1本使い、竜骨（胸骨）を非常に優しく押し下げます。1分間に約120〜150回の速いペースで圧迫します。胸を押し潰さないよう注意してください。</p>
+                <p><strong>人工呼吸:</strong> 鳥のくちばしと鼻孔をご自身の口で慎重に覆います。ため息をつくような強さで、小さく優しい息をくちばしに吹き込みます。</p>
+                <p><strong>回数比:</strong> 5回の圧迫と1回の人工呼吸を交互に行います。</p>
+            `,
+            choking: `
+                <p><strong>症状:</strong> 口を開けたままにする、頭を振る、喘鳴、またはあえぎ呼吸。</p>
+                <p><strong>くくちばしの確認:</strong> 鳥をしっかりと、しかし優しく保定します（胸の動きを制限しないこと）。くちばしを開け、種子やオモチャの破片が詰まっていないか確認します。見える場合は、平らな爪楊枝や先の丸いピンセットで慎重に取り除きます。</p>
+                <p><strong>重力:</strong> 鳥を一時的に逆さまにして、重力を利用して気道から異物を落とします。</p>
+            `,
+            bleeding: `
+                <div class="warning-box"><strong>鳥は血液量が極めて少ないです:</strong> 数滴の失血でも致命的になります。新しい成長中の羽（血羽）が折れると、開いたストローのようになります。</div>
+                <p><strong>対処法:</strong> 出血部位に止血パウダー、コーンスターチ、または小麦粉を塗布し、2分間しっかりと圧迫します。血羽の場合は、最終的に獣医師や経験豊富な飼い主がラジオペンチで根元から抜く必要があります。</p>
+            `,
+            heatstroke: `
+                <p><strong>症状:</strong> 開口呼吸（口を開けての呼吸）、羽を体から離して浮かせる、不安行動。</p>
+                <p><strong>冷却:</strong> 冷水の霧吹きで鳥に軽くスプレーします。びしょ濡れにしないでください。涼しく暗い部屋に移動させ、直射日光から避難させます。</p>
+            `,
+            poisoning: `
+                <div class="warning-box"><strong>吸入毒（致命的）:</strong> テフロン/PTFEの煙（加熱されたフライパン）、エアゾール、煙、香水。ただちに鳥を新鮮な空気へ移動させます。</div>
+                <p class="first-aid-sub">主な鳥の毒物と影響度:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>毒物名</th>
+                            <th>種類</th>
+                            <th>影響度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>テフロン（PTFE）ガス</td><td>吸入ガス</td><td><span class="impact-badge high">高（即死・呼吸不全）</span></td></tr>
+                        <tr><td>アボカド（ペルシン）</td><td>果物</td><td><span class="impact-badge high">高（致命的・呼吸困難）</span></td></tr>
+                        <tr><td>チョコレート・カフェイン</td><td>食品</td><td><span class="impact-badge high">高（心停止）</span></td></tr>
+                        <tr><td>重金属（鉛・亜鉛おもちゃ）</td><td>金属</td><td><span class="impact-badge high">高（鉛中毒）</span></td></tr>
+                        <tr><td>スズラン（すずらん）</td><td>植物</td><td><span class="impact-badge high">高（心不全）</span></td></tr>
+                        <tr><td>リンゴやサクランボの種</td><td>果物</td><td><span class="impact-badge moderate">中（シアン化物毒性）</span></td></tr>
+                        <tr><td>タマネギ・ニンニク</td><td>食品</td><td><span class="impact-badge moderate">中（血液細胞破壊）</span></td></tr>
+                        <tr><td>フィロデンドロン・アイビー</td><td>植物</td><td><span class="impact-badge moderate">中（口腔内刺激）</span></td></tr>
+                        <tr><td>塩分・塩辛いスナック</td><td>食品</td><td><span class="impact-badge moderate">中（脱水・心臓負荷）</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>症状:</strong> ケージの底で羽を膨らませてうずくまる、目を閉じる、止まり木を握る力が弱い。</p>
+                <p><strong>「保温箱」:</strong> 鳥を小さくクッションを敷いた箱やキャリーに入れます。暗く静かに保ち、箱の片側の底に低設定のホットカーペットを敷いて保温（約85°F / 29°C）します。</p>
+            `
+        },
+        rabbit: {
+            cpr: `
+                <div class="warning-box"><strong>脆弱な解剖学的構造:</strong> うさぎは極めて繊細な骨格を持っています。細心の注意を払ってください。</div>
+                <p><strong>姿勢:</strong> うさぎを横向きに寝かせます。</p>
+                <p><strong>圧迫:</strong> 前肢のすぐ後ろにある胸壁の側面に2〜3本の指を置きます。1分間に100〜120回の速いペースで優しく圧迫します。</p>
+                <p><strong>人工呼吸:</strong> 口を閉じ、5〜6回の圧迫ごとに鼻孔に優しく息を吹き込みます。</p>
+            `,
+            choking: `
+                <p><strong>症状:</strong> 頭を上に伸ばす、青い舌・歯茎、もがく。</p>
+                <p><strong>うさぎのハイムリック法:</strong> うさぎの頭と体をしっかりと腕の中に抱え込みます。持ち上げてから、滑らかかつ素早い下方向の円弧を描く動作（遠心力を利用）を行い、喉から異物を排出させます。</p>
+                <p><strong>確認:</strong> 口を優しく開け、異物が安全にかき出せる位置まで移動したか確認します。</p>
+            `,
+            bleeding: `
+                <p><strong>圧迫:</strong> 清潔なガーゼを使用し、直接圧迫します。うさぎはパニックになりやすいため、暴れて背骨を骨折しないようしっかりと保定してください。</p>
+                <p><strong>深爪時の出血:</strong> 爪を短く切りすぎた場合は、コーンスターチまたは止血粉を爪先に塗布して圧迫します。</p>
+            `,
+            heatstroke: `
+                <div class="warning-box"><strong>うさぎは80°F（26°C）以上で容易に熱中症になります。</strong></div>
+                <p><strong>対処法:</strong> うさぎを水に沈めないでください。致命的なショックを引き起こす可能性があります。代わりに、耳に冷水をスプレーするか（うさぎは耳で体温調節をします）、冷たく湿らせたタオルで優しく包みます。布で包んだ凍ったペットボトルを横に置きます。</p>
+            `,
+            poisoning: `
+                <div class="warning-box"><strong>嘔吐しません:</strong> うさぎは吐くことができません。無理に吐かせようとしないでください。新鮮な水を与えます。</div>
+                <p class="first-aid-sub">主なうさぎの毒物と影響度:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>毒物名</th>
+                            <th>種類</th>
+                            <th>影響度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>ユリ・ジギタリス</td><td>植物</td><td><span class="impact-badge high">高（心不全・胃腸停止）</span></td></tr>
+                        <tr><td>ルバーブの葉</td><td>植物</td><td><span class="impact-badge high">高（腎臓障害）</span></td></tr>
+                        <tr><td>アボカド（ペルシン）</td><td>果物</td><td><span class="impact-badge high">高（心不全）</span></td></tr>
+                        <tr><td>チョコレート</td><td>食品</td><td><span class="impact-badge high">高（致命的）</span></td></tr>
+                        <tr><td>タマネギ・ニンニク</td><td>食品</td><td><span class="impact-badge high">高（貧血・胃腸破壊）</span></td></tr>
+                        <tr><td>ツタ（アイビー）・シャクナゲ</td><td>植物</td><td><span class="impact-badge moderate">中（胃腸うっ滞）</span></td></tr>
+                        <tr><td>リンゴの種</td><td>果物</td><td><span class="impact-badge moderate">中（シアン化物毒性）</span></td></tr>
+                        <tr><td>パン・穀物・種子類</td><td>食品</td><td><span class="impact-badge moderate">中（胃腸うっ滞誘発）</span></td></tr>
+                        <tr><td>柑橘類の皮</td><td>果物</td><td><span class="impact-badge mild">低（胃腸の不調）</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>症状:</strong> 耳が冷たい、体がぐったりする、白い歯茎、低体温。うさぎのショックは急速に致命的な胃腸うっ滞（GIスタシス）を引き起こします。</p>
+                <p><strong>保温と静寂:</strong> 保温が極めて重要です。温かいタオルで包むか、ラップをかけた湯たんぽの上に寝かせます。ストレスを排除するため、移動中は完全に暗く静かな状態を保ってください。</p>
+            `
+        }
+    },
+    my: {
+        dog: {
+            cpr: `
+                <p><strong>အသက်ရှူခြင်းနှင့် သွေးခုန်နှုန်း စစ်ဆေးခြင်း:</strong> ပေါင်ခြံအတွင်းပိုင်း (ပေါင်သွေးလွှတ်ကြော) တွင် သွေးခုန်နှုန်းကို စမ်းသပ်ပြီး ရင်ဘတ်လှုပ်ရှားမှုကို စောင့်ကြည့်ပါ။</p>
+                <p><strong>အနေအထား:</strong> ခွေးကို ညာဘက်ခြမ်းသို့ လှဲထားပါ။</p>
+                <p><strong>ရင်ဘတ်ဖိခြင်း:</strong> လက်နှစ်ဖက်ကို ရင်ဘတ်၏ အကျယ်ဆုံးနေရာ (သို့မဟုတ် ခွေးငယ်များအတွက် နှလုံးတည့်တည့်) ပေါ်တွင် တင်ပါ။ ရင်ဘတ်၏ ၁/၃ မှ ၁/၂ အထိ တစ်မိနစ်လျှင် ၁၀၀-၁၂၀ ကြိမ်နှုန်းဖြင့် ဖိပေးပါ ("Stayin' Alive" သီချင်း၏ စည်းချက်အတိုင်း)။</p>
+                <p><strong>အသက်ရှူကူညီခြင်း:</strong> ခွေး၏ နှုတ်သီးကို သင့်လက်ဖြင့် တင်းကြပ်စွာ ပိတ်ထားပါ။ ၎င်း၏ နှာခေါင်းထဲသို့ ရင်ဘတ်ပင့်တက်လာသည်အထိ မှုတ်သွင်းပေးပါ။</p>
+                <p><strong>အချိုးအစား:</strong> ဖိခြင်း ၃၀ ကြိမ်လျှင် အသက်ရှူကူညီခြင်း ၂ ကြိမ်။ ခွေးပြန်လည်သတိရလာသည်အထိ သို့မဟုတ် ဆေးခန်းသို့ ရောက်သည်အထိ ပြုလုပ်ပေးပါ။</p>
+            `,
+            choking: `
+                <p><strong>ပါးစပ်ကို စစ်ဆေးပါ:</strong> မေးရိုးများကို ဖွင့်၍ အတွင်းပိုင်းကို ကြည့်ပါ။ တစ်ခုခု နင်နေသည်ကို ထင်ရှားစွာ မြင်ရပါက လက်ချောင်း သို့မဟုတ် ဇာဂနာဖြင့် ဂရုတစိုက် ဖယ်ရှားပါ။</p>
+                <div class="warning-box"><strong>မမြင်ရဘဲ နှိုက်မထုတ်ပါနှင့်။</strong> အရာဝတ္ထုကို ပိုမိုနက်ရှိုင်းစွာ တွန်းပို့မိသွားနိုင်ပါသည်။</div>
+                <p class="first-aid-sub">Heimlich နည်းလမ်း (လည်ပင်းနင်သက်သာစေသောနည်း):</p>
+                <ul>
+                    <li><strong>ခွေးငယ်များ:</strong> သင့်ဝမ်းဗိုက်တွင် ကပ်လျက်抱ထားပြီး ခေါင်းကို အပေါ်တင်ကာ ခြေထောက်များကို တွဲလောင်းချထားပါ။ ၎င်းတို့၏ နံရိုးအောက်တွင် လက်သီးဖြင့် အပေါ်နှင့် အရှေ့သို့ ပင့်တွန်းပါ။</li>
+                    <li><strong>ခွေးကြီးများ:</strong> မတ်တပ်ရပ်နေပါက ၎င်းတို့၏ ဝမ်းဗိုက်ကို နံရိုးအောက်နားမှ ပွေ့ဖက်၍ အပေါ်သို့ ပင့်တွန်းပါ။ လှဲနေပါက လက်တစ်ဖက်ကို ၎င်းတို့၏ ကျောပေါ်တင်ပြီး အခြားလက်တစ်ဖက်�        // Localize My Pets elements
+        if (navTriageBtn) navTriageBtn.textContent = strings.navTriage;
+        if (navPetsBtn) navPetsBtn.textContent = strings.navPets;
+        if (myPetsTitle) myPetsTitle.textContent = strings.myPetsTitle;
+        if (addPetBtn) addPetBtn.textContent = strings.addPetBtn;
+        if (registerPetTitle) registerPetTitle.textContent = strings.registerPetTitle;
+        if (regPetName) regPetName.placeholder = strings.petNamePlaceholder;
+        if (regPetAddress) regPetAddress.placeholder = strings.addressPlaceholder;
+        if (regPetChip) regPetChip.placeholder = strings.chipNumberPlaceholder;
+        if (labelPetName) labelPetName.textContent = strings.petNamePlaceholder;
+        if (labelPetAddress) labelPetAddress.textContent = strings.addressPlaceholder;
+        if (labelPetChip) labelPetChip.textContent = strings.chipNumberPlaceholder;
+        if (labelPetVaccine) labelPetVaccine.textContent = strings.lastVaccinatedDateLabel;
+        if (registerSubmitBtn) registerSubmitBtn.textContent = strings.registerBtn;
+        if (registerCancelBtn) registerCancelBtn.textContent = strings.cancelBtn;
+        if (emptyPetsMessage) emptyPetsMessage.textContent = strings.noPetsMessage;
+
+        if (labelPetType) labelPetType.textContent = strings.petTypeLabel;
+        if (labelPetPhoto) labelPetPhoto.textContent = strings.petPhotoLabel;
+        if (photoUploadBtn) photoUploadBtn.textContent = strings.choosePhotoBtn;
+        if (optDog) optDog.textContent = strings.pets.dog;
+        if (optCat) optCat.textContent = strings.pets.cat;
+        if (optBird) optBird.textContent = strings.pets.bird;
+        if (optRabbit) optRabbit.textContent = strings.pets.rabbit;
+        if (optOther) optOther.textContent = strings.optOther;"warning-box"><strong>သွေးတားကြိုး (Tourniquet) ကို လုံးဝမသုံးပါနှင့်</strong> (ခြေလက်များ လုံးဝပြတ်တောက်သွားသည့် အခြေအနေမှအပ)။ ၎င်းသည် တစ်ရှူးများကို အမြဲတမ်း ပျက်စီးစေနိုင်ပါသည်။</div>
+            `,
+            heatstroke: `
+                <p><strong>ချက်ချင်း အအေးပေးပါ:</strong> ခွေးကို လေအေးပေးစက်ရှိသော အခန်း သို့မဟုတ် အရိပ်ထဲသို့ ရွှေ့ပါ။</p>
+                <p><strong>ရေခပ်နွေးနွေး သုံးပါ:</strong> ခွေး၏ ကိုယ်ခန္ဓာ (အထူးသဖြင့် ဝမ်းဗိုက်၊ ဂျိုင်းကြားနှင့် ခြေဖဝါးများ) ပေါ်သို့ ရေခပ်နွေးနွေး သို့မဟုတ် သာမန်ရေကို ဖျန်းပေးပါ သို့မဟုတ် လောင်းပေးပါ။</p>
+                <div class="warning-box"><strong>မလုပ်ရမည့်အရာ:</strong> ရေခဲ သို့မဟုတ် ရေခဲရေကို လုံးဝမသုံးပါနှင့်။ ၎င်းသည် သွေးကြောများကို ကျုံ့သွားစေပြီး ကိုယ်တွင်းအင်္ဂါများတွင် အပူများကို ပိတ်မိစေပါသည်။ ရေကို အတင်းမတိုက်ပါနှင့်၊ ရေအေးအနည်းငယ်ကိုသာ လျက်စေပါ။</div>
+            `,
+            poisoning: `
+                <p><strong>အဆိပ်သင့်ပစ္စည်းကို ရှာဖွေပါ:</strong> ခွေးဘာစားမိသလဲ၊ မည်မျှ စားမိသလဲကို မြန်မြန်ဆန်းဆန်း ရှာဖွေပါ။ တိရစ္ဆာန်ဆေးကုဆရာဝန်ထံ ချက်ချင်း ဖုန်းဆက်ပါ။</p>
+                <div class="warning-box"><strong>အန်အောင် အတင်းမလုပ်ပါနှင့်</strong> (ကျွမ်းကျင်သူက ညွှန်ကြားမှသာ ပြုလုပ်ပါ)။ တိုက်စားတတ်သော အရာများ မျိုချမိပါက အစာပြွန်ကို ထပ်မံလောင်ကျွမ်းစေနိုင်ပါသည်။</div>
+                <p class="first-aid-sub">အဖြစ်များသော ခွေးအဆိပ်သင့်ပစ္စည်းများနှင့် သက်ရောက်မှုအဆင့်များ:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>အဆိပ်သင့်ပစ္စည်း</th>
+                            <th>အမျိုးအစား</th>
+                            <th>သက်ရောက်မှုအဆင့်</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Xylitol (အချိုဓာတ်)</td><td>အစာ</td><td><span class="impact-badge high">မြင့်မား (သေဆုံးနိုင်)</span></td></tr>
+                        <tr><td>စပျစ်သီး နှင့် စပျစ်ခြောက်</td><td>သစ်သီး</td><td><span class="impact-badge high">မြင့်မား (ကျောက်ကပ်ပျက်စီး)</span></td></tr>
+                        <tr><td>ချောကလက် (Theobromine)</td><td>အစာ</td><td><span class="impact-badge high">မြင့်မား (နှလုံး/အတက်ရောဂါ)</span></td></tr>
+                        <tr><td>Sago Palm (ပေပင်တု)</td><td>အပင်</td><td><span class="impact-badge high">မြင့်မား (အသည်းပျက်စီး)</span></td></tr>
+                        <tr><td>ကြက်သွန်နီ နှင့် ကြက်သွန်ဖြူ</td><td>အစာ</td><td><span class="impact-badge high">မြင့်မား (သွေးအားနည်း)</span></td></tr>
+                        <tr><td>မက်ကဒေးမီးယား အခွံမာသီး</td><td>အစာ</td><td><span class="impact-badge moderate">အလယ်အလတ် (ခြေလက်မသယ်နိုင်)</span></td></tr>
+                        <tr><td>အိုင်ဗီ ( Ivy နွယ်ပင်)</td><td>အပင်</td><td><span class="impact-badge moderate">အလယ်အလတ် (ဝမ်းလျှော)</span></td></tr>
+                        <tr><td>ကျူးလစ်ပန်း / ဒက်ဖိုဒယ်ပန်း</td><td>အပင်</td><td><span class="impact-badge moderate">အလယ်အလတ် (အော့အန်)</span></td></tr>
+                        <tr><td>ထောပတ်သီး</td><td>သစ်သီး</td><td><span class="impact-badge mild">အနည်းငယ် (အစာအိမ်မကောင်း)</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> ဖြူဖျော့သောသွားဖုံးများ၊ မြန်သော်လည်း အားနည်းသော သွေးခုန်နှုန်း၊ အေးစက်သော ခြေလက်များနှင့် ဒဏ်ရာရပြီးနောက် နုံးချည့်နေခြင်း။</p>
+                <p><strong>နွေးထွေးအောင် ထားပါ:</strong> ကိုယ်အပူချိန် ထိန်းသိမ်းရန် ခွေးကို နွေးထွေးသော စောင်ဖြင့် ပတ်ထားပါ။</p>
+                <p><strong>အနေအထား:</strong> လှဲလျက်အနေအထားအတိုင်း ထားပါ။ သွေးများ ဦးနှောက်နှင့် နှလုံးသို့ စီးဆင်းစေရန် တင်ပါးကို တဘက်ဖြင့် အနည်းငယ် မြှင့်တင်ပေးပါ။ လေပြွန်ကို ဖြောင့်တန်းစွာ ထားရှိပါ။</p>
+            `
+        },
+        cat: {
+            cpr: `
+                <p><strong>အသက်ရှူခြင်းနှင့် သွေးခုန်နှုန်း စစ်ဆေးခြင်း:</strong> အသက်ရှူခြင်းနှင့် ပေါင်ခြံအတွင်းပိုင်း သွေးခုန်နှုန်းကို စစ်ဆေးပါ။</p>
+                <p><strong>အနေအထား:</strong> ကြောင်ကို ညာဘက်ခြမ်းသို့ လှဲထားပါ။</p>
+                <p><strong>ရင်ဘတ်ဖိခြင်း:</strong> လက်တစ်ဖက်ကို ကြောင်၏ ရင်ဘတ် (ရှေ့တံတောင်ဆစ်များနောက်) တွင် ပတ်၍ လက်မနှင့် လက်ညှိုးတို့ဖြင့် ညှစ်ဖိပေးပါ။ ရင်ဘတ်၏ ၁/၃ မှ ၁/၂ ခန့်အထိ တစ်မိနစ်လျှင် ၁၀၀-၁၂၀ ကြိမ်နှုန်းဖြင့် ဖိပေးပါ။</p>
+                <p><strong>အသက်ရှူကူညီခြင်း:</strong> ကြောင်၏ နှာခေါင်းနှင့် ပါးစပ်တစ်ခုလုံးကို သင့်ပါးစပ်ဖြင့် အုပ်ပြီး ရင်ဘတ်ပင့်တက်လာသည်အထိ ညင်သာစွာ လေမှုတ်သွင်းပေးပါ။</p>
+                <p><strong>အချိုးအစား:</strong> ဖိခြင်း ၃၀ ကြိမ်လျှင် အသက်ရှူကူညီခြင်း ၂ ကြိမ်။</p>
+            `,
+            choking: `
+                <p><strong>ညင်သာစွာ စစ်ဆေးပါ:</strong> ကြောင်များသည် ခွေးများနှင့် နှိုင်းယှဉ်ပါက လည်ပင်းနင်ခဲသော်လည်း (ကြိုးများ ပိုဖြစ်တတ်သည်) ပါးစပ်ကို စစ်ဆေးပါ။ အကိုက်မခံရစေရန် အလွန်သတိထားပါ။</p>
+                <p><strong>ကြောင်အတွက် Heimlich:</strong> ကြောင်၏ ကျောကို သင့်ရင်ဘတ်တွင် မှီထားပါ။ သင့်လက်သီးကို နံရိုးအောက်ရှိ ပျော့ပျောင်းသောနေရာတွင် ထားပါ။ ညင်သာပြီး ပြတ်သားသော အပေါ်ပင့်တွန်းမှု ၃-၄ ကြိမ် ပြုလုပ်ပါ။</p>
+                <div class="warning-box"><strong>ကြိုးထွက်နေပါက:</strong> ၎င်းကို လုံးဝဆွဲမထုတ်ပါနှင့်။ အူလမ်းကြောင်းတွင် ပတ်မိနေပါက ဆွဲထုတ်ခြင်းက ကိုယ်တွင်းအင်္ဂါများကို ပြတ်တောက်သွားစေနိုင်ပါသည်။ ကြိုးကို အတိုဖြတ်ပြီး ဆရာဝန်ထံ အမြန်သွားပါ။</div>
+            `,
+            bleeding: `
+                <p><strong>တိုက်ရိုက် ဖိထားပါ:</strong> သန့်ရှင်းသော ပတ်တီး သို့မဟုတ် အဝတ်ဖြင့် ဒဏ်ရာပေါ်သို့ တိုက်ရိုက် ငြိမ်ဝပ်စွာ ဖိထားပါ။</p>
+                <p><strong>စိတ်ဖိစီးမှုလျှော့ချပါ:</strong> ကြောင်များသည် နာကျင်သောအခါ အလွယ်တကူ ထိတ်လန့်တတ်ပြီး သွေးတိုးစေကာ သွေးထွက်ပိုများစေသည်။ ကြောင်ကို တဘက်ဖြင့် လုံခြုံစွာပတ်ထားပါ (ကြောင်လိပ်ကဲ့သို့) ဒဏ်ရာရသောနေရာကိုသာ ထုတ်ထားပြီး ငြိမ်ဝပ်စေပါ။</p>
+            `,
+            heatstroke: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> အသက်ရှူပြင်းခြင်း (ကြောင်များသည် စိတ်ဖိစီးမှု သို့မဟုတ် အပူလွန်ကဲမှသာ ဟောဟဲလိုက်တတ်သည်)၊ တံတွေးယိုခြင်း၊ သွားဖုံးများနီရဲခြင်း။</p>
+                <p><strong>အအေးပေးခြင်း:</strong> ကြောင်ကို စိုစွတ်ပြီး နွေးရုံသာရှိသော တဘက်ဖြင့် ပတ်ထားပါ။ ခြေဖဝါးများကို ရေအေးဖြင့် ပွတ်ပေးပါ။ ပန်ကာဖွင့်ပေးပါ။ အသက်ရှူမှန်သွားပါက အအေးပေးခြင်းကို ရပ်တန့်ပါ။</p>
+            `,
+            poisoning: `
+                <p><strong>ကြောင်များအတွက် အဆိပ်သင့်စေသောအရာများ:</strong> လီလီပန်းများ (အလွန်အဆိပ်ပြင်းသည်)၊ Essential Oils၊ မနောက်ဆီဒီး (Minoxidil)၊ လူသုံးကိုက်ခဲပျောက်ဆေးများ၊ ခွေးလှေးဆေးများ။</p>
+                <p><strong>အမွှေးပေါ်ရှိပါက:</strong> လျက်မိပြီး အဆိပ်မသင့်စေရန် ပန်းကန်ဆေးဆပ်ပြာဖြင့် အမွှေးကို ချက်ချင်းဆေးကြောပါ။</p>
+                <div class="warning-box"><strong>အိမ်တွင် အန်အောင် အတင်းမလုပ်ပါနှင့်။</strong> ကြောင်များ၏ ခန္ဓာဗေဒအရ ဆရာဝန်မပါဘဲ အန်စေခြင်းသည် အလွန်အန္တရာယ်ရှိပါသည်။</div>
+            `,
+            shock: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> အလွန်ဖြူဖျော့သော သို့မဟုတ် ပြာနှမ်းသောသွားဖုံးများ၊ ကိုယ်ပူချိန်ကျဆင်းခြင်း၊ သွားဖုံးကိုဖိပြီး ပြန်လွှတ်ပါက ဖြူမြဲဖြူနေခြင်း။</p>
+                <p><strong>အိမ်တွင်းပြုစုမှု:</strong> ကြောင်ကို နွေးထွေးပြီး မှောင်သော တဘက်ဖြင့် ပတ်ကာ ငြိမ်ငြိမ်ထားပါ။ စိတ်ဖိစီးမှုလျှော့ချရန် ဆူညံသံနှင့် အလင်းရောင်ကို လျှော့ချပြီး ဆေးခန်းသို့ အမြန်သွားပါ။</p>
+            `
+        },
+        bird: {
+            cpr: `
+                <p><strong>အန္တရာယ်များပါသည်:</strong> ငှက်များအတွက် CPR သည် အလွန်သိမ်မွေ့ပြီး အောင်မြင်မှုနှုန်းနည်းပါးသော်လည်း အသက်ရှူရပ်သွားပါက ကြိုးစားကြည့်သင့်သည်။</p>
+                <p><strong>ရင်ဘတ်ဖိခြင်း:</strong> ငှက်ကို ပက်လက်လှဲထားပါ။ လက်ညှိုးတစ်ချောင်းဖြင့် ရင်ညွန့်ရိုးပေါ်တွင် အလွန်ညင်သာစွာ ဖိပေးပါ။ တစ်မိနစ်လျှင် ၁၂၀-၁၅၀ ကြိမ်နှုန်းဖြင့် လျင်မြန်စွာ ဖိပေးပါ။ ရင်ဘတ်ကို မဖိခြေမိစေရန် သတိပြုပါ။</p>
+                <p><strong>အသက်ရှူကူညီခြင်း:</strong> ငှက်၏ နှုတ်သီးနှင့် နှာခေါင်းပေါက်များကို သင့်ပါးစပ်ဖြင့် ဂရုတစိုက်အုပ်ပြီး သက်ပြင်းချသကဲ့သို့ အလွန်ညင်သာသော လေအနည်းငယ်ကို မှုတ်သွင်းပေးပါ။</p>
+                <p><strong>အချိုးအစား:</strong> ဖိခြင်း ၅ ကြိမ်လျှင် အသက်ရှူကူညီခြင်း ၁ ကြိမ်။</p>
+            `,
+            choking: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> ပါးစပ်ဟထားခြင်း၊ ခေါင်းခါခြင်း၊ အသက်ရှူရာတွင် တရွှီရွှီမြည်ခြင်း သို့မဟုတ် ဟောဟဲလိုက်ခြင်း။</p>
+                <p><strong>နှုတ်သီးကို ရှင်းလင်းပါ:</strong> ငှက်ကို ညင်သာစွာ ထိန်းထားပါ (ရင်ဘတ်လှုပ်ရှားမှုကို မပိတ်ဆို့ပါနှင့်)။ နှုတ်သီးကို ဖွင့်ပြီး အစေ့ သို့မဟုတ် ကစားစရာ အပိုင်းအစ ညပ်နေသလား ကြည့်ပါ။ မြင်ရပါက သွားကြားထိုးတံ သို့မဟုတ် ထိပ်ဝိုင်းဇာဂနာဖြင့် ဂရုတစိုက် ထုတ်ယူပါ။</p>
+                <p><strong>ဆွဲအားကိုသုံးပါ:</strong> လေပြွန်ထဲမှ အရာဝတ္ထု လွတ်ကျလာစေရန် ငှက်ကို တစ်စက္ကန့်ခန့် ဇောက်ထိုး ပြောင်းပြန်လှန်ပေးပါ။</p>
+            `,
+            bleeding: `
+                <div class="warning-box"><strong>ငှက်များတွင် သွေးအနည်းငယ်သာရှိသည်:</strong> သွေးအနည်းငယ်ထွက်ရုံမျှဖြင့် သေဆုံးနိုင်သည်။ သွေးပေါက်နေသော အမွေးအသစ်များ ကျိုးသွားပါက ပိုက်ပွင့်နေသကဲ့သို့ ဖြစ်နေတတ်သည်။</div>
+                <p><strong>ဥပဒေသင်တန်း:</strong> သွေးထွက်သည့်နေရာကို သွေးတားမှုန့်၊ ပြောင်းဖူးမှုန့် သို့မဟုတ် ဂျုံမှုန့်တို့ဖြင့် အုံပေးပြီး ၂ မိနစ်ခန့် ဖိထားပါ။ သွေးအမွေးဖြစ်ပါက တိရစ္ဆာန်ဆရာဝန် သို့မဟုတ် အတွေ့အကြုံရှိသူက ပလာယာဖြင့် အမွေးရင်းမှ နှုတ်ပစ်ရန် လိုအပ်နိုင်ပါသည်။</p>
+            `,
+            heatstroke: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> ဟောဟဲလိုက်ခြင်း (ပါးစပ်ဟ၍ အသက်ရှူခြင်း)၊ အတောင်ပံများကို ကိုယ်ခန္ဓာနှင့် ခွာထားခြင်း၊ ဂဏာမငြိမ်ဖြစ်ခြင်း။</p>
+                <p><strong>အအေးပေးခြင်း:</strong> ရေအေးမှုန်များဖြင့် ငှက်ကို ညင်သာစွာ ဖျန်းပေးပါ။ လုံးဝမစိုစွတ်စေပါနှင့်။ 涼涼မှောင်မှောင်ရှိသော အခန်းသို့ ရွှေ့ပါ။ နေရောင်ခြည်နှင့် ချက်ချင်းကင်းလွတ်ပါစေ。</p>
+            `,
+            poisoning: `
+                <div class="warning-box"><strong>ရှူရှိုက်မိသောအဆိပ် (အလွန်အန္တရာယ်ကြီးသည်):</strong> Teflon/PTFE အခိုးအငွေ့များ၊ စပရေးဗူးများ၊ မီးခိုး၊ ရေမွှေး။ လတ်ဆတ်သော ပြင်ပလေရှိရာသို့ ချက်ချင်းရွှေ့ပါ။</div>
+                <p class="first-aid-sub">အဖြစ်များသော ငှက်အဆိပ်သင့်ပစ္စည်းများနှင့် သက်ရောက်မှုအဆင့်များ:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>အဆိပ်သင့်ပစ္စည်း</th>
+                            <th>အမျိုးအစား</th>
+                            <th>သက်ရောက်မှုအဆင့်</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Teflon / PTFE အခိုးအငွေ့</td><td>အငွေ့ရှူမိ</td><td><span class="impact-badge high">မြင့်မား (ချက်ချင်းသေဆုံး)</span></td></tr>
+                        <tr><td>ထောပတ်သီး (Persin အဆိပ်)</td><td>သစ်သီး</td><td><span class="impact-badge high">မြင့်မား (သေဆုံးနိုင်)</span></td></tr>
+                        <tr><td>ချောကလက် / ကဖင်း</td><td>အစာ</td><td><span class="impact-badge high">မြင့်မား (နှလုံးရပ်တန့်)</span></td></tr>
+                        <tr><td>ခဲ / ဇင့် အစရှိသော သတ္တုများ</td><td>သတ္တု</td><td><span class="impact-badge high">မြင့်မား (သတ္တုအဆိပ်သင့်)</span></td></tr>
+                        <tr><td>စလောင်းပန်း (Lily of the Valley)</td><td>အပင်</td><td><span class="impact-badge high">မြင့်မား (နှလုံးရပ်)</span></td></tr>
+                        <tr><td>ပန်းသီး / ချယ်ရီစေ့များ</td><td>သစ်သီး</td><td><span class="impact-badge moderate">အလယ်အလတ် (ဆိုင်ယာနိုက်)</span></td></tr>
+                        <tr><td>ကြက်သွန်နီ နှင့် ကြက်သွန်ဖြူ</td><td>အစာ</td><td><span class="impact-badge moderate">အလယ်အလတ် (သွေးဆဲလ်ပျက်စီး)</span></td></tr>
+                        <tr><td>ဖီလိုဒန်ဒရွန် / အိုင်ဗီ</td><td>အပင်</td><td><span class="impact-badge moderate">အလယ်အလတ် (ပါးစပ်နာ)</span></td></tr>
+                        <tr><td>ဆား / ဆားပါသောအစာများ</td><td>အစာ</td><td><span class="impact-badge moderate">အလယ်အလတ် (ရေဓာတ်ခန်း)</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> လှောင်အိမ်အောက်ခြေတွင် အမွေးပွပွဖြင့် ထိုင်နေခြင်း၊ မျက်စိမှိတ်ထားခြင်း၊ ခြေသည်းဆုပ်ကိုင်အားမရှိခြင်း。</p>
+                <p><strong>"လူနာသေတ္တာ":</strong> ၎င်းကို အောက်ခံပါသော သေတ္တာငယ် သို့မဟုတ် သယ်ဆောင်သည့် ဘူးထဲသို့ ထည့်ပါ။ မှောင်ပြီး တိတ်ဆိတ်နွေးထွေးသော အပူချိန် (85°F / 29°C ခန့်) တွင် ထားရှိပါ။</p>
+            `
+        },
+        rabbit: {
+            cpr: `
+                <div class="warning-box"><strong>နုနယ်သော ခန္ဓာဗေဒ:</strong> ယုန်များတွင် အလွန်နုနယ်သော အရိုးစုရှိသဖြင့် အထူးသတိပြုပါ။</div>
+                <p><strong>အနေအထား:</strong> ယုန်ကို ဘေးစောင်းလှဲထားပါ။</p>
+                <p><strong>ရင်ဘတ်ဖိခြင်း:</strong> လက်ညှိုး၊ လက်ခလယ်တို့ကို ရှေ့ခြေထောက်များ၏ အနောက်တည့်တည့် ရင်ဘတ်နံရိုးပေါ်တွင် တင်ပါ။ တစ်မိနစ်လျှင် ၁၀၀-၁၂၀ ကြိမ်နှုန်းဖြင့် ညင်သာစွာ ဖိပေးပါ။</p>
+                <p><strong>အသက်ရှူကူညီခြင်း:</strong> ပါးစပ်ကို ပိတ်ပြီး ၅-၆ ကြိမ် ဖိပြီးတိုင်း နှာခေါင်းပေါက်များထဲသို့ ညင်သာစွာ လေမှုတ်သွင်းပေးပါ။</p>
+            `,
+            choking: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> ခေါင်းကို အပေါ်သို့ ဆန့်ထားခြင်း၊ ပြာနှမ်းသောလျှာ/သွားဖုံးများ၊ ရုန်းကန်နေခြင်း။</p>
+                <p><strong>ယုန်အတွက် Heimlich:</strong> ယုန်၏ ဦးခေါင်းနှင့် ခန္ဓာကိုယ်ကို သင့်ထံသို့ တင်းတင်းကြပ်ကြပ် ပွေ့ပိုက်ထားပါ။ ၎င်းကို မတင်ပြီး မြန်ဆန်ချောမွေ့သော အောက်ဘက်ဝိုက်ဆွဲလှုပ်ရှားမှုဖြင့် လည်ချောင်းထဲမှ အရာဝတ္ထုကို ကွာကျစေပါ။</p>
+                <p><strong>စစ်ဆေးပါ:</strong> ပါးစပ်ကို ညင်သာစွာ ဖွင့်ပြီး ပိတ်ဆို့နေသောအရာ ထွက်လာသလား ကြည့်ပါ။</p>
+            `,
+            bleeding: `
+                <p><strong>ဖိထားပါ:</strong> သန့်ရှင်းသော ပတ်တီးဖြင့် တိုက်ရိုက် ဖိထားပါ။ ယုန်များသည် အလွယ်တကူ ထိတ်လန့်တတ်သဖြင့် ကျောရိုးကျိုးမသွားစေရန် ခိုင်မြဲစွာ ထိန်းထားပါ။</p>
+                <p><strong>ခြေသည်း သွေးထွက်ခြင်း:</strong> ခြေသည်းတိုလွန်းပါက ပြောင်းဖူးမှုန့် သို့မဟုတ် သွေးတားမှုန့်ဖြင့် သိပ်ပေးပါ။</p>
+            `,
+            heatstroke: `
+                <div class="warning-box"><strong>ယုန်များသည် 80°F (26°C) ထက်ကျော်လွန်ပါက အလွယ်တကူ အပူလွန်ကဲတတ်သည်။</strong></div>
+                <p><strong>အအေးပေးခြင်း:</strong> ယုန်ကို ရေထဲသို့ လုံးဝမနှစ်ပါနှင့်၊ ၎င်းသည် ရှော့ခ်ရစေနိုင်သည်။ ယုန်၏နားရွက်များကို ရေအေးဖျန်းပေးပါ (နားရွက်ဖြင့် အပူချိန်ညှိသည်) သို့မဟုတ် ရေအေးစိုစွတ်သော တဘက်ဖြင့် ပတ်ထားပါ။ ရေခဲဗူးကို အဝတ်ပတ်၍ ဘေးတွင် ချထားပေးပါ။</p>
+            `,
+            poisoning: `
+                <div class="warning-box"><strong>အန်ခြင်းမရှိပါ:</strong> ယုန်များသည် အန်ထုတ်ခြင်း မလုပ်နိုင်ပါ။ အန်အောင် လုံးဝမပြုလုပ်ပါနှင့်။ ရေလတ်ဆတ်စွာ တိုက်ပါ။</div>
+                <p class="first-aid-sub">အဖြစ်များသော ယုန်အဆိပ်သင့်ပစ္စည်းများနှင့် သက်ရောက်မှုအဆင့်များ:</p>
+                <table class="toxins-table">
+                    <thead>
+                        <tr>
+                            <th>အဆိပ်သင့်ပစ္စည်း</th>
+                            <th>အမျိုးအစား</th>
+                            <th>သက်ရောက်မှုအဆင့်</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>လီလီပန်း / ဖောက်စ်ဂလပ်ပန်း</td><td>အပင်</td><td><span class="impact-badge high">မြင့်မား (နှလုံး/အူလမ်းကြောင်း)</span></td></tr>
+                        <tr><td>Rhubarb (ရူဘတ်ပင်) အရွက်များ</td><td>အပင်</td><td><span class="impact-badge high">မြင့်မား (ကျောက်ကပ်ပျက်စီး)</span></td></tr>
+                        <tr><td>ထောပတ်သီး (Persin အဆိပ်)</td><td>သစ်သီး</td><td><span class="impact-badge high">မြင့်မား (နှလုံးရပ်)</span></td></tr>
+                        <tr><td>ချောကလက်</td><td>အစာ</td><td><span class="impact-badge high">မြင့်မား (သေဆုံးနိုင်)</span></td></tr>
+                        <tr><td>ကြက်သွန်နီ နှင့် ကြက်သွန်ဖြူ</td><td>အစာ</td><td><span class="impact-badge high">မြင့်မား (သွေးအားနည်း)</span></td></tr>
+                        <tr><td>အိုင်ဗီ / ရိုဒိုဒန်ဒရွန်ပန်း</td><td>အပင်</td><td><span class="impact-badge moderate">အလယ်အလတ် (အူပိတ်)</span></td></tr>
+                        <tr><td>ပန်းသီးစေ့များ</td><td>သစ်သီး</td><td><span class="impact-badge moderate">အလယ်အလတ် (ဆိုင်ယာနိုက်)</span></td></tr>
+                        <tr><td>ပေါင်မုန့် / ဂျုံစေ့ / အစေ့အဆန်</td><td>အစာ</td><td><span class="impact-badge moderate">အလယ်အလတ် (အူပိတ်လှုပ်ရှားမှု)</span></td></tr>
+                        <tr><td>ရှောက်သီးခွံ / လိမ္မော်သီးခွံ</td><td>သစ်သီး</td><td><span class="impact-badge mild">အနည်းငယ် (အစာအိမ်မကောင်း)</span></td></tr>
+                    </tbody>
+                </table>
+            `,
+            shock: `
+                <p><strong>ရောဂါလက္ခဏာများ:</strong> နားရွက်များ အေးစက်ခြင်း၊ ခန္ဓာကိုယ်ပျော့ခွေသွားခြင်း၊ ဖြူဖျော့သောသွားဖုံးများ၊ ကိုယ်ပူချိန်ကျဆင်းခြင်း။ ယုန်များတွင် ရှော့ခ်ရခြင်းသည် သေစေနိုင်သော အစာအိမ်လှုပ်ရှားမှုရပ်ဆိုင်းခြင်း (GI Stasis) သို့ ဦးတည်သွားစေနိုင်သည်။</p>
+                <p><strong>နွေးထွေးမှုနှင့် တိတ်ဆိတ်မှု:</strong> နွေးထွေးမှုသည် မရှိမဖြစ်လိုအပ်သည်။ နွေးထွေးသော တဘက်ဖြင့် ပတ်ထားပါ သို့မဟုတ် လျှပ်စစ်ရေနွေးအိတ်ပေါ်တွင် တင်ထားပါ။ သယ်ဆောင်စဉ်အတွင်း အလင်းရောင်နှင့် ဆူညံသံများကို လုံးဝပိတ်ဆို့ထားပါ။</p>
+            `
         }
     }
 };
@@ -331,9 +1210,6 @@ function updateLanguageUI(lang) {
         const rabbitEl = document.getElementById('pet-rabbit');
         if (rabbitEl) rabbitEl.textContent = strings.pets.rabbit;
         
-        const othersEl = document.getElementById('pet-others');
-        if (othersEl) othersEl.textContent = strings.pets.others;
-        
         // Update clinics locator strings
         clinicsHeader.textContent = strings.clinicsHeader;
         clinicsPromptText.textContent = strings.shareLocationText;
@@ -346,6 +1222,83 @@ function updateLanguageUI(lang) {
         const query = MAPS_QUERIES[lang] || MAPS_QUERIES['en'];
         searchMapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
+        // Localize My Pets elements safely
+        if (navTriageBtn) navTriageBtn.textContent = strings.navTriage;
+        if (navPetsBtn) navPetsBtn.textContent = strings.navPets;
+        if (myPetsTitle) myPetsTitle.textContent = strings.myPetsTitle;
+        if (addPetBtn) addPetBtn.textContent = strings.addPetBtn;
+        if (registerPetTitle) registerPetTitle.textContent = strings.registerPetTitle;
+        if (regPetName) regPetName.placeholder = strings.petNamePlaceholder;
+        if (regPetAddress) regPetAddress.placeholder = strings.addressPlaceholder;
+        if (regPetChip) regPetChip.placeholder = strings.chipNumberPlaceholder;
+        if (labelPetName) labelPetName.textContent = strings.petNamePlaceholder;
+        if (labelPetAddress) labelPetAddress.textContent = strings.addressPlaceholder;
+        if (labelPetChip) labelPetChip.textContent = strings.chipNumberPlaceholder;
+        if (labelPetVaccine) labelPetVaccine.textContent = strings.lastVaccinatedDateLabel;
+        if (registerSubmitBtn) registerSubmitBtn.textContent = strings.registerBtn;
+        if (registerCancelBtn) registerCancelBtn.textContent = strings.cancelBtn;
+        if (emptyPetsMessage) emptyPetsMessage.textContent = strings.noPetsMessage;
+
+        if (labelPetType) labelPetType.textContent = strings.petTypeLabel;
+        if (labelPetPhoto) labelPetPhoto.textContent = strings.petPhotoLabel;
+        if (photoUploadBtn) photoUploadBtn.textContent = strings.choosePhotoBtn;
+        if (optDog) optDog.textContent = strings.pets.dog;
+        if (optCat) optCat.textContent = strings.pets.cat;
+        if (optBird) optBird.textContent = strings.pets.bird;
+        if (optRabbit) optRabbit.textContent = strings.pets.rabbit;
+        if (optOther) optOther.textContent = strings.optOther;
+
+        if (typeof renderPets === 'function') {
+            renderPets();
+        }
+    }
+    
+    // Refresh first aid translations & active category layout
+    updateFirstAidUI();
+}
+
+let currentFirstAidCategory = 'cpr';
+
+function updateFirstAidUI() {
+    const strings = TRANSLATIONS[currentLang];
+    if (!strings) return;
+
+    // 1. Get pet emoji and label
+    const petEmojis = { dog: "🐶", cat: "🐱", bird: "🐦", rabbit: "🐰" };
+    const emoji = petEmojis[currentPet] || "🐾";
+    const petLabel = strings.pets[currentPet] || currentPet;
+
+    // 2. Set title
+    const titleEl = document.getElementById('first-aid-title');
+    if (titleEl) {
+        let titleText = strings.firstAidTitle || "{emoji} {pet} First Aid & CPR Guide";
+        titleText = titleText.replace("{emoji}", emoji).replace("{pet}", petLabel);
+        titleEl.textContent = titleText;
+    }
+
+    // 3. Translate tab buttons
+    const tabBtns = document.querySelectorAll('.first-aid-tab');
+    tabBtns.forEach(btn => {
+        const category = btn.getAttribute('data-category');
+        if (category && strings.firstAidTabs && strings.firstAidTabs[category]) {
+            btn.textContent = strings.firstAidTabs[category];
+        }
+        
+        // Ensure correct active class is set
+        if (category === currentFirstAidCategory) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // 4. Update content area
+    const contentEl = document.getElementById('first-aid-content');
+    if (contentEl) {
+        const langData = FIRST_AID_DATA[currentLang] || FIRST_AID_DATA['en'];
+        const petData = langData[currentPet] || FIRST_AID_DATA['en'][currentPet];
+        const categoryHtml = petData[currentFirstAidCategory] || FIRST_AID_DATA['en'][currentPet][currentFirstAidCategory] || "";
+        contentEl.innerHTML = categoryHtml;
     }
 }
 
@@ -399,8 +1352,7 @@ function showResult(data) {
         dog: "🐶",
         cat: "🐱",
         bird: "🐦",
-        rabbit: "🐰",
-        others: "🐾"
+        rabbit: "🐰"
     };
     const petStrings = TRANSLATIONS[currentLang]?.pets || TRANSLATIONS['en'].pets;
     const petLabel = petStrings[currentPet] || currentPet;
@@ -483,6 +1435,10 @@ function resetApp() {
         }
     });
 
+    // Reset first aid guide state
+    currentFirstAidCategory = 'cpr';
+    updateFirstAidUI();
+
     inputEl.focus();
 }
 
@@ -495,6 +1451,8 @@ document.querySelectorAll('.pet-select-btn').forEach(btn => {
         btn.classList.add('active');
         // Update currentPet state
         currentPet = btn.getAttribute('data-pet');
+        // Refresh first aid guide content for the new pet selection
+        updateFirstAidUI();
     });
 });
 
@@ -759,30 +1717,10 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
                 `;
                 marker.bindPopup(popupContent);
                 mapMarkers.push({ id: `verified-${idx}`, marker: marker, data: clinic });
-            } else {
-                // Keep as standard clinic
-                standardClinics.push(clinic);
-                
-                const standardIcon = L.divIcon({
-                    className: 'custom-standard-marker',
-                    html: '<div class="standard-marker-pin"></div>',
-                    iconSize: [16, 16],
-                    iconAnchor: [8, 16]
-                });
-                const marker = L.marker([clinic.lat, clinic.lon], { icon: standardIcon }).addTo(mapInstance);
-                const popupContent = `
-                    <div style="font-family: 'Outfit', sans-serif;">
-                        <h4 style="margin:0 0 4px; color:#4a5568;">${clinic.name}</h4>
-                        <p style="margin:0 0 2px;">${clinic.address}</p>
-                        ${clinic.phone ? `<p style="margin:0;">📞 ${clinic.phone}</p>` : ''}
-                    </div>
-                `;
-                marker.bindPopup(popupContent);
-                mapMarkers.push({ id: `standard-${standardClinics.length - 1}`, marker: marker, data: clinic });
             }
         });
         
-        renderClinicsList(verifiedDesks, standardClinics);
+        renderClinicsList(verifiedDesks, []);
     } catch (err) {
         console.error("Failed to load nearby clinics, using offline mock mode:", err);
         setupOfflineMockDesks(lat, lon);
@@ -950,80 +1888,300 @@ function renderClinicsList(verifiedDesks, standardClinics) {
         
         clinicsList.appendChild(card);
     });
-    
-    // Render Divider
-    if (standardClinics.length > 0) {
-        const divider = document.createElement('div');
-        divider.className = 'clinics-divider';
-        divider.style.margin = '16px 0 8px';
-        divider.style.paddingBottom = '4px';
-        divider.style.borderBottom = '1px solid rgba(255, 255, 255, 0.15)';
-        divider.style.fontWeight = '700';
-        divider.style.fontSize = '14px';
-        divider.style.opacity = '0.8';
-        divider.textContent = TRANSLATIONS[currentLang]?.additionalClinicsHeader || 'Additional Area Clinics';
-        
-        if (document.body.classList.contains('state-yellow')) {
-            divider.style.borderBottomColor = 'rgba(18, 18, 18, 0.15)';
+}
+
+// First aid tab buttons click event delegation / listener
+document.querySelectorAll('.first-aid-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        currentFirstAidCategory = btn.getAttribute('data-category');
+        updateFirstAidUI();
+    });
+});
+
+// Run initial render of first aid guides
+updateFirstAidUI();
+
+// Switch screen state utility
+function switchScreen(screenName) {
+    [landingState, resultState, myPetsState, newPetState].forEach(state => {
+        if (state) {
+            state.classList.remove('active');
+            state.classList.add('hidden');
         }
-        
-        clinicsList.appendChild(divider);
-        
-        // Render Standard Clinics
-        standardClinics.forEach((clinic, idx) => {
-            const card = document.createElement('div');
-            card.className = 'clinic-card';
-            
-            const nameRow = document.createElement('div');
-            nameRow.className = 'clinic-name-row';
-            
-            const nameEl = document.createElement('h3');
-            nameEl.className = 'clinic-name';
-            nameEl.textContent = clinic.name;
-            
-            const distEl = document.createElement('span');
-            distEl.className = 'clinic-distance';
-            distEl.textContent = `${clinic.distance.toFixed(1)} ${unit}`;
-            
-            nameRow.appendChild(nameEl);
-            nameRow.appendChild(distEl);
-            
-            const detailsEl = document.createElement('div');
-            detailsEl.className = 'clinic-details';
-            
-            const addrLink = document.createElement('a');
-            addrLink.className = 'clinic-address';
-            addrLink.href = `https://www.google.com/maps/dir/?api=1&destination=${clinic.lat},${clinic.lon}`;
-            addrLink.target = '_blank';
-            addrLink.title = 'Open in Google Maps';
-            addrLink.innerHTML = `<span class="loc-icon">📍</span> ${clinic.address}`;
-            
-            const phoneEl = document.createElement('div');
-            phoneEl.className = 'clinic-phone';
-            if (clinic.phone) {
-                const cleanPhone = clinic.phone.replace(/[^0-9+]/g, '');
-                phoneEl.innerHTML = `<span class="phone-icon">📞</span> <a href="tel:${cleanPhone}" class="phone-link">${clinic.phone}</a>`;
-            } else {
-                phoneEl.innerHTML = `<span class="phone-icon">📞</span> <span class="phone-na">${phoneNaText}</span>`;
-            }
-            
-            detailsEl.appendChild(addrLink);
-            detailsEl.appendChild(phoneEl);
-            
-            card.appendChild(nameRow);
-            card.appendChild(detailsEl);
-            
-            card.addEventListener('click', () => {
-                if (mapInstance) {
-                    mapInstance.setView([clinic.lat, clinic.lon], 15);
-                    const match = mapMarkers.find(m => m.id === `standard-${idx}`);
-                    if (match) {
-                        match.marker.openPopup();
-                    }
-                }
-            });
-            
-            clinicsList.appendChild(card);
-        });
+    });
+
+    navTriageBtn.classList.remove('active');
+    navPetsBtn.classList.remove('active');
+
+    // Reset active body urgency background state when navigating to non-triage screens
+    if (screenName !== 'triage' && screenName !== 'result') {
+        document.body.className = '';
+    }
+
+    let activeEl;
+    if (screenName === 'triage') {
+        activeEl = landingState;
+        navTriageBtn.classList.add('active');
+    } else if (screenName === 'result') {
+        activeEl = resultState;
+        navTriageBtn.classList.add('active');
+    } else if (screenName === 'pets') {
+        activeEl = myPetsState;
+        navPetsBtn.classList.add('active');
+        renderPets();
+    } else if (screenName === 'register') {
+        activeEl = newPetState;
+    }
+
+    if (activeEl) {
+        activeEl.classList.remove('hidden');
+        setTimeout(() => {
+            activeEl.classList.add('active');
+        }, 50);
     }
 }
+
+// LocalStorage helpers for pet registry
+function getPets() {
+    try {
+        return JSON.parse(localStorage.getItem('pawpurse_registered_pets')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function savePets(pets) {
+    localStorage.setItem('pawpurse_registered_pets', JSON.stringify(pets));
+}
+
+function deletePet(id) {
+    let pets = getPets();
+    pets = pets.filter(p => p.id !== id);
+    savePets(pets);
+    renderPets();
+}
+
+function getPetTypeEmoji(type) {
+    const emojiMap = {
+        dog: "🐶",
+        cat: "🐱",
+        bird: "🐦",
+        rabbit: "🐰",
+        other: "🐾"
+    };
+    return emojiMap[type] || "🐾";
+}
+
+function resetPhotoUploader() {
+    uploadedPhotoBase64 = "";
+    if (regPetPhoto) regPetPhoto.value = "";
+    if (photoPreviewContainer) photoPreviewContainer.classList.add('hidden');
+    if (photoPreview) photoPreview.src = "";
+    if (photoUploadBtn) photoUploadBtn.classList.remove('hidden');
+}
+
+function handlePhotoUpload(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Set canvas size (max 120x120 to preserve localStorage quota)
+            const maxDim = 120;
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+                if (width > maxDim) {
+                    height *= maxDim / width;
+                    width = maxDim;
+                }
+            } else {
+                if (height > maxDim) {
+                    width *= maxDim / height;
+                    height = maxDim;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Compress to JPEG Data URL with 0.7 quality
+            uploadedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            
+            // Show preview
+            if (photoPreview) photoPreview.src = uploadedPhotoBase64;
+            if (photoPreviewContainer) photoPreviewContainer.classList.remove('hidden');
+            if (photoUploadBtn) photoUploadBtn.classList.add('hidden');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function renderPets() {
+    if (!petsGrid || !emptyPetsMessage) return;
+
+    const pets = getPets();
+    const strings = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+
+    if (pets.length === 0) {
+        emptyPetsMessage.classList.remove('hidden');
+        petsGrid.classList.add('hidden');
+        return;
+    }
+
+    emptyPetsMessage.classList.add('hidden');
+    petsGrid.classList.remove('hidden');
+    petsGrid.innerHTML = '';
+
+    pets.forEach(pet => {
+        const card = document.createElement('div');
+        card.className = 'pet-card';
+
+        const avatarHtml = pet.photo 
+            ? `<img src="${pet.photo}" alt="${escapeHtml(pet.name)}">` 
+            : getPetTypeEmoji(pet.type || 'other');
+
+        card.innerHTML = `
+            <div class="pet-card-header">
+                <div class="pet-card-title-group">
+                    <div class="pet-avatar">
+                        ${avatarHtml}
+                    </div>
+                    <span class="pet-card-name">${escapeHtml(pet.name)}</span>
+                </div>
+                <button class="pet-remove-btn" data-id="${pet.id}">${strings.deletePetBtn || 'Remove'}</button>
+            </div>
+            <div class="pet-card-details">
+                <div class="pet-detail-item">
+                    <span class="pet-detail-label">${strings.petAddressLabel || 'Address:'}</span>
+                    <span class="pet-detail-val">${escapeHtml(pet.address)}</span>
+                </div>
+                <div class="pet-detail-item">
+                    <span class="pet-detail-label">${strings.petChipLabel || 'Chip Number:'}</span>
+                    <span class="pet-detail-val">${pet.chip ? escapeHtml(pet.chip) : '-'}</span>
+                </div>
+                <div class="pet-detail-item">
+                    <span class="pet-detail-label">${strings.petVaccineLabel || 'Last Vaccinated:'}</span>
+                    <span class="pet-detail-val">${pet.vaccineDate ? escapeHtml(pet.vaccineDate) : '-'}</span>
+                </div>
+            </div>
+        `;
+
+        card.querySelector('.pet-remove-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deletePet(pet.id);
+        });
+
+        petsGrid.appendChild(card);
+    });
+}
+
+function registerPet() {
+    const name = regPetName.value.trim();
+    const type = regPetType.value;
+    const address = regPetAddress.value.trim();
+    const chip = regPetChip.value.trim();
+    const vaccineDate = regPetVaccine.value;
+
+    if (!name || !address) return;
+
+    const newPet = {
+        id: 'pet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        name: name,
+        type: type,
+        address: address,
+        chip: chip,
+        vaccineDate: vaccineDate,
+        photo: uploadedPhotoBase64
+    };
+
+    const pets = getPets();
+    pets.push(newPet);
+    savePets(pets);
+
+    regPetForm.reset();
+    resetPhotoUploader();
+    switchScreen('pets');
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// Navigation event listeners
+if (navTriageBtn) {
+    navTriageBtn.addEventListener('click', () => {
+        if (!resultState.classList.contains('hidden')) {
+            switchScreen('result');
+        } else {
+            switchScreen('triage');
+        }
+    });
+}
+
+if (logoHome) {
+    logoHome.addEventListener('click', () => {
+        switchScreen('triage');
+    });
+}
+
+if (navPetsBtn) {
+    navPetsBtn.addEventListener('click', () => {
+        switchScreen('pets');
+    });
+}
+
+if (addPetBtn) {
+    addPetBtn.addEventListener('click', () => {
+        switchScreen('register');
+    });
+}
+
+if (registerCancelBtn) {
+    registerCancelBtn.addEventListener('click', () => {
+        regPetForm.reset();
+        resetPhotoUploader();
+        switchScreen('pets');
+    });
+}
+
+if (regPetForm) {
+    regPetForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        registerPet();
+    });
+}
+
+// Photo upload listeners
+if (photoUploadBtn && regPetPhoto) {
+    photoUploadBtn.addEventListener('click', () => {
+        regPetPhoto.click();
+    });
+    regPetPhoto.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handlePhotoUpload(e.target.files[0]);
+        }
+    });
+}
+
+if (photoRemoveBtn) {
+    photoRemoveBtn.addEventListener('click', () => {
+        resetPhotoUploader();
+    });
+}
+
+// Render pets list initially
+renderPets();
+
