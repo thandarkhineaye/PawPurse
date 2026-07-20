@@ -372,14 +372,34 @@ footer {
     margin-bottom: 32px;
 }
 
+/* Registered Emergency Contacts Section */
+.emergency-call-container {
+    margin-bottom: 32px;
+}
+
+.emergency-call-section-title {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    color: #ffffff;
+    text-align: left;
+}
+
+.emergency-call-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 /* Registered Emergency Contact Call Card */
 .emergency-call-card {
     background: #ffffff;
     color: #121212;
     border-radius: 16px;
     padding: 18px 24px;
-    margin-bottom: 32px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -390,7 +410,7 @@ footer {
 
 @keyframes pulseCallCard {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.012); }
+    50% { transform: scale(1.01); }
 }
 
 .emergency-call-info {
@@ -416,6 +436,13 @@ body.state-yellow .emergency-call-label {
     font-size: 18px;
     font-weight: 900;
     color: #12281a;
+    word-break: break-word;
+}
+
+.emergency-call-details {
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a5568;
     word-break: break-word;
 }
 
@@ -445,6 +472,13 @@ body.state-yellow .emergency-call-btn {
 .emergency-call-btn:hover {
     transform: translateY(-2px);
     opacity: 0.95;
+}
+
+.clinics-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
 .instructions-card {

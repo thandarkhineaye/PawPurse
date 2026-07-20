@@ -120,16 +120,10 @@
                 <div id="urgency-badge" class="badge"></div>
                 <h1 id="action-directive" class="directive-text"></h1>
 
-                <!-- Registered Emergency Contact Action Call (shown on RED and YELLOW) -->
-                <div id="emergency-call-card" class="emergency-call-card hidden">
-                    <div class="emergency-call-info">
-                        <span id="emergency-call-label" class="emergency-call-label">📞 Registered Emergency Contact</span>
-                        <span id="emergency-call-name" class="emergency-call-name"></span>
-                    </div>
-                    <a id="emergency-call-btn" class="emergency-call-btn" href="#">
-                        <span class="call-icon">📞</span>
-                        <span id="emergency-call-btn-text">Call Now</span>
-                    </a>
+                <!-- Registered Emergency Contacts Action List (shown on RED and YELLOW) -->
+                <div id="emergency-call-container" class="emergency-call-container hidden">
+                    <h2 id="emergency-call-section-title" class="emergency-call-section-title">📞 Registered Emergency Contacts</h2>
+                    <div id="emergency-call-list" class="emergency-call-list"></div>
                 </div>
 
                 <div class="instructions-card">
@@ -247,33 +241,19 @@
             <main>
                 <div class="emergency-contact-header">
                     <h1 id="emergency-contact-title">Emergency Contact</h1>
+                    <button id="add-clinic-top-btn" class="primary-btn">+ Add Contact</button>
                 </div>
 
-                <!-- Saved Clinic Details Display -->
+                <!-- Saved Clinics List Display -->
                 <div id="clinic-display-container" class="hidden">
-                    <div class="clinic-contact-card">
-                        <h2 id="disp-clinic-name"></h2>
-                        <div class="clinic-contact-details">
-                            <div class="clinic-detail-item">
-                                <span class="pet-detail-label" id="label-disp-address">Address:</span>
-                                <a id="disp-clinic-address" class="clinic-address-link" href="#" target="_blank"></a>
-                            </div>
-                            <div class="clinic-detail-item">
-                                <span class="pet-detail-label" id="label-disp-phone">Phone:</span>
-                                <a id="disp-clinic-phone" class="phone-link" href=""></a>
-                            </div>
-                        </div>
-                        <div class="contact-actions">
-                            <button id="edit-clinic-btn" class="secondary-btn">Edit Details</button>
-                            <button id="remove-clinic-btn" class="pet-remove-btn">Remove</button>
-                        </div>
-                    </div>
+                    <div id="clinics-cards-list" class="clinics-cards-list"></div>
                 </div>
 
-                <!-- Clinic Edit Form -->
+                <!-- Clinic Edit/Add Form -->
                 <div id="clinic-form-container" class="hidden">
                     <div class="registration-card"
                         style="background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e1efe6; box-shadow: 0 4px 20px rgba(18, 40, 26, 0.04);">
+                        <h2 id="clinic-form-title" style="margin-top: 0; margin-bottom: 20px; font-size: 20px; color: #12281a;">Add Emergency Contact</h2>
                         <form id="clinic-register-form" onsubmit="return false;">
                             <div class="form-group" style="margin-bottom: 16px;">
                                 <label for="reg-clinic-name" id="label-reg-clinic-name">Clinic Name</label>
@@ -296,7 +276,7 @@
                 </div>
 
                 <!-- Empty State Message -->
-                <div id="empty-clinic-message" class="empty-pets-message"
+                <div id="empty-clinic-message" class="empty-pets-message hidden"
                     style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 48px 24px;">
                     <p id="empty-clinic-p" style="margin: 0;">No emergency contact saved yet.</p>
                     <button id="add-clinic-btn" class="primary-btn"

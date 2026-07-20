@@ -1713,18 +1713,15 @@ function updateLanguageUI(lang) {
             renderClinic();
         }
 
-        // Update active emergency call card if present
-        const emergencyCallCard = document.getElementById('emergency-call-card');
-        const emergencyCallLabel = document.getElementById('emergency-call-label');
-        const emergencyCallBtnText = document.getElementById('emergency-call-btn-text');
-        if (emergencyCallCard && !emergencyCallCard.classList.contains('hidden')) {
-            const clinic = getEmergencyClinic();
-            if (clinic && clinic.phone) {
-                if (emergencyCallLabel) emergencyCallLabel.textContent = strings.emergencyCallLabel || "📞 Registered Emergency Contact";
-                if (emergencyCallBtnText) emergencyCallBtnText.textContent = strings.emergencyCallBtnText || "Call Now";
-            } else {
-                if (emergencyCallLabel) emergencyCallLabel.textContent = strings.noContactSavedLabel || "🚨 Emergency Contact";
-                if (emergencyCallBtnText) emergencyCallBtnText.textContent = strings.addContactBtnText || "+ Add Contact";
+        // Update active emergency call section if present
+        const emergencyCallContainer = document.getElementById('emergency-call-container');
+        const emergencyCallSectionTitle = document.getElementById('emergency-call-section-title');
+        if (emergencyCallContainer && !emergencyCallContainer.classList.contains('hidden')) {
+            const contacts = getEmergencyClinics();
+            if (emergencyCallSectionTitle) {
+                emergencyCallSectionTitle.textContent = contacts.length > 0
+                    ? (strings.emergencyCallSectionTitle || "📞 Registered Emergency Contacts")
+                    : (strings.noContactSavedLabel || "🚨 Emergency Contact");
             }
         }
     }
@@ -1843,43 +1840,85 @@ function showResult(data) {
         listEl.appendChild(li);
     });
 
-    // Registered Emergency Contact call banner display on RED or YELLOW
-    const emergencyCallCard = document.getElementById('emergency-call-card');
-    const emergencyCallLabel = document.getElementById('emergency-call-label');
-    const emergencyCallName = document.getElementById('emergency-call-name');
-    const emergencyCallBtn = document.getElementById('emergency-call-btn');
-    const emergencyCallBtnText = document.getElementById('emergency-call-btn-text');
+    // Registered Emergency Contacts call list display on RED or YELLOW
+    const emergencyCallContainer = document.getElementById('emergency-call-container');
+    const emergencyCallList = document.getElementById('emergency-call-list');
+    const emergencyCallSectionTitle = document.getElementById('emergency-call-section-title');
 
-    if (emergencyCallCard) {
+    if (emergencyCallContainer) {
         if (data.urgency === 'RED' || data.urgency === 'YELLOW') {
-            const clinic = getEmergencyClinic();
+            const contacts = getEmergencyClinics();
             const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
 
-            if (clinic && clinic.phone) {
-                if (emergencyCallLabel) emergencyCallLabel.textContent = str.emergencyCallLabel || "📞 Registered Emergency Contact";
-                if (emergencyCallName) emergencyCallName.textContent = `${clinic.name} (${clinic.phone})`;
-                if (emergencyCallBtnText) emergencyCallBtnText.textContent = str.emergencyCallBtnText || "Call Now";
-                if (emergencyCallBtn) {
-                    const cleanPhone = clinic.phone.replace(/[^0-9+]/g, '');
-                    emergencyCallBtn.href = `tel:${cleanPhone}`;
-                    emergencyCallBtn.onclick = null;
-                }
-                emergencyCallCard.classList.remove('hidden');
-            } else {
-                if (emergencyCallLabel) emergencyCallLabel.textContent = str.noContactSavedLabel || "🚨 Emergency Contact";
-                if (emergencyCallName) emergencyCallName.textContent = str.noContactSavedText || "No Emergency Contact Saved";
-                if (emergencyCallBtnText) emergencyCallBtnText.textContent = str.addContactBtnText || "+ Add Contact";
-                if (emergencyCallBtn) {
-                    emergencyCallBtn.href = "#";
-                    emergencyCallBtn.onclick = (e) => {
+            if (emergencyCallSectionTitle) {
+                emergencyCallSectionTitle.textContent = contacts.length > 0
+                    ? (str.emergencyCallSectionTitle || "📞 Registered Emergency Contacts")
+                    : (str.noContactSavedLabel || "🚨 Emergency Contact");
+            }
+
+            if (emergencyCallList) {
+                emergencyCallList.innerHTML = '';
+
+                if (contacts.length > 0) {
+                    contacts.forEach(clinic => {
+                        const card = document.createElement('div');
+                        card.className = 'emergency-call-card';
+
+                        const info = document.createElement('div');
+                        info.className = 'emergency-call-info';
+
+                        const name = document.createElement('span');
+                        name.className = 'emergency-call-name';
+                        name.textContent = clinic.name;
+
+                        const details = document.createElement('span');
+                        details.className = 'emergency-call-details';
+                        details.textContent = `${clinic.phone} • ${clinic.address}`;
+
+                        info.appendChild(name);
+                        info.appendChild(details);
+
+                        const callBtn = document.createElement('a');
+                        callBtn.className = 'emergency-call-btn';
+                        const cleanPhone = clinic.phone.replace(/[^0-9+]/g, '');
+                        callBtn.href = `tel:${cleanPhone}`;
+                        callBtn.innerHTML = `<span class="call-icon">📞</span> ${str.emergencyCallBtnText || 'Call Now'}`;
+
+                        card.appendChild(info);
+                        card.appendChild(callBtn);
+                        emergencyCallList.appendChild(card);
+                    });
+                } else {
+                    const card = document.createElement('div');
+                    card.className = 'emergency-call-card empty-prompt';
+
+                    const info = document.createElement('div');
+                    info.className = 'emergency-call-info';
+
+                    const label = document.createElement('span');
+                    label.className = 'emergency-call-name';
+                    label.textContent = str.noContactSavedText || "No Emergency Contact Saved";
+
+                    info.appendChild(label);
+
+                    const addBtn = document.createElement('a');
+                    addBtn.className = 'emergency-call-btn';
+                    addBtn.href = "#";
+                    addBtn.textContent = str.addContactBtnText || "+ Add Contact";
+                    addBtn.onclick = (e) => {
                         e.preventDefault();
                         switchScreen('clinic');
                     };
+
+                    card.appendChild(info);
+                    card.appendChild(addBtn);
+                    emergencyCallList.appendChild(card);
                 }
-                emergencyCallCard.classList.remove('hidden');
             }
+
+            emergencyCallContainer.classList.remove('hidden');
         } else {
-            emergencyCallCard.classList.add('hidden');
+            emergencyCallContainer.classList.add('hidden');
         }
     }
 
@@ -1904,9 +1943,9 @@ function resetApp() {
     // Reset body
     document.body.className = '';
 
-    const emergencyCallCard = document.getElementById('emergency-call-card');
-    if (emergencyCallCard) {
-        emergencyCallCard.classList.add('hidden');
+    const emergencyCallContainer = document.getElementById('emergency-call-container');
+    if (emergencyCallContainer) {
+        emergencyCallContainer.classList.add('hidden');
     }
 
     // Hide result, show landing
@@ -2872,29 +2911,59 @@ if (photoRemoveBtn) {
 renderPets();
 
 // Emergency Contact local storage and registration helpers
-function getEmergencyClinic() {
+let editingClinicId = null;
+
+function getEmergencyClinics() {
     try {
-        return JSON.parse(localStorage.getItem('pawpurse_emergency_clinic')) || null;
+        const data = JSON.parse(localStorage.getItem('pawpurse_emergency_contacts'));
+        if (Array.isArray(data) && data.length > 0) return data;
+
+        // Backwards compatibility migration from single object 'pawpurse_emergency_clinic'
+        const single = JSON.parse(localStorage.getItem('pawpurse_emergency_clinic'));
+        if (single && single.name) {
+            const migrated = [{ id: 'contact_' + Date.now(), ...single }];
+            localStorage.setItem('pawpurse_emergency_contacts', JSON.stringify(migrated));
+            return migrated;
+        }
+        return [];
     } catch (e) {
-        return null;
+        return [];
     }
 }
 
-function saveEmergencyClinic(data) {
-    localStorage.setItem('pawpurse_emergency_clinic', JSON.stringify(data));
+function saveEmergencyClinics(contacts) {
+    localStorage.setItem('pawpurse_emergency_contacts', JSON.stringify(contacts));
 }
 
-function deleteEmergencyClinic() {
-    localStorage.removeItem('pawpurse_emergency_clinic');
+function saveEmergencyClinicItem(contact) {
+    const contacts = getEmergencyClinics();
+    if (contact.id) {
+        const idx = contacts.findIndex(c => c.id === contact.id);
+        if (idx !== -1) {
+            contacts[idx] = contact;
+        } else {
+            contacts.push(contact);
+        }
+    } else {
+        contact.id = 'contact_' + Date.now();
+        contacts.push(contact);
+    }
+    saveEmergencyClinics(contacts);
+}
+
+function deleteEmergencyClinicItem(id) {
+    const contacts = getEmergencyClinics().filter(c => c.id !== id);
+    saveEmergencyClinics(contacts);
     renderClinic();
 }
 
 function renderClinic() {
     if (!clinicDisplayContainer || !clinicFormContainer || !emptyClinicMessage) return;
 
-    const clinic = getEmergencyClinic();
+    const contacts = getEmergencyClinics();
+    const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
 
-    if (!clinic) {
+    if (contacts.length === 0) {
         clinicDisplayContainer.classList.add('hidden');
         clinicFormContainer.classList.add('hidden');
         emptyClinicMessage.classList.remove('hidden');
@@ -2905,16 +2974,69 @@ function renderClinic() {
     clinicFormContainer.classList.add('hidden');
     clinicDisplayContainer.classList.remove('hidden');
 
-    if (dispClinicName) dispClinicName.textContent = clinic.name;
-    if (dispClinicAddress) {
-        dispClinicAddress.textContent = clinic.address;
-        dispClinicAddress.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.address)}`;
-    }
-    if (dispClinicPhone) {
-        dispClinicPhone.textContent = clinic.phone;
+    const clinicsCardsList = document.getElementById('clinics-cards-list');
+    if (!clinicsCardsList) return;
+
+    clinicsCardsList.innerHTML = '';
+
+    contacts.forEach(clinic => {
+        const card = document.createElement('div');
+        card.className = 'clinic-contact-card';
+        card.style.marginBottom = '16px';
+
+        const title = document.createElement('h2');
+        title.textContent = clinic.name;
+
+        const details = document.createElement('div');
+        details.className = 'clinic-contact-details';
+
+        const addrItem = document.createElement('div');
+        addrItem.className = 'clinic-detail-item';
+        addrItem.innerHTML = `<span class="pet-detail-label">${str.clinicAddressLabel || 'Address:'}</span> <a class="clinic-address-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.address)}" target="_blank">${escapeHtml(clinic.address)}</a>`;
+
+        const phoneItem = document.createElement('div');
+        phoneItem.className = 'clinic-detail-item';
         const cleanPhone = clinic.phone.replace(/[^0-9+]/g, '');
-        dispClinicPhone.href = `tel:${cleanPhone}`;
-    }
+        phoneItem.innerHTML = `<span class="pet-detail-label">${str.clinicPhoneLabel || 'Phone:'}</span> <a class="phone-link" href="tel:${cleanPhone}">${escapeHtml(clinic.phone)}</a>`;
+
+        details.appendChild(addrItem);
+        details.appendChild(phoneItem);
+
+        const actions = document.createElement('div');
+        actions.className = 'contact-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'secondary-btn';
+        editBtn.textContent = str.editDetailsBtn || 'Edit Details';
+        editBtn.onclick = () => {
+            editingClinicId = clinic.id;
+            if (regClinicName) regClinicName.value = clinic.name;
+            if (regClinicAddress) regClinicAddress.value = clinic.address;
+            if (regClinicPhone) regClinicPhone.value = clinic.phone;
+            const titleEl = document.getElementById('clinic-form-title');
+            if (titleEl) titleEl.textContent = str.editClinicTitle || 'Edit Emergency Contact';
+
+            clinicDisplayContainer.classList.add('hidden');
+            emptyClinicMessage.classList.add('hidden');
+            clinicFormContainer.classList.remove('hidden');
+        };
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'pet-remove-btn';
+        removeBtn.textContent = str.deletePetBtn || 'Remove';
+        removeBtn.onclick = () => {
+            deleteEmergencyClinicItem(clinic.id);
+        };
+
+        actions.appendChild(editBtn);
+        actions.appendChild(removeBtn);
+
+        card.appendChild(title);
+        card.appendChild(details);
+        card.appendChild(actions);
+
+        clinicsCardsList.appendChild(card);
+    });
 }
 
 function registerEmergencyClinic() {
@@ -2924,11 +3046,25 @@ function registerEmergencyClinic() {
 
     if (!name || !address || !phone) return;
 
-    const data = { name, address, phone };
-    saveEmergencyClinic(data);
+    const data = { id: editingClinicId, name, address, phone };
+    saveEmergencyClinicItem(data);
+    editingClinicId = null;
 
     if (clinicRegisterForm) clinicRegisterForm.reset();
     renderClinic();
+}
+
+function openClinicAddForm() {
+    editingClinicId = null;
+    const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+    const titleEl = document.getElementById('clinic-form-title');
+    if (titleEl) titleEl.textContent = str.addClinicTitle || 'Add Emergency Contact';
+
+    if (clinicRegisterForm) clinicRegisterForm.reset();
+    if (clinicDisplayContainer) clinicDisplayContainer.classList.add('hidden');
+    if (emptyClinicMessage) emptyClinicMessage.classList.add('hidden');
+    if (clinicFormContainer) clinicFormContainer.classList.remove('hidden');
+    if (regClinicName) regClinicName.focus();
 }
 
 // Emergency contact event listeners
@@ -2938,33 +3074,13 @@ if (navClinicBtn) {
     });
 }
 
+const addClinicTopBtn = document.getElementById('add-clinic-top-btn');
+if (addClinicTopBtn) {
+    addClinicTopBtn.addEventListener('click', openClinicAddForm);
+}
+
 if (addClinicBtn) {
-    addClinicBtn.addEventListener('click', () => {
-        if (clinicDisplayContainer) clinicDisplayContainer.classList.add('hidden');
-        if (emptyClinicMessage) emptyClinicMessage.classList.add('hidden');
-        if (clinicFormContainer) clinicFormContainer.classList.remove('hidden');
-        if (regClinicName) regClinicName.focus();
-    });
-}
-
-if (editClinicBtn) {
-    editClinicBtn.addEventListener('click', () => {
-        const clinic = getEmergencyClinic();
-        if (clinic) {
-            if (regClinicName) regClinicName.value = clinic.name;
-            if (regClinicAddress) regClinicAddress.value = clinic.address;
-            if (regClinicPhone) regClinicPhone.value = clinic.phone;
-        }
-        if (clinicDisplayContainer) clinicDisplayContainer.classList.add('hidden');
-        if (emptyClinicMessage) emptyClinicMessage.classList.add('hidden');
-        if (clinicFormContainer) clinicFormContainer.classList.remove('hidden');
-    });
-}
-
-if (removeClinicBtn) {
-    removeClinicBtn.addEventListener('click', () => {
-        deleteEmergencyClinic();
-    });
+    addClinicBtn.addEventListener('click', openClinicAddForm);
 }
 
 if (clinicRegisterForm) {
@@ -2976,6 +3092,7 @@ if (clinicRegisterForm) {
 
 if (cancelClinicBtn) {
     cancelClinicBtn.addEventListener('click', () => {
+        editingClinicId = null;
         if (clinicRegisterForm) clinicRegisterForm.reset();
         renderClinic();
     });
