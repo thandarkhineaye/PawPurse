@@ -281,6 +281,7 @@ const saveClinicBtn = document.getElementById('save-clinic-btn');
 const cancelClinicBtn = document.getElementById('cancel-clinic-btn');
 const emptyClinicMessage = document.getElementById('empty-clinic-message');
 const addClinicBtn = document.getElementById('add-clinic-btn');
+const addClinicTopBtn = document.getElementById('add-clinic-top-btn');
 const emptyClinicP = document.getElementById('empty-clinic-p');
 
 const labelRegClinicName = document.getElementById('label-reg-clinic-name');
@@ -382,7 +383,6 @@ const TRANSLATIONS = {
         emergencyCallBtnText: "Call Now",
         noContactSavedLabel: "🚨 Emergency Contact",
         noContactSavedText: "No Emergency Contact Saved",
-        addContactBtnText: "+ Add Contact",
         verifiedBadgeText: "Verified Triage Desk",
         additionalClinicsHeader: "Additional Area Clinics",
         yourLocation: "Your Location",
@@ -429,7 +429,6 @@ const TRANSLATIONS = {
         saveClinicBtn: "Save Contact",
         noClinicMessage: "No emergency contact saved yet.",
         editDetailsBtn: "Edit Details",
-        addContactBtn: "+ Add Contact",
         breedLabel: "Breed",
         breedGuideToggle: "🐾 View Breed Insights",
         breedGuideHide: "🐾 Hide Breed Insights",
@@ -619,8 +618,8 @@ const TRANSLATIONS = {
         optOther: "အခြား",
         navClinic: "ဆက်သွယ်ရန်",
         emergencyContactTitle: "အရေးပေါ် ဆက်သွယ်ရန်",
-        clinicNameLabel: "ဆေးကုခန်းအမည်",
-        clinicAddressLabel: "ဆေးကုခန်းလိပ်စာ",
+        clinicNameLabel: "ဆေးခန်းအမည်",
+        clinicAddressLabel: "ဆေးခန်းလိပ်စာ",
         clinicPhoneLabel: "ဖုန်းနံပါတ်",
         saveClinicBtn: "လိပ်စာသိမ်းဆည်းရန်",
         noClinicMessage: "အရေးပေါ် ဆက်သွယ်ရန်လိပ်စာ မရှိသေးပါ။",
@@ -3040,11 +3039,16 @@ function renderClinic() {
 }
 
 function registerEmergencyClinic() {
-    const name = regClinicName.value.trim();
-    const address = regClinicAddress.value.trim();
-    const phone = regClinicPhone.value.trim();
+    const name = regClinicName ? regClinicName.value.trim() : '';
+    const address = regClinicAddress ? regClinicAddress.value.trim() : '';
+    const phone = regClinicPhone ? regClinicPhone.value.trim() : '';
 
-    if (!name || !address || !phone) return;
+    if (!name || !address || !phone) {
+        if (regClinicName && !name) regClinicName.reportValidity();
+        else if (regClinicAddress && !address) regClinicAddress.reportValidity();
+        else if (regClinicPhone && !phone) regClinicPhone.reportValidity();
+        return;
+    }
 
     const data = { id: editingClinicId, name, address, phone };
     saveEmergencyClinicItem(data);
@@ -3064,7 +3068,7 @@ function openClinicAddForm() {
     if (clinicDisplayContainer) clinicDisplayContainer.classList.add('hidden');
     if (emptyClinicMessage) emptyClinicMessage.classList.add('hidden');
     if (clinicFormContainer) clinicFormContainer.classList.remove('hidden');
-    if (regClinicName) regClinicName.focus();
+    if (regClinicName) setTimeout(() => regClinicName.focus(), 50);
 }
 
 // Emergency contact event listeners
@@ -3074,13 +3078,19 @@ if (navClinicBtn) {
     });
 }
 
-const addClinicTopBtn = document.getElementById('add-clinic-top-btn');
 if (addClinicTopBtn) {
     addClinicTopBtn.addEventListener('click', openClinicAddForm);
 }
 
 if (addClinicBtn) {
     addClinicBtn.addEventListener('click', openClinicAddForm);
+}
+
+if (saveClinicBtn) {
+    saveClinicBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerEmergencyClinic();
+    });
 }
 
 if (clinicRegisterForm) {
