@@ -15,14 +15,14 @@ function detectLanguage(text) {
 function classifySymptomsLocally(symptoms, language) {
     const lang = language || detectLanguage(symptoms);
     const lowerSymptoms = symptoms.toLowerCase();
-    
+
     let isRed = false;
     let isYellow = false;
 
     // English keywords
     const redEn = [
-        "bleed", "blood", "chok", "breath", "unconscious", "collapse", "seizure", "convulsion", "paralyz", 
-        "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "heat shock", "stasis", "limp", 
+        "bleed", "blood", "chok", "breath", "unconscious", "collapse", "seizure", "convulsion", "paralyz",
+        "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "heat shock", "stasis", "limp",
         "fracture", "broken", "unresponsive", "gasp", "pant", "blue", "pale", "bloat", "fit",
         "accident", "hit by car", "run over", "fell from", "dog attack", "animal attack", "trauma", "crash", "collision", "hit by", "struck by",
         "eye bleed", "bleeding eye", "eye bleeding", "proptosis", "eye pop", "eyeball pop", "eye puncture", "blindness",
@@ -46,9 +46,9 @@ function classifySymptomsLocally(symptoms, language) {
 
     // Japanese keywords
     const redJa = [
-        "出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり", "血", "吐血", "呼吸困難", 
-        "息苦しい", "気絶", "倒れる", "反応がない", "けいれん", "痙攣", "発作", "麻痺", "まひ", "動けない", 
-        "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "ヒートショック", "うっ滞", 
+        "出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり", "血", "吐血", "呼吸困難",
+        "息苦しい", "気絶", "倒れる", "反応がない", "けいれん", "痙攣", "発作", "麻痺", "まひ", "動けない",
+        "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "ヒートショック", "うっ滞",
         "骨折", "折れる", "ハアハア", "あえぎ呼吸", "蒼白", "胃拡張",
         "事故", "車にひかれた", "ひかれた", "転落", "犬に噛まれた", "噛まれた", "動物に襲われた", "外傷", "衝突", "はねられた",
         "眼球突出", "目が飛び出る", "目が飛び出た", "眼の出血", "目の出血", "失明", "眼に刺さる",
@@ -72,9 +72,9 @@ function classifySymptomsLocally(symptoms, language) {
 
     // Burmese keywords
     const redMy = [
-        "သွေးထွက်", "နင်", "အသက်ရှူ", "သတိလစ်", "သွေး", "သီး", "လည်ပင်းနင်", "အသက်ရှူကျပ်", "မေ့မြော", 
-        "တက်", "အတက်ရောဂါ", "ဆွဲတက်", "လေဖြတ်", "လှုပ်မရ", "အဆိပ်", "အဆိပ်သင့်", "ချောကလက်", "လီလီ", 
-        "လီလီပန်း", "တက်ဖလွန်", "မီးခိုး", "အပူလျှပ်", "အစာအိမ်လှুদ্ধားမှုရပ်", "လေပွ", "အရိုးကျိုး", "ကျိုး", 
+        "သွေးထွက်", "နင်", "အသက်ရှူ", "သတိလစ်", "သွေး", "သီး", "လည်ပင်းနင်", "အသက်ရှူကျပ်", "မေ့မြော",
+        "တက်", "အတက်ရောဂါ", "ဆွဲတက်", "လေဖြတ်", "လှုပ်မရ", "အဆိပ်", "အဆိပ်သင့်", "ချောကလက်", "လီလီ",
+        "လီလီပန်း", "တက်ဖလွန်", "မီးခိုး", "အပူလျှပ်", "အစာအိမ်လှুদ্ধားမှုရပ်", "လေပွ", "အရိုးကျိုး", "ကျိုး",
         "ဟောဟဲ", "အသက်ရှူပြင်း", "ဖြူဖျော့", "ပြာနှမ်း", "ဗိုက်ပွ", "လေထိုး",
         "မတော်တဆ", "ကားတိုက်", "ပြုတ်ကျ", "ခွေးကိုက်", "အခြားတိရစ္ဆာန်ကိုက်", "ဒဏ်ရာရ", "တိုက်မိ", "ဆောင့်မိ",
         "မျက်လုံးပြူးထွက်", "မျက်လုံးပြူး", "မျက်လုံးမှသွေးထွက်", "မျက်စိကွယ်", "မျက်လုံးစူး", "မျက်စိပေါက်",
@@ -96,13 +96,13 @@ function classifySymptomsLocally(symptoms, language) {
         "အစင်းရာအနည်းငယ်", "အရေပြားခြောက်", "ဗောက်ထ", "ယားယံရုံတင်"
     ];
 
-    if (redEn.some(w => lowerSymptoms.includes(w)) || 
-        redJa.some(w => symptoms.includes(w)) || 
+    if (redEn.some(w => lowerSymptoms.includes(w)) ||
+        redJa.some(w => symptoms.includes(w)) ||
         redMy.some(w => symptoms.includes(w))) {
         isRed = true;
-    } else if (yellowEn.some(w => lowerSymptoms.includes(w)) || 
-               yellowJa.some(w => symptoms.includes(w)) || 
-               yellowMy.some(w => symptoms.includes(w))) {
+    } else if (yellowEn.some(w => lowerSymptoms.includes(w)) ||
+        yellowJa.some(w => symptoms.includes(w)) ||
+        yellowMy.some(w => symptoms.includes(w))) {
         isYellow = true;
     }
 
@@ -348,7 +348,7 @@ const DOCTOR_NAMES = {
 const TRANSLATIONS = {
     en: {
         promptHeader: "What is happening with your pet?",
-        accuracyNoticeText: "Triage accuracy is 50% on the app and 50% on you. Please enter the condition and relevant numbers (like body temperature, duration, or frequency) accurately and completely.",
+        accuracyNoticeText: "Please enter the detail of the pet's condition and relevant numbers (like body temperature, duration, or frequency) accurately and completely.",
         placeholder: "Describe symptoms and details (e.g., my dog ate chocolate 2 hours ago, my cat is breathing heavily at 40 breaths/min)...",
         checkBtn: "Check Urgency",
         charWarning: "Character limit reached",
@@ -441,7 +441,7 @@ const TRANSLATIONS = {
     },
     ja: {
         promptHeader: "ペットに何が起きていますか？",
-        accuracyNoticeText: "トリアージの正確性は、アプリ側に50％、ユーザーの正確な入力に50％依存します。症状の様子と具体的な数値（体温、持続時間、頻度など）を正確かつ完全に入力してください。",
+        accuracyNoticeText: "症状の様子と具体的な数値（体温、持続時間、頻度など）を正確かつ完全に入力してください。",
         placeholder: "症状や詳細（例：2時間前に犬がチョコを誤食した、猫が1分間に40回荒い呼吸をしている等）を入力してください...",
         checkBtn: "緊急度を判定する",
         charWarning: "文字数制限に達しました",
@@ -534,7 +534,7 @@ const TRANSLATIONS = {
     },
     my: {
         promptHeader: "သင့်အိမ်မွေးတိရစ္ဆာန် ဘာဖြစ်နေသလဲ။",
-        accuracyNoticeText: "ဤခွဲခြားအကဲဖြတ်မှု မှန်ကန်ခြင်းသည် စနစ်အပေါ်တွင် ၅၀ ရာခိုင်နှုန်းနှင့် အသုံးပြုသူ၏ တိကျစွာ ထည့်သွင်းမှုအပေါ်တွင် ၅၀ ရာခိုင်နှုန်း မူတည်သည်။ ရောဂါလက္ခဏာ အခြေအနေနှင့် သက်ဆိုင်ရာ ကိန်းဂဏန်းများ (ဥပမာ- ကိုယ်အပူချိန်၊ ကြာချိန်၊ အကြိမ်အရေအတွက်) ကို တိကျပြည့်စုံစွာ ထည့်သွင်းပေးပါ။",
+        accuracyNoticeText: "ရောဂါလက္ခဏာ အခြေအနေနှင့် သက်ဆိုင်ရာ ကိန်းဂဏန်းများ (ဥပမာ- ကိုယ်အပူချိန်၊ ကြာချိန်၊ အကြိမ်အရေအတွက်) ကို တိကျပြည့်စုံစွာ ထည့်သွင်းပေးပါ။",
         placeholder: "ရောဂါလက္ခဏာနှင့် အသေးစိတ်အချက်အလက်များ (ဥပမာ- လွန်ခဲ့သော ၂ နာရီက ခွေးချောကလက် စားမိခြင်း၊ ကြောင်တစ်မိနစ်လျှင် အသက်ရှူအကြိမ် ၄၀ ဖြင့် အသက်ရှူပြင်းခြင်း) ကို ဖော်ပြပါ...",
         checkBtn: "အရေးပေါ်အခြေအနေ စစ်ဆေးရန်",
         charWarning: "စာလုံးရေကန့်သတ်ချက် ပြည့်သွားပါပြီ",
@@ -1597,7 +1597,7 @@ let editingPetId = null;
 function updateLanguageUI(lang) {
     currentLang = lang;
     localStorage.setItem('pawpurse_lang', lang);
-    
+
     langBtns.forEach(btn => {
         if (btn.getAttribute('data-lang') === lang) {
             btn.classList.add('active');
@@ -1605,7 +1605,7 @@ function updateLanguageUI(lang) {
             btn.classList.remove('active');
         }
     });
-    
+
     const strings = TRANSLATIONS[lang];
     if (strings) {
         promptHeaderEl.textContent = strings.promptHeader;
@@ -1616,23 +1616,23 @@ function updateLanguageUI(lang) {
         errorBanner.textContent = strings.errorBanner;
         disclaimerEl.textContent = strings.disclaimer;
         resetBtn.textContent = strings.resetBtn;
-        
+
         // Update pet selector translations
         const selectPetLabelEl = document.getElementById('select-pet-label');
         if (selectPetLabelEl) selectPetLabelEl.textContent = strings.selectPetLabel;
-        
+
         const dogEl = document.getElementById('pet-dog');
         if (dogEl) dogEl.textContent = strings.pets.dog;
-        
+
         const catEl = document.getElementById('pet-cat');
         if (catEl) catEl.textContent = strings.pets.cat;
-        
+
         const birdEl = document.getElementById('pet-bird');
         if (birdEl) birdEl.textContent = strings.pets.bird;
-        
+
         const rabbitEl = document.getElementById('pet-rabbit');
         if (rabbitEl) rabbitEl.textContent = strings.pets.rabbit;
-        
+
         // Update clinics locator strings
         clinicsHeader.textContent = strings.clinicsHeader;
         clinicsPromptText.textContent = strings.shareLocationText;
@@ -1640,7 +1640,7 @@ function updateLanguageUI(lang) {
         clinicsLoadingText.textContent = strings.locatingClinics;
         clinicsFallbackText.textContent = strings.locErrorText;
         searchMapsBtn.textContent = strings.searchMapsBtn;
-        
+
         // Localize default search query link
         const query = MAPS_QUERIES[lang] || MAPS_QUERIES['en'];
         searchMapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
@@ -1698,7 +1698,7 @@ function updateLanguageUI(lang) {
             renderClinic();
         }
     }
-    
+
     // Refresh first aid translations & active category layout
     updateFirstAidUI();
 }
@@ -1729,7 +1729,7 @@ function updateFirstAidUI() {
         if (category && strings.firstAidTabs && strings.firstAidTabs[category]) {
             btn.textContent = strings.firstAidTabs[category];
         }
-        
+
         // Ensure correct active class is set
         if (category === currentFirstAidCategory) {
             btn.classList.add('active');
@@ -1755,7 +1755,7 @@ updateLanguageUI(currentLang);
 inputEl.addEventListener('input', () => {
     const val = inputEl.value.trim();
     checkBtn.disabled = val.length === 0;
-    
+
     if (val.length > MAX_CHARS) {
         inputEl.value = val.substring(0, MAX_CHARS);
         charWarning.classList.remove('hidden');
@@ -1786,13 +1786,13 @@ function showResult(data) {
     setTimeout(() => {
         landingState.classList.add('hidden');
         resultState.classList.remove('hidden');
-        
+
         // Wait a tiny bit for display:flex to apply before setting active for animation
         setTimeout(() => {
             resultState.classList.add('active');
         }, 50);
     }, 400); // Wait for fade out
-    
+
     // Set UI elements
     const petEmojiMap = {
         dog: "🐶",
@@ -1802,17 +1802,17 @@ function showResult(data) {
     };
     const petStrings = TRANSLATIONS[currentLang]?.pets || TRANSLATIONS['en'].pets;
     const petLabel = petStrings[currentPet] || currentPet;
-    
+
     badgeEl.textContent = `${petEmojiMap[currentPet] || "🐾"} ${petLabel.toUpperCase()} - ${data.urgency}: ${getUrgencySubtitle(data.urgency)}`;
     directiveEl.textContent = data.action_directive;
-    
+
     listEl.innerHTML = '';
     data.key_instructions.forEach(inst => {
         const li = document.createElement('li');
         li.textContent = inst;
         listEl.appendChild(li);
     });
-    
+
     // Nearest animal hospital clinics section display on RED or YELLOW
     if (data.urgency === 'RED' || data.urgency === 'YELLOW') {
         clinicsSection.classList.remove('hidden');
@@ -1820,7 +1820,7 @@ function showResult(data) {
     } else {
         clinicsSection.classList.add('hidden');
     }
-    
+
     // Change body state
     document.body.className = `state-${data.urgency.toLowerCase()}`;
 }
@@ -1833,7 +1833,7 @@ function getUrgencySubtitle(urgency) {
 function resetApp() {
     // Reset body
     document.body.className = '';
-    
+
     // Hide result, show landing
     resultState.classList.remove('active');
     setTimeout(() => {
@@ -1843,7 +1843,7 @@ function resetApp() {
             landingState.classList.add('active');
         }, 50);
     }, 400);
-    
+
     // Clean up map
     const mapContainer = document.getElementById('map-container');
     if (mapContainer) {
@@ -1854,14 +1854,14 @@ function resetApp() {
         mapInstance = null;
     }
     mapMarkers = [];
-    
+
     // Reset clinics section states
     clinicsSection.classList.add('hidden');
     clinicsPrompt.classList.add('hidden');
     clinicsLoading.classList.add('hidden');
     clinicsFallback.classList.add('hidden');
     clinicsList.classList.add('hidden');
-    
+
     // Reset inputs
     inputEl.value = '';
     inputEl.disabled = false;
@@ -1870,7 +1870,7 @@ function resetApp() {
     spinner.classList.add('hidden');
     errorBanner.classList.add('hidden');
     charWarning.classList.add('hidden');
-    
+
     // Reset pet selection
     currentPet = 'dog';
     document.querySelectorAll('.pet-select-btn').forEach(btn => {
@@ -1917,9 +1917,9 @@ langBtns.forEach(btn => {
 checkBtn.addEventListener('click', () => {
     const text = inputEl.value.trim();
     if (!text) return;
-    
+
     showLoading();
-    
+
     // Simulate a brief local processing delay (750ms) for premium visual feedback
     setTimeout(() => {
         try {
@@ -1943,12 +1943,12 @@ function initClinicsFinder() {
     clinicsLoading.classList.add('hidden');
     clinicsPrompt.classList.add('hidden');
     clinicsList.classList.add('hidden');
-    
+
     const mapContainer = document.getElementById('map-container');
     if (mapContainer) {
         mapContainer.classList.add('hidden');
     }
-    
+
     // If permission has already been granted previously, fetch immediately
     if (localStorage.getItem('pawpurse_gps_allowed') === 'true') {
         requestLocation();
@@ -1962,12 +1962,12 @@ function requestLocation() {
     clinicsLoading.classList.remove('hidden');
     clinicsFallback.classList.add('hidden');
     clinicsList.classList.add('hidden');
-    
+
     if (!navigator.geolocation) {
         handleLocationError();
         return;
     }
-    
+
     navigator.geolocation.getCurrentPosition(
         (position) => {
             localStorage.setItem('pawpurse_gps_allowed', 'true');
@@ -1984,7 +1984,7 @@ function requestLocation() {
 function handleLocationError() {
     clinicsLoading.classList.add('hidden');
     clinicsFallback.classList.remove('hidden');
-    
+
     const coords = FALLBACK_COORDS[currentLang] || FALLBACK_COORDS['en'];
     fetchNearbyClinics(coords.lat, coords.lon, false);
 }
@@ -1994,24 +1994,24 @@ function setupMapAndClinics(lat, lon, isGpsAllowed) {
     if (mapContainer) {
         mapContainer.classList.remove('hidden');
     }
-    
+
     if (mapInstance) {
         mapInstance.remove();
         mapInstance = null;
     }
     mapMarkers = [];
-    
+
     mapInstance = L.map('map', {
         zoomControl: false
     }).setView([lat, lon], 13);
-    
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mapInstance);
-    
+
     L.control.zoom({ position: 'topright' }).addTo(mapInstance);
-    
+
     if (isGpsAllowed) {
         const userIcon = L.divIcon({
             className: 'custom-user-marker',
@@ -2026,33 +2026,33 @@ function setupMapAndClinics(lat, lon, isGpsAllowed) {
 
 async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
     setupMapAndClinics(lat, lon, isGpsAllowed);
-    
+
     const query = MAPS_QUERIES[currentLang] || MAPS_QUERIES['en'];
     searchMapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${query}&query_place_id=&location=${lat},${lon}`;
-    
+
     const verifiedText = TRANSLATIONS[currentLang]?.verifiedBadgeText || 'Verified Triage Desk';
-    
+
     try {
         const queryStr = `[out:json][timeout:8];nwr(around:15000,${lat},${lon})[amenity=veterinary];out center 8;`;
         const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(queryStr)}`;
-        
+
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error('Overpass API fetch error');
         }
-        
+
         const data = await response.json();
         const elements = data.elements || [];
-        
+
         if (elements.length === 0) {
             throw new Error('No elements found');
         }
-        
+
         // 1. Process all elements into standard clinic objects
         const rawClinics = elements.map(el => {
             const elLat = el.lat || (el.center && el.center.lat);
             const elLon = el.lon || (el.center && el.center.lon);
-            
+
             let name = el.tags?.name;
             if (!name) {
                 if (currentLang === 'ja') {
@@ -2063,7 +2063,7 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
                     name = 'Veterinary Clinic (Unnamed)';
                 }
             }
-            
+
             let address = '';
             if (el.tags) {
                 if (el.tags['addr:full']) {
@@ -2086,7 +2086,7 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
                     address = 'Address not specified (check map)';
                 }
             }
-            
+
             let phone = '';
             if (el.tags) {
                 phone = el.tags['phone'] || el.tags['contact:phone'] || el.tags['contact:mobile'] || el.tags['mobile'] || el.tags['phone:emergency'] || el.tags['emergency:phone'] || '';
@@ -2094,7 +2094,7 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
             if (!phone) {
                 phone = "00-0000-0000";
             }
-            
+
             const distance = calculateDistance(lat, lon, elLat, elLon);
             return {
                 name: name,
@@ -2105,29 +2105,29 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
                 distance: distance
             };
         });
-        
+
         // Sort all by distance
         rawClinics.sort((a, b) => a.distance - b.distance);
-        
+
         // 2. Select top 3 (or less if not enough) to promote to Verified Desks
         const numVerified = Math.min(3, rawClinics.length);
         const verifiedDesks = [];
         const standardClinics = [];
-        
+
         const statuses = ["active", "busy", "high"];
         const waitTimes = ["0-5 min wait", "15 min wait", "35 min wait"];
         const waitTimesJa = ["待ち時間 0-5分", "待ち時間 15分", "待ち時間 35分"];
         const waitTimesMy = ["စောင့်ဆိုင်းရန်မလို (၀-၅ မိနစ်)", "၁၅ မိနစ် စောင့်ဆိုင်းရမည်", "၃၅ မိနစ် စောင့်ဆိုင်းရမည်"];
-        
+
         const statusLabels = TRANSLATIONS[currentLang]?.statusLabels || TRANSLATIONS['en'].statusLabels;
         const statusLabelKeys = ["active", "busy", "high"];
-        
+
         rawClinics.forEach((clinic, idx) => {
             if (idx < numVerified) {
                 // Promote to verified desk
                 clinic.status = statuses[idx];
                 clinic.statusLabel = statusLabels[statusLabelKeys[idx]];
-                
+
                 if (currentLang === 'ja') {
                     clinic.waitTime = waitTimesJa[idx];
                 } else if (currentLang === 'my') {
@@ -2135,14 +2135,14 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
                 } else {
                     clinic.waitTime = waitTimes[idx];
                 }
-                
+
                 // If no phone registered, generate a placeholder
                 if (!clinic.phone || clinic.phone === "00-0000-0000") {
                     clinic.phone = "00-0000-0000";
                 }
-                
+
                 verifiedDesks.push(clinic);
-                
+
                 // Add custom verified marker
                 const statusClass = clinic.status === 'active' ? 'status-active' : (clinic.status === 'busy' ? 'status-busy' : 'status-high');
                 const verifiedIcon = L.divIcon({
@@ -2151,7 +2151,7 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
                     iconSize: [30, 30],
                     iconAnchor: [15, 30]
                 });
-                
+
                 const marker = L.marker([clinic.lat, clinic.lon], { icon: verifiedIcon }).addTo(mapInstance);
                 const popupContent = `
                     <div style="font-family: 'Outfit', sans-serif;">
@@ -2165,7 +2165,7 @@ async function fetchNearbyClinics(lat, lon, isGpsAllowed) {
                 mapMarkers.push({ id: `verified-${idx}`, marker: marker, data: clinic });
             }
         });
-        
+
         renderClinicsList(verifiedDesks, []);
     } catch (err) {
         console.error("Failed to load nearby clinics, using offline mock mode:", err);
@@ -2216,9 +2216,9 @@ function setupOfflineMockDesks(lat, lon) {
         desk.distance = calculateDistance(lat, lon, desk.lat, desk.lon);
     });
     verifiedDesks.sort((a, b) => a.distance - b.distance);
-    
+
     const verifiedText = TRANSLATIONS[currentLang]?.verifiedBadgeText || 'Verified Triage Desk';
-    
+
     // Add markers for verified desks
     verifiedDesks.forEach((desk, idx) => {
         const statusClass = desk.status === 'active' ? 'status-active' : (desk.status === 'busy' ? 'status-busy' : 'status-high');
@@ -2228,7 +2228,7 @@ function setupOfflineMockDesks(lat, lon) {
             iconSize: [30, 30],
             iconAnchor: [15, 30]
         });
-        
+
         const marker = L.marker([desk.lat, desk.lon], { icon: verifiedIcon }).addTo(mapInstance);
         const popupContent = `
             <div style="font-family: 'Outfit', sans-serif;">
@@ -2241,7 +2241,7 @@ function setupOfflineMockDesks(lat, lon) {
         marker.bindPopup(popupContent);
         mapMarkers.push({ id: `verified-${idx}`, marker: marker, data: desk });
     });
-    
+
     renderClinicsList(verifiedDesks, []);
 }
 
@@ -2250,11 +2250,11 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
 
@@ -2262,36 +2262,36 @@ function renderClinicsList(verifiedDesks, standardClinics) {
     clinicsLoading.classList.add('hidden');
     clinicsList.innerHTML = '';
     clinicsList.classList.remove('hidden');
-    
+
     const unit = TRANSLATIONS[currentLang]?.distanceUnit || 'km';
     const phoneNaText = TRANSLATIONS[currentLang]?.phoneNa || 'No phone registered';
     const verifiedText = TRANSLATIONS[currentLang]?.verifiedBadgeText || 'Verified Triage Desk';
-    
+
     // Render Verified Desks
     verifiedDesks.forEach((desk, idx) => {
         const card = document.createElement('div');
         card.className = 'clinic-card verified-desk';
-        
+
         const badge = document.createElement('div');
         badge.className = 'verified-badge';
         badge.innerHTML = `<span class="badge-icon">✓</span> ${verifiedText}`;
         card.appendChild(badge);
-        
+
         const nameRow = document.createElement('div');
         nameRow.className = 'clinic-name-row';
-        
+
         const nameEl = document.createElement('h3');
         nameEl.className = 'clinic-name';
         nameEl.textContent = desk.name;
-        
+
         const distEl = document.createElement('span');
         distEl.className = 'clinic-distance';
         distEl.textContent = `${desk.distance.toFixed(1)} ${unit}`;
-        
+
         nameRow.appendChild(nameEl);
         nameRow.appendChild(distEl);
         card.appendChild(nameRow);
-        
+
         const statusRow = document.createElement('div');
         statusRow.className = 'clinic-status-row';
         const dot = document.createElement('span');
@@ -2302,26 +2302,26 @@ function renderClinicsList(verifiedDesks, standardClinics) {
         statusRow.appendChild(dot);
         statusRow.appendChild(statusText);
         card.appendChild(statusRow);
-        
+
         const detailsEl = document.createElement('div');
         detailsEl.className = 'clinic-details';
-        
+
         const addrLink = document.createElement('a');
         addrLink.className = 'clinic-address';
         addrLink.href = `https://www.google.com/maps/dir/?api=1&destination=${desk.lat},${desk.lon}`;
         addrLink.target = '_blank';
         addrLink.title = 'Open in Google Maps';
         addrLink.innerHTML = `<span class="loc-icon">📍</span> ${desk.address}`;
-        
+
         const phoneEl = document.createElement('div');
         phoneEl.className = 'clinic-phone';
         const cleanPhone = desk.phone.replace(/[^0-9+]/g, '');
         phoneEl.innerHTML = `<span class="phone-icon">📞</span> <a href="tel:${cleanPhone}" class="phone-link">${desk.phone}</a>`;
-        
+
         detailsEl.appendChild(addrLink);
         detailsEl.appendChild(phoneEl);
         card.appendChild(detailsEl);
-        
+
         card.addEventListener('click', () => {
             if (mapInstance) {
                 mapInstance.setView([desk.lat, desk.lon], 15);
@@ -2331,7 +2331,7 @@ function renderClinicsList(verifiedDesks, standardClinics) {
                 }
             }
         });
-        
+
         clinicsList.appendChild(card);
     });
 }
@@ -2437,9 +2437,9 @@ function resetPhotoUploader() {
 function handlePhotoUpload(file) {
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             // Set canvas size (max 120x120 to preserve localStorage quota)
             const maxDim = 120;
             let width = img.width;
@@ -2464,7 +2464,7 @@ function handlePhotoUpload(file) {
 
             // Compress to JPEG Data URL with 0.7 quality
             uploadedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            
+
             // Show preview
             if (photoPreview) photoPreview.src = uploadedPhotoBase64;
             if (photoPreviewContainer) photoPreviewContainer.classList.remove('hidden');
@@ -2495,8 +2495,8 @@ function renderPets() {
         const card = document.createElement('div');
         card.className = 'pet-card';
 
-        const avatarHtml = pet.photo 
-            ? `<img src="${pet.photo}" alt="${escapeHtml(pet.name)}">` 
+        const avatarHtml = pet.photo
+            ? `<img src="${pet.photo}" alt="${escapeHtml(pet.name)}">`
             : getPetTypeEmoji(pet.type || 'other');
 
         const breedKey = pet.breed || 'generic';
@@ -2600,7 +2600,7 @@ function renderPets() {
             editingPetId = pet.id;
             regPetName.value = pet.name || '';
             regPetType.value = pet.type || 'dog';
-            
+
             // Populate breed dropdown based on type and select breed
             populateBreedDropdown();
             if (regPetBreed) {
@@ -2711,7 +2711,7 @@ function escapeHtml(text) {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function (m) { return map[m]; });
 }
 
 // Navigation event listeners
@@ -2740,7 +2740,7 @@ if (navPetsBtn) {
 if (addPetBtn) {
     addPetBtn.addEventListener('click', () => {
         editingPetId = null;
-        
+
         // Restore default labels
         const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
         if (registerPetTitle) registerPetTitle.textContent = str.registerPetTitle || 'Register New Pet';
