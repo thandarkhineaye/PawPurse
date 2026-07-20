@@ -1,12 +1,16 @@
-# PawPurse 🐾
+<div align="center">
+  <img src="logo.png" alt="PawPurse Logo" width="140" style="border-radius: 12px;" />
+  <h1>PawPurse 🐾</h1>
+  <p><strong>Instant, color-coded emergency triage for anxious pet owners in a crisis.</strong></p>
 
-**Instant, color-coded emergency triage for anxious pet owners in a crisis.**
-
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.138+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Gemini 3.5](https://img.shields.io/badge/AI-Gemini%203.5%20Flash-8E44AD?style=flat&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Tests](https://img.shields.io/badge/Tests-Pytest%20Passing-brightgreen?style=flat&logo=pytest&logoColor=white)](#running-tests)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+  <p>
+    <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white" alt="Python"></a>
+    <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.138+-009688?style=flat&logo=fastapi&logoColor=white" alt="FastAPI"></a>
+    <a href="https://ai.google.dev/"><img src="https://img.shields.io/badge/AI-Gemini%203.5%20Flash-8E44AD?style=flat&logo=google&logoColor=white" alt="Gemini 3.5"></a>
+    <a href="#running-tests"><img src="https://img.shields.io/badge/Tests-Pytest%20Passing-brightgreen?style=flat&logo=pytest&logoColor=white" alt="Tests"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
+  </p>
+</div>
 
 ---
 
