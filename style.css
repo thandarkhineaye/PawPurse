@@ -369,7 +369,82 @@ footer {
     font-size: 40px;
     font-weight: 900;
     line-height: 1.1;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
+}
+
+/* Registered Emergency Contact Call Card */
+.emergency-call-card {
+    background: #ffffff;
+    color: #121212;
+    border-radius: 16px;
+    padding: 18px 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    animation: pulseCallCard 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseCallCard {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.012); }
+}
+
+.emergency-call-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.emergency-call-label {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #e53e3e;
+}
+
+body.state-yellow .emergency-call-label {
+    color: #dd6b20;
+}
+
+.emergency-call-name {
+    font-size: 18px;
+    font-weight: 900;
+    color: #12281a;
+    word-break: break-word;
+}
+
+.emergency-call-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #e53e3e;
+    color: #ffffff !important;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 900;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(229, 62, 62, 0.4);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+body.state-yellow .emergency-call-btn {
+    background-color: #dd6b20;
+    box-shadow: 0 4px 14px rgba(221, 107, 32, 0.4);
+}
+
+.emergency-call-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
 }
 
 .instructions-card {

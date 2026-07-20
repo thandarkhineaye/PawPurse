@@ -378,6 +378,11 @@ const TRANSLATIONS = {
         phoneNa: "No phone registered",
         doctorLabel: "Doctor: ",
         doctorFallback: "Duty Veterinarian",
+        emergencyCallLabel: "📞 Registered Emergency Contact",
+        emergencyCallBtnText: "Call Now",
+        noContactSavedLabel: "🚨 Emergency Contact",
+        noContactSavedText: "No Emergency Contact Saved",
+        addContactBtnText: "+ Add Contact",
         verifiedBadgeText: "Verified Triage Desk",
         additionalClinicsHeader: "Additional Area Clinics",
         yourLocation: "Your Location",
@@ -471,6 +476,11 @@ const TRANSLATIONS = {
         phoneNa: "電話番号の登録なし",
         doctorLabel: "担当医師: ",
         doctorFallback: "当直獣医師",
+        emergencyCallLabel: "📞 登録済み緊急連絡先",
+        emergencyCallBtnText: "今すぐ発信",
+        noContactSavedLabel: "🚨 緊急連絡先",
+        noContactSavedText: "緊急連絡先が未登録です",
+        addContactBtnText: "+ 連絡先を追加",
         verifiedBadgeText: "確認済み 優先デスク",
         additionalClinicsHeader: "その他の周辺クリニック",
         yourLocation: "現在地",
@@ -564,6 +574,11 @@ const TRANSLATIONS = {
         phoneNa: "ဖုန်းနံပါတ် မရှိပါ",
         doctorLabel: "တိရစ္ဆာန်ဆရာဝန်: ",
         doctorFallback: "တာဝန်ကျ တိရစ္ဆာန်ဆရာဝန်",
+        emergencyCallLabel: "📞 မှတ်ပုံတင်ထားသော အရေးပေါ် ဆက်သွယ်ရန်",
+        emergencyCallBtnText: "ယခု ဖုန်းခေါ်မည်",
+        noContactSavedLabel: "🚨 အရေးပေါ် ဆက်သွယ်ရန်",
+        noContactSavedText: "အရေးပေါ်ဆက်သွယ်ရန် မသိမ်းဆည်းရသေးပါ",
+        addContactBtnText: "+ ဆက်သွယ်ရန် ထည့်မည်",
         verifiedBadgeText: "ညဉ့်နက်ပိုင်း လူနာခွဲခြားရေးဌာန",
         additionalClinicsHeader: "အခြား အနီးနားရှိဆေးခန်းများ",
         yourLocation: "သင်၏တည်နေရာ",
@@ -1697,6 +1712,21 @@ function updateLanguageUI(lang) {
         if (typeof renderClinic === 'function') {
             renderClinic();
         }
+
+        // Update active emergency call card if present
+        const emergencyCallCard = document.getElementById('emergency-call-card');
+        const emergencyCallLabel = document.getElementById('emergency-call-label');
+        const emergencyCallBtnText = document.getElementById('emergency-call-btn-text');
+        if (emergencyCallCard && !emergencyCallCard.classList.contains('hidden')) {
+            const clinic = getEmergencyClinic();
+            if (clinic && clinic.phone) {
+                if (emergencyCallLabel) emergencyCallLabel.textContent = strings.emergencyCallLabel || "📞 Registered Emergency Contact";
+                if (emergencyCallBtnText) emergencyCallBtnText.textContent = strings.emergencyCallBtnText || "Call Now";
+            } else {
+                if (emergencyCallLabel) emergencyCallLabel.textContent = strings.noContactSavedLabel || "🚨 Emergency Contact";
+                if (emergencyCallBtnText) emergencyCallBtnText.textContent = strings.addContactBtnText || "+ Add Contact";
+            }
+        }
     }
 
     // Refresh first aid translations & active category layout
@@ -1813,6 +1843,46 @@ function showResult(data) {
         listEl.appendChild(li);
     });
 
+    // Registered Emergency Contact call banner display on RED or YELLOW
+    const emergencyCallCard = document.getElementById('emergency-call-card');
+    const emergencyCallLabel = document.getElementById('emergency-call-label');
+    const emergencyCallName = document.getElementById('emergency-call-name');
+    const emergencyCallBtn = document.getElementById('emergency-call-btn');
+    const emergencyCallBtnText = document.getElementById('emergency-call-btn-text');
+
+    if (emergencyCallCard) {
+        if (data.urgency === 'RED' || data.urgency === 'YELLOW') {
+            const clinic = getEmergencyClinic();
+            const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+
+            if (clinic && clinic.phone) {
+                if (emergencyCallLabel) emergencyCallLabel.textContent = str.emergencyCallLabel || "📞 Registered Emergency Contact";
+                if (emergencyCallName) emergencyCallName.textContent = `${clinic.name} (${clinic.phone})`;
+                if (emergencyCallBtnText) emergencyCallBtnText.textContent = str.emergencyCallBtnText || "Call Now";
+                if (emergencyCallBtn) {
+                    const cleanPhone = clinic.phone.replace(/[^0-9+]/g, '');
+                    emergencyCallBtn.href = `tel:${cleanPhone}`;
+                    emergencyCallBtn.onclick = null;
+                }
+                emergencyCallCard.classList.remove('hidden');
+            } else {
+                if (emergencyCallLabel) emergencyCallLabel.textContent = str.noContactSavedLabel || "🚨 Emergency Contact";
+                if (emergencyCallName) emergencyCallName.textContent = str.noContactSavedText || "No Emergency Contact Saved";
+                if (emergencyCallBtnText) emergencyCallBtnText.textContent = str.addContactBtnText || "+ Add Contact";
+                if (emergencyCallBtn) {
+                    emergencyCallBtn.href = "#";
+                    emergencyCallBtn.onclick = (e) => {
+                        e.preventDefault();
+                        switchScreen('clinic');
+                    };
+                }
+                emergencyCallCard.classList.remove('hidden');
+            }
+        } else {
+            emergencyCallCard.classList.add('hidden');
+        }
+    }
+
     // Nearest animal hospital clinics section display on RED or YELLOW
     if (data.urgency === 'RED' || data.urgency === 'YELLOW') {
         clinicsSection.classList.remove('hidden');
@@ -1833,6 +1903,11 @@ function getUrgencySubtitle(urgency) {
 function resetApp() {
     // Reset body
     document.body.className = '';
+
+    const emergencyCallCard = document.getElementById('emergency-call-card');
+    if (emergencyCallCard) {
+        emergencyCallCard.classList.add('hidden');
+    }
 
     // Hide result, show landing
     resultState.classList.remove('active');
