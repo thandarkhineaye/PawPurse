@@ -54,6 +54,14 @@ def api_triage(request: TriageRequest):
 # Serve the static files from the repository root
 static_dir = os.path.dirname(os.path.dirname(__file__))
 
+@app.get("/logo.png")
+def serve_logo_png():
+    return FileResponse(os.path.join(static_dir, "logo.png"))
+
+@app.get("/logo.jpg")
+def serve_logo_jpg():
+    return FileResponse(os.path.join(static_dir, "logo.jpg"))
+
 @app.get("/style.css")
 def serve_css():
     return FileResponse(os.path.join(static_dir, "style.css"))

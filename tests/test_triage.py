@@ -63,3 +63,13 @@ def test_triage_flow_api_down(monkeypatch):
     response = client.post("/api/triage", json={"symptoms": "dog is fine"})
     assert response.status_code == 503
     assert "unavailable" in response.json()["detail"]
+
+def test_local_triage_heat_shock(monkeypatch):
+    # Temporarily force engine.client to None to ensure it uses the local classifier list
+    monkeypatch.setattr(engine, "client", None)
+    res = engine.classify_symptoms("my dog suffered a heat shock")
+    assert res["urgency"] == "RED"
+    
+    res_ja = engine.classify_symptoms("犬がヒートショックを起こした")
+    assert res_ja["urgency"] == "RED"
+

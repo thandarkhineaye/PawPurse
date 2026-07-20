@@ -117,7 +117,7 @@ class TriageEngine:
             # English keywords
             red_en = [
                 "bleed", "blood", "chok", "breath", "unconscious", "collapse", "seizure", "convulsion", "paralyz", 
-                "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "stasis", "limp", 
+                "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "heat shock", "stasis", "limp", 
                 "fracture", "broken", "unresponsive", "gasp", "pant", "blue", "pale", "bloat", "fit",
                 "accident", "hit by car", "run over", "fell from", "dog attack", "animal attack", "trauma", "crash", "collision", "hit by", "struck by",
                 "eye bleed", "bleeding eye", "eye bleeding", "proptosis", "eye pop", "eyeball pop", "eye puncture", "blindness",
@@ -137,7 +137,7 @@ class TriageEngine:
             red_ja = [
                 "出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり", "血", "吐血", "呼吸困難", 
                 "息苦しい", "気絶", "倒れる", "反応がない", "けいれん", "痙攣", "発作", "麻痺", "まひ", "動けない", 
-                "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "うっ滞", 
+                "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "ヒートショック", "うっ滞", 
                 "骨折", "折れる", "ハアハア", "あえぎ呼吸", "蒼白", "胃拡張",
                 "事故", "車にひかれた", "ひかれた", "転落", "犬に噛まれた", "噛まれた", "動物に襲われた", "外傷", "衝突", "はねられた",
                 "眼球突出", "目が飛び出る", "目が飛び出た", "眼の出血", "目の出血", "失明", "眼に刺さる",

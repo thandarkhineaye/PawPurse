@@ -22,7 +22,7 @@ function classifySymptomsLocally(symptoms, language) {
     // English keywords
     const redEn = [
         "bleed", "blood", "chok", "breath", "unconscious", "collapse", "seizure", "convulsion", "paralyz", 
-        "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "stasis", "limp", 
+        "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "heat shock", "stasis", "limp", 
         "fracture", "broken", "unresponsive", "gasp", "pant", "blue", "pale", "bloat", "fit",
         "accident", "hit by car", "run over", "fell from", "dog attack", "animal attack", "trauma", "crash", "collision", "hit by", "struck by",
         "eye bleed", "bleeding eye", "eye bleeding", "proptosis", "eye pop", "eyeball pop", "eye puncture", "blindness",
@@ -48,7 +48,7 @@ function classifySymptomsLocally(symptoms, language) {
     const redJa = [
         "出血", "のどにつまる", "窒息", "息", "呼吸", "意識不明", "ぐったり", "血", "吐血", "呼吸困難", 
         "息苦しい", "気絶", "倒れる", "反応がない", "けいれん", "痙攣", "発作", "麻痺", "まひ", "動けない", 
-        "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "うっ滞", 
+        "中毒", "毒", "チョコレート", "ユリ", "ゆり", "化学物質", "テフロン", "煙", "熱中症", "ヒートショック", "うっ滞", 
         "骨折", "折れる", "ハアハア", "あえぎ呼吸", "蒼白", "胃拡張",
         "事故", "車にひかれた", "ひかれた", "転落", "犬に噛まれた", "噛まれた", "動物に襲われた", "外傷", "衝突", "はねられた",
         "眼球突出", "目が飛び出る", "目が飛び出た", "眼の出血", "目の出血", "失明", "眼に刺さる",
@@ -233,6 +233,7 @@ const charWarning = document.getElementById('char-warning');
 
 const promptHeaderEl = document.getElementById('prompt-header');
 const disclaimerEl = document.getElementById('disclaimer');
+const accuracyNoticeTextEl = document.getElementById('accuracy-notice-text');
 const langBtns = document.querySelectorAll('.lang-btn');
 
 const landingState = document.getElementById('landing-state');
@@ -259,8 +260,34 @@ const searchMapsBtn = document.getElementById('search-maps-btn');
 const logoHome = document.getElementById('logo-home');
 const navTriageBtn = document.getElementById('nav-triage-btn');
 const navPetsBtn = document.getElementById('nav-pets-btn');
+const navClinicBtn = document.getElementById('nav-clinic-btn');
 const myPetsState = document.getElementById('my-pets-state');
 const newPetState = document.getElementById('new-pet-state');
+const emergencyContactState = document.getElementById('emergency-contact-state');
+
+const emergencyContactTitle = document.getElementById('emergency-contact-title');
+const clinicDisplayContainer = document.getElementById('clinic-display-container');
+const dispClinicName = document.getElementById('disp-clinic-name');
+const dispClinicAddress = document.getElementById('disp-clinic-address');
+const dispClinicPhone = document.getElementById('disp-clinic-phone');
+const editClinicBtn = document.getElementById('edit-clinic-btn');
+const removeClinicBtn = document.getElementById('remove-clinic-btn');
+const clinicFormContainer = document.getElementById('clinic-form-container');
+const clinicRegisterForm = document.getElementById('clinic-register-form');
+const regClinicName = document.getElementById('reg-clinic-name');
+const regClinicAddress = document.getElementById('reg-clinic-address');
+const regClinicPhone = document.getElementById('reg-clinic-phone');
+const saveClinicBtn = document.getElementById('save-clinic-btn');
+const cancelClinicBtn = document.getElementById('cancel-clinic-btn');
+const emptyClinicMessage = document.getElementById('empty-clinic-message');
+const addClinicBtn = document.getElementById('add-clinic-btn');
+const emptyClinicP = document.getElementById('empty-clinic-p');
+
+const labelRegClinicName = document.getElementById('label-reg-clinic-name');
+const labelRegClinicAddress = document.getElementById('label-reg-clinic-address');
+const labelRegClinicPhone = document.getElementById('label-reg-clinic-phone');
+const labelDispAddress = document.getElementById('label-disp-address');
+const labelDispPhone = document.getElementById('label-disp-phone');
 
 const myPetsTitle = document.getElementById('my-pets-title');
 const addPetBtn = document.getElementById('add-pet-btn');
@@ -288,6 +315,8 @@ const optCat = document.getElementById('opt-cat');
 const optBird = document.getElementById('opt-bird');
 const optRabbit = document.getElementById('opt-rabbit');
 const optOther = document.getElementById('opt-other');
+const labelPetBreed = document.getElementById('label-pet-breed');
+const regPetBreed = document.getElementById('reg-pet-breed');
 
 const labelPetPhoto = document.getElementById('label-pet-photo');
 const regPetPhoto = document.getElementById('reg-pet-photo');
@@ -319,7 +348,8 @@ const DOCTOR_NAMES = {
 const TRANSLATIONS = {
     en: {
         promptHeader: "What is happening with your pet?",
-        placeholder: "Describe symptoms or behavior (e.g., my dog ate chocolate, my cat is breathing heavily)...",
+        accuracyNoticeText: "Triage accuracy is 50% on the app and 50% on you. Please enter the condition and relevant numbers (like body temperature, duration, or frequency) accurately and completely.",
+        placeholder: "Describe symptoms and details (e.g., my dog ate chocolate 2 hours ago, my cat is breathing heavily at 40 breaths/min)...",
         checkBtn: "Check Urgency",
         charWarning: "Character limit reached",
         errorBanner: "Unable to reach triage service. If this is a life-threatening emergency, please visit a clinic immediately.",
@@ -385,11 +415,34 @@ const TRANSLATIONS = {
         petTypeLabel: "Pet Type",
         petPhotoLabel: "Pet Photo",
         choosePhotoBtn: "Choose Photo",
-        optOther: "Other"
+        optOther: "Other",
+        navClinic: "Emergency Contact",
+        emergencyContactTitle: "Emergency Contact",
+        clinicNameLabel: "Clinic Name",
+        clinicAddressLabel: "Clinic Address",
+        clinicPhoneLabel: "Phone Number",
+        saveClinicBtn: "Save Contact",
+        noClinicMessage: "No emergency contact saved yet.",
+        editDetailsBtn: "Edit Details",
+        addContactBtn: "+ Add Contact",
+        breedLabel: "Breed",
+        breedGuideToggle: "🐾 View Breed Insights",
+        breedGuideHide: "🐾 Hide Breed Insights",
+        originTitle: "Origin",
+        temperamentTitle: "Temperament",
+        weightTitle: "Ideal Weight Guide",
+        coatMaintenanceTitle: "Coat Care",
+        healthProsTitle: "Key Strengths",
+        healthConsTitle: "Potential Health Risks",
+        genericBreedOpt: "General / Other Breed",
+        editPetBtn: "Edit",
+        editPetTitle: "Edit Pet Details",
+        saveChangesBtn: "Save Changes"
     },
     ja: {
         promptHeader: "ペットに何が起きていますか？",
-        placeholder: "症状や様子を入力してください（例：犬がチョコレートを食べてしまった、猫の呼吸が荒いなど）...",
+        accuracyNoticeText: "トリアージの正確性は、アプリ側に50％、ユーザーの正確な入力に50％依存します。症状の様子と具体的な数値（体温、持続時間、頻度など）を正確かつ完全に入力してください。",
+        placeholder: "症状や詳細（例：2時間前に犬がチョコを誤食した、猫が1分間に40回荒い呼吸をしている等）を入力してください...",
         checkBtn: "緊急度を判定する",
         charWarning: "文字数制限に達しました",
         errorBanner: "判定サービスに接続できません。命に関わる緊急事態の場合は、ただちに最寄りの動物病院を受診してください。",
@@ -455,11 +508,34 @@ const TRANSLATIONS = {
         petTypeLabel: "ペットの種類",
         petPhotoLabel: "ペットの写真",
         choosePhotoBtn: "写真を選択",
-        optOther: "その他"
+        optOther: "その他",
+        navClinic: "緊急連絡先",
+        emergencyContactTitle: "緊急連絡先",
+        clinicNameLabel: "クリニック名",
+        clinicAddressLabel: "クリニック住所",
+        clinicPhoneLabel: "電話番号",
+        saveClinicBtn: "連絡先を保存",
+        noClinicMessage: "登録されている緊急連絡先はありません。",
+        editDetailsBtn: "詳細を編集",
+        addContactBtn: "+ 連絡先を追加",
+        breedLabel: "犬種・猫種",
+        breedGuideToggle: "🐾 インサイトを表示",
+        breedGuideHide: "🐾 インサイトを非表示",
+        originTitle: "原産地",
+        temperamentTitle: "気質・性格",
+        weightTitle: "理想的な体重ガイド",
+        coatMaintenanceTitle: "被毛のお手入れ",
+        healthProsTitle: "主な強み",
+        healthConsTitle: "注意すべき健康リスク",
+        genericBreedOpt: "一般 / その他の品種",
+        editPetBtn: "編集",
+        editPetTitle: "ペット情報の編集",
+        saveChangesBtn: "変更を保存"
     },
     my: {
         promptHeader: "သင့်အိမ်မွေးတိရစ္ဆာန် ဘာဖြစ်နေသလဲ။",
-        placeholder: "ရောဂါလက္ခဏာ သို့မဟုတ် အပြုအမူကို ဖော်ပြပါ (ဥပမာ- ခွေးချောကလက်စားမိခြင်း၊ ကြောင်အသက်ရှူပြင်းခြင်း)...",
+        accuracyNoticeText: "ဤခွဲခြားအကဲဖြတ်မှု မှန်ကန်ခြင်းသည် စနစ်အပေါ်တွင် ၅၀ ရာခိုင်နှုန်းနှင့် အသုံးပြုသူ၏ တိကျစွာ ထည့်သွင်းမှုအပေါ်တွင် ၅၀ ရာခိုင်နှုန်း မူတည်သည်။ ရောဂါလက္ခဏာ အခြေအနေနှင့် သက်ဆိုင်ရာ ကိန်းဂဏန်းများ (ဥပမာ- ကိုယ်အပူချိန်၊ ကြာချိန်၊ အကြိမ်အရေအတွက်) ကို တိကျပြည့်စုံစွာ ထည့်သွင်းပေးပါ။",
+        placeholder: "ရောဂါလက္ခဏာနှင့် အသေးစိတ်အချက်အလက်များ (ဥပမာ- လွန်ခဲ့သော ၂ နာရီက ခွေးချောကလက် စားမိခြင်း၊ ကြောင်တစ်မိနစ်လျှင် အသက်ရှူအကြိမ် ၄၀ ဖြင့် အသက်ရှူပြင်းခြင်း) ကို ဖော်ပြပါ...",
         checkBtn: "အရေးပေါ်အခြေအနေ စစ်ဆေးရန်",
         charWarning: "စာလုံးရေကန့်သတ်ချက် ပြည့်သွားပါပြီ",
         errorBanner: "စစ်ဆေးမှုစနစ်သို့ ဆက်သွယ်၍မရပါ။ အသက်အန္တရာယ်ရှိသော အရေးပေါ်အခြေအနေဖြစ်ပါက ဆေးခန်းသို့ ချက်ချင်းသွားပါ။",
@@ -525,9 +601,354 @@ const TRANSLATIONS = {
         petTypeLabel: "အိမ်မွေးတိရစ္ဆာန်အမျိုးအစား",
         petPhotoLabel: "အိမ်မွေးတိရစ္ဆာန်ဓာတ်ပုံ",
         choosePhotoBtn: "ဓာတ်ပုံရွေးချယ်ရန်",
-        optOther: "အခြား"
+        optOther: "အခြား",
+        navClinic: "ဆက်သွယ်ရန်",
+        emergencyContactTitle: "အရေးပေါ် ဆက်သွယ်ရန်",
+        clinicNameLabel: "ဆေးကုခန်းအမည်",
+        clinicAddressLabel: "ဆေးကုခန်းလိပ်စာ",
+        clinicPhoneLabel: "ဖုန်းနံပါတ်",
+        saveClinicBtn: "လိပ်စာသိမ်းဆည်းရန်",
+        noClinicMessage: "အရေးပေါ် ဆက်သွယ်ရန်လိပ်စာ မရှိသေးပါ။",
+        editDetailsBtn: "ပြင်ဆင်ရန်",
+        addContactBtn: "+ အဆက်အသွယ်ထည့်ရန်",
+        breedLabel: "မျိုးစိတ်",
+        breedGuideToggle: "🐾 အချက်အလက်များကြည့်ရန်",
+        breedGuideHide: "🐾 အချက်အလက်များ ဖျောက်ထားရန်",
+        originTitle: "မူလဒေသ",
+        temperamentTitle: "စိတ်နေသဘောထား",
+        weightTitle: "အလေးချိန် လမ်းညွှန်",
+        coatMaintenanceTitle: "အမွေးအမျှင်ထိန်းသိမ်းမှု",
+        healthProsTitle: "အားသာချက်များ",
+        healthConsTitle: "ဖြစ်နိုင်ချေရှိသော ကျန်းမာရေးပြဿနာများ",
+        genericBreedOpt: "အခြားမျိုးစိတ်",
+        editPetBtn: "ပြင်ဆင်ရန်",
+        editPetTitle: "အချက်အလက် ပြင်ဆင်ရန်",
+        saveChangesBtn: "ပြင်ဆင်မှု သိမ်းဆည်းရန်"
     }
 };
+
+// Localized Breed Database structure
+const BREED_DATABASE = {
+    en: {
+        dog: {
+            "shiba_inu": {
+                name: "Shiba Inu",
+                origin: "Japan",
+                temperament: "Loyal, Alert, Active, Independent",
+                pros: "Clean, quiet, extremely loyal, beautiful appearance",
+                cons: "Can be stubborn, strong prey drive, sheds heavily",
+                maintenance: "High (Heavy seasonal shedding)",
+                weight: "8 - 11 kg (Adult)"
+            },
+            "golden_retriever": {
+                name: "Golden Retriever",
+                origin: "Scotland",
+                temperament: "Friendly, Intelligent, Devoted, Playful",
+                pros: "Highly trainable, excellent family pet, gentle",
+                cons: "Prone to cancer and hip issues, sheds constantly",
+                maintenance: "Medium-High (Regular brushing needed)",
+                weight: "25 - 34 kg (Adult)"
+            },
+            "poodle": {
+                name: "Poodle",
+                origin: "Germany / France",
+                temperament: "Active, Proud, Very Smart, Elegant",
+                pros: "Hypoallergenic coat (no shedding), incredibly smart",
+                cons: "Requires professional grooming, prone to ear infections",
+                maintenance: "High (Needs regular clipping & grooming)",
+                weight: "20 - 32 kg (Standard)"
+            },
+            "chihuahua": {
+                name: "Chihuahua",
+                origin: "Mexico",
+                temperament: "Charming, Alert, Loyal, Sassy",
+                pros: "Excellent for apartments, long lifespan, portable",
+                cons: "Can be fragile, prone to shivering, easily startled",
+                maintenance: "Low (Minimal grooming required)",
+                weight: "1.5 - 3.0 kg (Adult)"
+            },
+            "other_dog": {
+                name: "General / Mixed Breed",
+                origin: "Various",
+                temperament: "Unique personality, Adaptable",
+                pros: "High genetic health diversity, highly adaptable",
+                cons: "Unpredictable traits if mixed ancestry",
+                maintenance: "Depends on coat length",
+                weight: "Varies widely"
+            }
+        },
+        cat: {
+            "siamese": {
+                name: "Siamese",
+                origin: "Thailand",
+                temperament: "Vocal, Social, Affectionate, Curious",
+                pros: "Extremely communicative, deep bonds, playful",
+                cons: "Very loud, demands constant attention, prone to anxiety",
+                maintenance: "Low (Short fine coat)",
+                weight: "3.5 - 5.5 kg (Adult)"
+            },
+            "persian": {
+                name: "Persian",
+                origin: "Iran",
+                temperament: "Quiet, Sweet, Placid, Dignified",
+                pros: "Very gentle, quiet household companion, affectionate",
+                cons: "Prone to breathing issues (brachycephalic), tear stains",
+                maintenance: "High (Requires daily detangling & washing)",
+                weight: "3.2 - 5.5 kg (Adult)"
+            },
+            "maine_coon": {
+                name: "Maine Coon",
+                origin: "United States",
+                temperament: "Gentle Giant, Friendly, Playful",
+                pros: "Very friendly, great with kids/dogs, dog-like traits",
+                cons: "Prone to hypertrophic cardiomyopathy (HCM)",
+                maintenance: "Medium-High (Thick shaggy double coat)",
+                weight: "5.0 - 10.0 kg (Adult)"
+            },
+            "munchkin": {
+                name: "Munchkin",
+                origin: "United States",
+                temperament: "Sweet, Active, Outgoing, People-oriented",
+                pros: "Extremely cute short legs, agile, very playful",
+                cons: "Controversial breeding, prone to joint stiffness",
+                maintenance: "Medium (Weekly brushing needed)",
+                weight: "2.5 - 4.0 kg (Adult)"
+            },
+            "other_cat": {
+                name: "General / Domestic Cat",
+                origin: "Various",
+                temperament: "Independent, Adaptable, Playful",
+                pros: "Low genetic hereditary diseases, highly independent",
+                cons: "Varies depending on environment",
+                maintenance: "Low-Medium (Shorthair/Longhair)",
+                weight: "3.5 - 5.0 kg"
+            }
+        }
+    },
+    ja: {
+        dog: {
+            "shiba_inu": {
+                name: "柴犬",
+                origin: "日本",
+                temperament: "忠実、敏捷、活発、独立心が強い",
+                pros: "清潔で静か、飼い主に非常に従順、美しい外見",
+                cons: "頑固な面あり、警戒心が強い、抜け毛が多い",
+                maintenance: "高い（換毛期に大量の抜け毛）",
+                weight: "8 - 11 kg (成犬)"
+            },
+            "golden_retriever": {
+                name: "ゴールデン・レトリバー",
+                origin: "スコットランド",
+                temperament: "フレンドリー、賢い、献身的、遊び好き",
+                pros: "しつけが非常に容易、優れた家庭犬、優しい性格",
+                cons: "股関節疾患や腫瘍のリスク、年間を通じた抜け毛",
+                maintenance: "中〜高（定期的なブラッシングが必要）",
+                weight: "25 - 34 kg (成犬)"
+            },
+            "poodle": {
+                name: "プードル",
+                origin: "ドイツ / フランス",
+                temperament: "活動的、誇り高い、非常に聡明、エレガント",
+                pros: "抜け毛が少なく低アレルゲン、非常に頭が良い",
+                cons: "定期的なカットが必要、耳感染症にかかりやすい",
+                maintenance: "高い（定期的なトリミングとトリマー予約が必要）",
+                weight: "20 - 32 kg (スタンダード)"
+            },
+            "chihuahua": {
+                name: "チワワ",
+                origin: "メキシコ",
+                temperament: "魅力的、機敏、忠実、勇敢",
+                pros: "室内飼いに最適、長寿、持ち運びが容易",
+                cons: "骨が細く怪我しやすい、寒がり、怖がりな面も",
+                maintenance: "低い（最小限のお手入れでOK）",
+                weight: "1.5 - 3.0 kg (成犬)"
+            },
+            "other_dog": {
+                name: "一般 / 雑種・その他の犬種",
+                origin: "様々",
+                temperament: "ユニークな個性、適応力が高い",
+                pros: "遺伝的多様性により健康、環境適応力が高い",
+                cons: "ルーツ不明な場合のサイズ予測が困難",
+                maintenance: "被毛の長さに依存",
+                weight: "個体による"
+            }
+        },
+        cat: {
+            "siamese": {
+                name: "シャム（サイアミーズ）",
+                origin: "タイ",
+                temperament: "おしゃべり、社交的、愛情深い、好奇心旺盛",
+                pros: "おしゃべりで感情表現が豊か、強い絆",
+                cons: "鳴き声が大きい、寂しがりや、注意を引きたがる",
+                maintenance: "低い（短毛種でなめらかな被毛）",
+                weight: "3.5 - 5.5 kg (成猫)"
+            },
+            "persian": {
+                name: "ペルシャ",
+                origin: "イラン",
+                temperament: "静か、穏やか、温和、気品がある",
+                pros: "非常におっとりしている、静かな環境を好む",
+                cons: "鼻ペチャ（短頭種）による呼吸トラブル、涙やけ",
+                maintenance: "高い（毎日の毛並みのお手入れが必須）",
+                weight: "3.2 - 5.5 kg (成猫)"
+            },
+            "maine_coon": {
+                name: "メインクーン",
+                origin: "アメリカ",
+                temperament: "ジェントルジャイアント（穏やかな巨人）、人懐っこい",
+                pros: "非常にフレンドリー、子供や他ペットとも良好、犬のような従順さ",
+                cons: "肥大型心筋症（HCM）など心臓疾患のリスク",
+                maintenance: "中〜高（長毛種でダブルコート）",
+                weight: "5.0 - 10.0 kg (成猫)"
+            },
+            "munchkin": {
+                name: "マンチカン",
+                origin: "アメリカ",
+                temperament: "甘えん坊、活発、外交的、人間大好き",
+                pros: "短い手足が非常に愛らしい、動きが俊敏",
+                cons: "椎間板ヘルニアや関節の負担のリスク",
+                maintenance: "中程度（週に数回のブラッシング）",
+                weight: "2.5 - 4.0 kg (成猫)"
+            },
+            "other_cat": {
+                name: "一般 / その他の猫種・雑種",
+                origin: "様々",
+                temperament: "マイペース、適応力あり、遊び好き",
+                pros: "遺伝病のリスクが比較的低い、非常に独立している",
+                cons: "環境によって性格が様々に変化",
+                maintenance: "低〜中（短毛または長毛による）",
+                weight: "3.5 - 5.0 kg"
+            }
+        }
+    },
+    my: {
+        dog: {
+            "shiba_inu": {
+                name: "ရှီဘာ အိနု (Shiba Inu)",
+                origin: "ဂျပန်နိုင်ငံ",
+                temperament: "သစ္စာရှိခြင်း၊ နိုးကြားခြင်း၊ တက်ကြွခြင်း၊ လွတ်လပ်စွာနေတတ်ခြင်း",
+                pros: "သန့်ရှင်းခြင်း၊ တိတ်ဆိတ်ခြင်း၊ အလွန်သစ္စာရှိခြင်း၊ လှပခြင်း",
+                cons: "ခေါင်းမာတတ်ခြင်း၊ အမဲလိုက်စိတ်ပြင်းပြခြင်း၊ အမွေးကျွတ်ခြင်း",
+                maintenance: "မြင့်မား (ရာသီအလိုက် အမွေးအလွန်ကျွတ်တတ်သည်)",
+                weight: "၈ - ၁၁ ကီလိုဂရမ် (အရွယ်ရောက်ပြီး)"
+            },
+            "golden_retriever": {
+                name: "ဂိုးဒင်း ရီထရီဗာ (Golden Retriever)",
+                origin: "စကော့တလန်နိုင်ငံ",
+                temperament: "ဖော်ရွေခြင်း၊ လိမ္မာပါးနပ်ခြင်း၊ သစ္စာရှိခြင်း၊ ဆော့ကစားတတ်ခြင်း",
+                pros: "သင်ကြားရလွယ်ကူခြင်း၊ မိသားစုအတွက်အကောင်းဆုံးဖြစ်ခြင်း၊ ညင်သာခြင်း",
+                cons: "တင်ပါးဆုံဆစ်လွဲခြင်းနှင့် ကင်ဆာရောဂါဖြစ်နိုင်ခြေရှိခြင်း၊ အမွေးအမြဲကျွတ်ခြင်း",
+                maintenance: "အလယ်အလတ်-မြင့်မား (ပုံမှန် အမွေးဖြီးပေးရန်လိုအပ်)",
+                weight: "၂၅ - ၃၄ ကီလိုဂရမ် (အရွယ်ရောက်ပြီး)"
+            },
+            "poodle": {
+                name: "ပုဒယ် (Poodle)",
+                origin: "ဂျာမနီ / ပြင်သစ်",
+                temperament: "တက်ကြွခြင်း၊ ဂုဏ်ယူတတ်ခြင်း၊ အလွန်လိမ္မာခြင်း၊ သပ်ရပ်ခြင်း",
+                pros: "အမွေးမကျွတ်သဖြင့် ဓာတ်မတည့်သူများအတွက်သင့်တော်ခြင်း၊ အလွန်ဉာဏ်ကောင်းခြင်း",
+                cons: "ပုံမှန် အမွေးညှပ်ပေးရန်လိုအပ်ခြင်း၊ နားပိုးဝင်လွယ်ခြင်း",
+                maintenance: "မြင့်မား (ပုံမှန် အမွေးညှပ်/ထိန်းသိမ်းမှုလိုအပ်သည်)",
+                weight: "၂၀ - ၃၂ ကီလိုဂရမ် (စံသတ်မှတ်ချက်)"
+            },
+            "chihuahua": {
+                name: "ချီဝါဝါ (Chihuahua)",
+                origin: "မက္ကဆီကိုနိုင်ငံ",
+                temperament: "ချစ်စရာကောင်းခြင်း၊ နိုးကြားခြင်း၊ သစ္စာရှိခြင်း၊ ထက်မြက်ခြင်း",
+                pros: "တိုက်ခန်းကျဉ်းများတွင်မွေးရန်အဆင်ပြေခြင်း၊ သက်တမ်းရှည်ခြင်း၊ သယ်ဆောင်ရလွယ်ကူခြင်း",
+                cons: "နုနယ်လွန်းခြင်း၊ အလွယ်တကူတုန်လှုပ်တတ်ခြင်း",
+                maintenance: "နိမ့်ပါး (အမွေးထိန်းသိမ်းမှု အနည်းငယ်သာလိုအပ်)",
+                weight: "၁.၅ - ၃.၀ ကီလိုဂရမ် (အရွယ်ရောက်ပြီး)"
+            },
+            "other_dog": {
+                name: "အထွေထွေ / မျိုးစိတ်ကွဲ",
+                origin: "အမျိုးမျိုး",
+                temperament: "ထူးခြားသောစိတ်နေသဘောထားရှိခြင်း၊ လိုက်လျောညီထွေရှိခြင်း",
+                pros: "ကျန်းမာရေးခံနိုင်ရည်ကောင်းခြင်း၊ လိုက်လျောညီထွေနေထိုင်နိုင်ခြင်း",
+                cons: "မျိုးရိုးမသဲကွဲပါက ခန့်မှန်းရခက်ခဲခြင်း",
+                maintenance: "အမွေးအရှည်ပေါ်တွင် မူတည်သည်",
+                weight: "အမျိုးမျိုးကွဲပြားသည်"
+            }
+        },
+        cat: {
+            "siamese": {
+                name: "ရှာမိစ် (Siamese)",
+                origin: "ထိုင်းနိုင်ငံ",
+                temperament: "အော်တတ်ခြင်း၊ ဖော်ရွေခြင်း၊ ချစ်ခင်တတ်ခြင်း၊ စပ်စုတတ်ခြင်း",
+                pros: "ဆက်သွယ်ပြောဆိုလိုစိတ်ပြင်းပြခြင်း၊ သံယောဇဉ်ကြီးခြင်း",
+                cons: "အသံကျယ်ကျယ်အော်တတ်ခြင်း၊ အာရုံစိုက်မှုအမြဲတောင်းခံခြင်း",
+                maintenance: "နိမ့်ပါး (အမွေးတိုညင်သာသည်)",
+                weight: "၃.၅ - ၅.၅ ကီလိုဂရမ် (အရွယ်ရောက်ပြီး)"
+            },
+            "persian": {
+                name: "ပါရှန်း (Persian)",
+                origin: "အီရန်နိုင်ငံ",
+                temperament: "တိတ်ဆိတ်ခြင်း၊ ချိုသာခြင်း၊ အေးချမ်းခြင်း၊ ခန့်ညားခြင်း",
+                pros: "အလွန်ညင်သာခြင်း၊ တိတ်ဆိတ်သောအိမ်များအတွက်သင့်တော်ခြင်း",
+                cons: "မျက်နှာပြားသဖြင့် အသက်ရှူလမ်းကြောင်းဆိုင်ရာပြဿနာရှိခြင်း၊ မျက်ရည်ပူထွက်ခြင်း",
+                maintenance: "မြင့်မား (နေ့စဉ် အမွေးဖြီးသင်ပေးရန် လိုအပ်သည်)",
+                weight: "၃.၂ - ၅.၅ ကီလိုဂရမ် (အရွယ်ရောက်ပြီး)"
+            },
+            "maine_coon": {
+                name: "မိန်းကွန်း (Maine Coon)",
+                origin: "အမေရိကန်ပြည်ထောင်စု",
+                temperament: "ဧရာမလူလိမ္မာကြီး၊ ဖော်ရွေခြင်း၊ ဆော့ကစားတတ်ခြင်း",
+                pros: "ဖော်ရွေလွန်းခြင်း၊ ကလေးများနှင့် အခြားခွေး/ကြောင်များနှင့်တည့်ခြင်း",
+                cons: "နှလုံးရောဂါဖြစ်နိုင်ခြေရှိခြင်း",
+                maintenance: "အလယ်အလတ်-မြင့်မား (အမွေးထူထပ်သည်)",
+                weight: "၅.၀ - ၁၀.၀ ကီလိုဂရမ် (အရွယ်ရောက်ပြီး)"
+            },
+            "munchkin": {
+                name: "မန့်ချ်ကင် (Munchkin)",
+                origin: "အမေရိကန်ပြည်ထောင်စု",
+                temperament: "ချိုသာခြင်း၊ တက်ကြွခြင်း၊ ဖော်ရွေခြင်း၊ လူခင်တတ်ခြင်း",
+                pros: "ခြေတိုလေးများဖြင့် ချစ်စရာကောင်းခြင်း၊ တက်ကြွဖျတ်လတ်ခြင်း",
+                cons: "ကျောရိုးနှင့် အဆစ်အမြစ်ဆိုင်ရာပြဿနာရှိနိုင်ခြင်း",
+                maintenance: "အလယ်အလတ် (အပတ်စဉ် အမွေးဖြီးပေးရန်လိုအပ်သည်)",
+                weight: "၂.၅ - ၄.၀ ကီလိုဂရမ် (အရွယ်ရောက်ပြီး)"
+            },
+            "other_cat": {
+                name: "အထွေထွေ / ဗမာကြောင်",
+                origin: "အမျိုးမျိုး",
+                temperament: "လွတ်လပ်စွာနေတတ်ခြင်း၊ လိုက်လျောညီထွေရှိခြင်း၊ ကစားတတ်ခြင်း",
+                pros: "မျိုးရိုးဗီဇဆိုင်ရာ ရောဂါဖြစ်ပွားမှုနည်းခြင်း၊ ကိုယ့်ဖာသာကိုယ်နေတတ်ခြင်း",
+                cons: "ပတ်ဝန်းကျင်အခြေအနေပေါ် မူတည်၍ ကွဲပြားသည်",
+                maintenance: "နိမ့်ပါး-အလယ်အလတ် (အမွေးအတို/အရှည်ပေါ်မူတည်၍)",
+                weight: "၃.၅ - ၅.၀ ကီလိုဂရမ်"
+            }
+        }
+    }
+};
+
+function populateBreedDropdown() {
+    if (!regPetBreed || !regPetType) return;
+    const type = regPetType.value;
+    regPetBreed.innerHTML = '';
+
+    const lang = currentLang || 'en';
+    const strings = TRANSLATIONS[lang];
+    const db = BREED_DATABASE[lang] || BREED_DATABASE['en'];
+
+    if (type === 'dog' || type === 'cat') {
+        const breeds = db[type];
+        for (const breedKey in breeds) {
+            const option = document.createElement('option');
+            option.value = breedKey;
+            option.textContent = breeds[breedKey].name;
+            regPetBreed.appendChild(option);
+        }
+    } else {
+        const option = document.createElement('option');
+        option.value = 'generic';
+        option.textContent = strings.genericBreedOpt || "General Breed";
+        regPetBreed.appendChild(option);
+    }
+}
+
+if (regPetType) {
+    regPetType.addEventListener('change', () => {
+        populateBreedDropdown();
+    });
+}
 
 const FIRST_AID_DATA = {
     en: {
@@ -1171,6 +1592,7 @@ if (!['en', 'ja', 'my'].includes(currentLang)) {
 }
 
 let currentPet = 'dog';
+let editingPetId = null;
 
 function updateLanguageUI(lang) {
     currentLang = lang;
@@ -1187,6 +1609,7 @@ function updateLanguageUI(lang) {
     const strings = TRANSLATIONS[lang];
     if (strings) {
         promptHeaderEl.textContent = strings.promptHeader;
+        if (accuracyNoticeTextEl) accuracyNoticeTextEl.textContent = strings.accuracyNoticeText;
         inputEl.placeholder = strings.placeholder;
         btnText.textContent = strings.checkBtn;
         charWarning.textContent = strings.charWarning;
@@ -1247,9 +1670,32 @@ function updateLanguageUI(lang) {
         if (optBird) optBird.textContent = strings.pets.bird;
         if (optRabbit) optRabbit.textContent = strings.pets.rabbit;
         if (optOther) optOther.textContent = strings.optOther;
+        if (labelPetBreed) labelPetBreed.textContent = strings.breedLabel;
 
         if (typeof renderPets === 'function') {
             renderPets();
+        }
+
+        // Localize Emergency Contact elements safely
+        if (navClinicBtn) navClinicBtn.textContent = strings.navClinic;
+        if (emergencyContactTitle) emergencyContactTitle.textContent = strings.emergencyContactTitle;
+        if (emptyClinicP) emptyClinicP.textContent = strings.noClinicMessage;
+        if (addClinicBtn) addClinicBtn.textContent = strings.addContactBtn;
+        if (labelRegClinicName) labelRegClinicName.textContent = strings.clinicNameLabel;
+        if (regClinicName) regClinicName.placeholder = strings.clinicNameLabel;
+        if (labelRegClinicAddress) labelRegClinicAddress.textContent = strings.clinicAddressLabel;
+        if (regClinicAddress) regClinicAddress.placeholder = strings.clinicAddressLabel;
+        if (labelRegClinicPhone) labelRegClinicPhone.textContent = strings.clinicPhoneLabel;
+        if (regClinicPhone) regClinicPhone.placeholder = strings.clinicPhoneLabel;
+        if (saveClinicBtn) saveClinicBtn.textContent = strings.saveClinicBtn;
+        if (cancelClinicBtn) cancelClinicBtn.textContent = strings.cancelBtn;
+        if (editClinicBtn) editClinicBtn.textContent = strings.editDetailsBtn;
+        if (removeClinicBtn) removeClinicBtn.textContent = strings.deletePetBtn || "Remove";
+        if (labelDispAddress) labelDispAddress.textContent = strings.petAddressLabel || "Address:";
+        if (labelDispPhone) labelDispPhone.textContent = strings.clinicPhoneLabel || "Phone Number:";
+
+        if (typeof renderClinic === 'function') {
+            renderClinic();
         }
     }
     
@@ -1903,7 +2349,7 @@ updateFirstAidUI();
 
 // Switch screen state utility
 function switchScreen(screenName) {
-    [landingState, resultState, myPetsState, newPetState].forEach(state => {
+    [landingState, resultState, myPetsState, newPetState, emergencyContactState].forEach(state => {
         if (state) {
             state.classList.remove('active');
             state.classList.add('hidden');
@@ -1912,6 +2358,7 @@ function switchScreen(screenName) {
 
     navTriageBtn.classList.remove('active');
     navPetsBtn.classList.remove('active');
+    if (navClinicBtn) navClinicBtn.classList.remove('active');
 
     // Reset active body urgency background state when navigating to non-triage screens
     if (screenName !== 'triage' && screenName !== 'result') {
@@ -1931,6 +2378,13 @@ function switchScreen(screenName) {
         renderPets();
     } else if (screenName === 'register') {
         activeEl = newPetState;
+        if (typeof populateBreedDropdown === 'function') {
+            populateBreedDropdown();
+        }
+    } else if (screenName === 'clinic') {
+        activeEl = emergencyContactState;
+        if (navClinicBtn) navClinicBtn.classList.add('active');
+        renderClinic();
     }
 
     if (activeEl) {
@@ -2045,6 +2499,63 @@ function renderPets() {
             ? `<img src="${pet.photo}" alt="${escapeHtml(pet.name)}">` 
             : getPetTypeEmoji(pet.type || 'other');
 
+        const breedKey = pet.breed || 'generic';
+        const type = pet.type || 'other';
+        let breedName = '';
+        let hasBreedInfo = false;
+
+        const db = BREED_DATABASE[currentLang] || BREED_DATABASE['en'];
+        if ((type === 'dog' || type === 'cat') && db[type] && db[type][breedKey]) {
+            breedName = db[type][breedKey].name;
+            hasBreedInfo = true;
+        } else {
+            breedName = strings.genericBreedOpt || "General Breed";
+        }
+
+        let insightsHtml = '';
+        if (hasBreedInfo) {
+            const info = db[type][breedKey];
+            insightsHtml = `
+                <button class="breed-insights-toggle" data-target="insights-${pet.id}">
+                    ${strings.breedGuideToggle || '🐾 View Breed Insights'}
+                </button>
+                <div id="insights-${pet.id}" class="breed-insights-container hidden">
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.originTitle || 'Origin'}</span>
+                        <div class="breed-tag-row">
+                            <span class="breed-badge">${escapeHtml(info.origin)}</span>
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.temperamentTitle || 'Temperament'}</span>
+                        <div class="breed-tag-row">
+                            ${info.temperament.split(',').map(tag => `<span class="breed-badge">${escapeHtml(tag.trim())}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.coatMaintenanceTitle || 'Coat Care'}</span>
+                        <div class="breed-tag-row">
+                            <span class="breed-badge highlight-red">${escapeHtml(info.maintenance)}</span>
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.weightTitle || 'Ideal Weight'}</span>
+                        <div class="breed-tag-row">
+                            <span class="breed-badge highlight-green">${escapeHtml(info.weight)}</span>
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.healthProsTitle || 'Key Strengths'}</span>
+                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">${escapeHtml(info.pros)}</div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.healthConsTitle || 'Health Risks'}</span>
+                        <div style="color: #c53030; font-size: 12px; margin-top: 2px;">${escapeHtml(info.cons)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
         card.innerHTML = `
             <div class="pet-card-header">
                 <div class="pet-card-title-group">
@@ -2053,9 +2564,16 @@ function renderPets() {
                     </div>
                     <span class="pet-card-name">${escapeHtml(pet.name)}</span>
                 </div>
-                <button class="pet-remove-btn" data-id="${pet.id}">${strings.deletePetBtn || 'Remove'}</button>
+                <div class="pet-card-actions">
+                    <button class="pet-edit-btn" data-id="${pet.id}">${strings.editPetBtn || 'Edit'}</button>
+                    <button class="pet-remove-btn" data-id="${pet.id}">${strings.deletePetBtn || 'Remove'}</button>
+                </div>
             </div>
             <div class="pet-card-details">
+                <div class="pet-detail-item">
+                    <span class="pet-detail-label">${strings.breedLabel || 'Breed:'}</span>
+                    <span class="pet-detail-val">${escapeHtml(breedName)}</span>
+                </div>
                 <div class="pet-detail-item">
                     <span class="pet-detail-label">${strings.petAddressLabel || 'Address:'}</span>
                     <span class="pet-detail-val">${escapeHtml(pet.address)}</span>
@@ -2069,12 +2587,64 @@ function renderPets() {
                     <span class="pet-detail-val">${pet.vaccineDate ? escapeHtml(pet.vaccineDate) : '-'}</span>
                 </div>
             </div>
+            ${insightsHtml}
         `;
 
         card.querySelector('.pet-remove-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             deletePet(pet.id);
         });
+
+        card.querySelector('.pet-edit-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            editingPetId = pet.id;
+            regPetName.value = pet.name || '';
+            regPetType.value = pet.type || 'dog';
+            
+            // Populate breed dropdown based on type and select breed
+            populateBreedDropdown();
+            if (regPetBreed) {
+                regPetBreed.value = pet.breed || 'generic';
+            }
+
+            regPetAddress.value = pet.address || '';
+            regPetChip.value = pet.chip || '';
+            regPetVaccine.value = pet.vaccineDate || '';
+
+            // Handle photo upload preview loading
+            uploadedPhotoBase64 = pet.photo || '';
+            if (uploadedPhotoBase64) {
+                if (photoPreview) photoPreview.src = uploadedPhotoBase64;
+                if (photoPreviewContainer) photoPreviewContainer.classList.remove('hidden');
+                if (photoUploadBtn) photoUploadBtn.classList.add('hidden');
+            } else {
+                resetPhotoUploader();
+            }
+
+            // Update title and button labels
+            const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+            if (registerPetTitle) registerPetTitle.textContent = str.editPetTitle || 'Edit Pet Details';
+            if (registerSubmitBtn) registerSubmitBtn.textContent = str.saveChangesBtn || 'Save Changes';
+
+            switchScreen('register');
+        });
+
+        if (hasBreedInfo) {
+            const toggleBtn = card.querySelector('.breed-insights-toggle');
+            const container = card.querySelector(`#insights-${pet.id}`);
+            if (toggleBtn && container) {
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = container.classList.contains('hidden');
+                    if (isHidden) {
+                        container.classList.remove('hidden');
+                        toggleBtn.textContent = strings.breedGuideHide || '🐾 Hide Breed Insights';
+                    } else {
+                        container.classList.add('hidden');
+                        toggleBtn.textContent = strings.breedGuideToggle || '🐾 View Breed Insights';
+                    }
+                });
+            }
+        }
 
         petsGrid.appendChild(card);
     });
@@ -2083,25 +2653,49 @@ function renderPets() {
 function registerPet() {
     const name = regPetName.value.trim();
     const type = regPetType.value;
+    const breed = regPetBreed ? regPetBreed.value : '';
     const address = regPetAddress.value.trim();
     const chip = regPetChip.value.trim();
     const vaccineDate = regPetVaccine.value;
 
     if (!name || !address) return;
 
-    const newPet = {
-        id: 'pet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-        name: name,
-        type: type,
-        address: address,
-        chip: chip,
-        vaccineDate: vaccineDate,
-        photo: uploadedPhotoBase64
-    };
-
     const pets = getPets();
-    pets.push(newPet);
+
+    if (editingPetId) {
+        // Edit existing pet
+        const petIdx = pets.findIndex(p => p.id === editingPetId);
+        if (petIdx !== -1) {
+            pets[petIdx].name = name;
+            pets[petIdx].type = type;
+            pets[petIdx].breed = breed;
+            pets[petIdx].address = address;
+            pets[petIdx].chip = chip;
+            pets[petIdx].vaccineDate = vaccineDate;
+            pets[petIdx].photo = uploadedPhotoBase64;
+        }
+        editingPetId = null;
+    } else {
+        // Create new pet
+        const newPet = {
+            id: 'pet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            name: name,
+            type: type,
+            breed: breed,
+            address: address,
+            chip: chip,
+            vaccineDate: vaccineDate,
+            photo: uploadedPhotoBase64
+        };
+        pets.push(newPet);
+    }
+
     savePets(pets);
+
+    // Restore default labels
+    const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+    if (registerPetTitle) registerPetTitle.textContent = str.registerPetTitle || 'Register New Pet';
+    if (registerSubmitBtn) registerSubmitBtn.textContent = str.registerBtn || 'Register Pet';
 
     regPetForm.reset();
     resetPhotoUploader();
@@ -2145,12 +2739,29 @@ if (navPetsBtn) {
 
 if (addPetBtn) {
     addPetBtn.addEventListener('click', () => {
+        editingPetId = null;
+        
+        // Restore default labels
+        const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+        if (registerPetTitle) registerPetTitle.textContent = str.registerPetTitle || 'Register New Pet';
+        if (registerSubmitBtn) registerSubmitBtn.textContent = str.registerBtn || 'Register Pet';
+
+        regPetForm.reset();
+        resetPhotoUploader();
+        populateBreedDropdown();
         switchScreen('register');
     });
 }
 
 if (registerCancelBtn) {
     registerCancelBtn.addEventListener('click', () => {
+        editingPetId = null;
+
+        // Restore default labels
+        const str = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+        if (registerPetTitle) registerPetTitle.textContent = str.registerPetTitle || 'Register New Pet';
+        if (registerSubmitBtn) registerSubmitBtn.textContent = str.registerBtn || 'Register Pet';
+
         regPetForm.reset();
         resetPhotoUploader();
         switchScreen('pets');
@@ -2184,4 +2795,116 @@ if (photoRemoveBtn) {
 
 // Render pets list initially
 renderPets();
+
+// Emergency Contact local storage and registration helpers
+function getEmergencyClinic() {
+    try {
+        return JSON.parse(localStorage.getItem('pawpurse_emergency_clinic')) || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveEmergencyClinic(data) {
+    localStorage.setItem('pawpurse_emergency_clinic', JSON.stringify(data));
+}
+
+function deleteEmergencyClinic() {
+    localStorage.removeItem('pawpurse_emergency_clinic');
+    renderClinic();
+}
+
+function renderClinic() {
+    if (!clinicDisplayContainer || !clinicFormContainer || !emptyClinicMessage) return;
+
+    const clinic = getEmergencyClinic();
+
+    if (!clinic) {
+        clinicDisplayContainer.classList.add('hidden');
+        clinicFormContainer.classList.add('hidden');
+        emptyClinicMessage.classList.remove('hidden');
+        return;
+    }
+
+    emptyClinicMessage.classList.add('hidden');
+    clinicFormContainer.classList.add('hidden');
+    clinicDisplayContainer.classList.remove('hidden');
+
+    if (dispClinicName) dispClinicName.textContent = clinic.name;
+    if (dispClinicAddress) {
+        dispClinicAddress.textContent = clinic.address;
+        dispClinicAddress.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.address)}`;
+    }
+    if (dispClinicPhone) {
+        dispClinicPhone.textContent = clinic.phone;
+        const cleanPhone = clinic.phone.replace(/[^0-9+]/g, '');
+        dispClinicPhone.href = `tel:${cleanPhone}`;
+    }
+}
+
+function registerEmergencyClinic() {
+    const name = regClinicName.value.trim();
+    const address = regClinicAddress.value.trim();
+    const phone = regClinicPhone.value.trim();
+
+    if (!name || !address || !phone) return;
+
+    const data = { name, address, phone };
+    saveEmergencyClinic(data);
+
+    if (clinicRegisterForm) clinicRegisterForm.reset();
+    renderClinic();
+}
+
+// Emergency contact event listeners
+if (navClinicBtn) {
+    navClinicBtn.addEventListener('click', () => {
+        switchScreen('clinic');
+    });
+}
+
+if (addClinicBtn) {
+    addClinicBtn.addEventListener('click', () => {
+        if (clinicDisplayContainer) clinicDisplayContainer.classList.add('hidden');
+        if (emptyClinicMessage) emptyClinicMessage.classList.add('hidden');
+        if (clinicFormContainer) clinicFormContainer.classList.remove('hidden');
+        if (regClinicName) regClinicName.focus();
+    });
+}
+
+if (editClinicBtn) {
+    editClinicBtn.addEventListener('click', () => {
+        const clinic = getEmergencyClinic();
+        if (clinic) {
+            if (regClinicName) regClinicName.value = clinic.name;
+            if (regClinicAddress) regClinicAddress.value = clinic.address;
+            if (regClinicPhone) regClinicPhone.value = clinic.phone;
+        }
+        if (clinicDisplayContainer) clinicDisplayContainer.classList.add('hidden');
+        if (emptyClinicMessage) emptyClinicMessage.classList.add('hidden');
+        if (clinicFormContainer) clinicFormContainer.classList.remove('hidden');
+    });
+}
+
+if (removeClinicBtn) {
+    removeClinicBtn.addEventListener('click', () => {
+        deleteEmergencyClinic();
+    });
+}
+
+if (clinicRegisterForm) {
+    clinicRegisterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        registerEmergencyClinic();
+    });
+}
+
+if (cancelClinicBtn) {
+    cancelClinicBtn.addEventListener('click', () => {
+        if (clinicRegisterForm) clinicRegisterForm.reset();
+        renderClinic();
+    });
+}
+
+
 
