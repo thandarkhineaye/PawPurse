@@ -1757,6 +1757,11 @@ function updateLanguageUI(lang) {
 
     // Refresh first aid translations & active category layout
     updateFirstAidUI();
+
+    // Re-run library search if search query is present
+    if (typeof searchBreedLibrary === 'function' && librarySearchInput && librarySearchInput.value.trim() !== '') {
+        searchBreedLibrary();
+    }
 }
 
 let currentFirstAidCategory = 'cpr';
@@ -3215,32 +3220,46 @@ if (navLibraryBtn) {
     });
 }
 
-let breedLibraryCache = null;
+let breedLibraryCacheEn = null;
+let breedLibraryCacheMy = null;
 
 async function loadBreedLibrary() {
-    if (breedLibraryCache) return breedLibraryCache;
+    const isBurmese = (currentLang === 'my');
+    if (isBurmese) {
+        if (breedLibraryCacheMy) return breedLibraryCacheMy;
+    } else {
+        if (breedLibraryCacheEn) return breedLibraryCacheEn;
+    }
+
     try {
-        const response = await fetch('data/breed_insight_library.csv');
+        const csvPath = isBurmese ? 'data/breed_insight_library_burmese.csv' : 'data/breed_insight_library.csv';
+        const response = await fetch(csvPath);
         if (!response.ok) {
-            throw new Error('Failed to fetch breed library csv');
+            throw new Error('Failed to fetch breed library csv: ' + csvPath);
         }
         const text = await response.text();
         const parsed = parseCSV(text);
-
+        
         // Remove header row
         const headers = parsed[0];
         const dataRows = parsed.slice(1);
-
+        
         // Map data rows to objects
-        breedLibraryCache = dataRows.map(row => {
+        const cache = dataRows.map(row => {
             const obj = {};
             headers.forEach((h, i) => {
                 obj[h.trim()] = row[i] ? row[i].trim() : '';
             });
             return obj;
         }).filter(item => item.id);
-
-        return breedLibraryCache;
+        
+        if (isBurmese) {
+            breedLibraryCacheMy = cache;
+            return breedLibraryCacheMy;
+        } else {
+            breedLibraryCacheEn = cache;
+            return breedLibraryCacheEn;
+        }
     } catch (e) {
         console.error('Error loading breed library:', e);
         return [];
@@ -3302,9 +3321,12 @@ async function searchBreedLibrary() {
     }
 
     const library = await loadBreedLibrary();
-    // Search by matching part of the breed name (case-insensitive)
+    // Search by matching part of the breed name, origin, temperament, or category (case-insensitive)
     const results = library.filter(breed => {
-        return (breed.breed_name || '').toLowerCase().includes(query);
+        return (breed.breed_name || '').toLowerCase().includes(query) ||
+               (breed.origin || '').toLowerCase().includes(query) ||
+               (breed.temperament || '').toLowerCase().includes(query) ||
+               (breed.category || '').toLowerCase().includes(query);
     });
 
     if (results.length === 0) {
