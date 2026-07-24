@@ -150,6 +150,7 @@ header.app-header {
 .lang-selector {
     display: flex;
     gap: 8px;
+    align-items: right;
 }
 
 .lang-btn {
@@ -409,8 +410,15 @@ footer {
 }
 
 @keyframes pulseCallCard {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.01); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.01);
+    }
 }
 
 .emergency-call-info {
