@@ -2027,9 +2027,75 @@ langBtns.forEach(btn => {
     });
 });
 
+function detectPetTypeFromText(text) {
+    if (!text) return null;
+    const lower = text.toLowerCase();
+
+    // Check for Cat keywords
+    const catKeywords = [
+        "cat", "kitten", "kittens", "feline", "kitty",
+        "猫", "ねこ", "ネコ", "子猫", "仔猫",
+        "ကြောင်", "ကြောင်လေး"
+    ];
+    if (catKeywords.some(w => lower.includes(w))) {
+        return "cat";
+    }
+
+    // Check for Bird keywords
+    const birdKeywords = [
+        "bird", "parrot", "budgie", "canary", "cockatiel", "avian",
+        "鳥", "とり", "インコ", "オウム", "文鳥", "小鳥",
+        "ငှက်", "ငှက်လေး"
+    ];
+    if (birdKeywords.some(w => lower.includes(w))) {
+        return "bird";
+    }
+
+    // Check for Rabbit keywords
+    const rabbitKeywords = [
+        "rabbit", "bunny", "bunnies", "hare",
+        "うさぎ", "ウサギ", "兎",
+        "ယုန်", "ယုန်လေး"
+    ];
+    if (rabbitKeywords.some(w => lower.includes(w))) {
+        return "rabbit";
+    }
+
+    // Check for Dog keywords
+    const dogKeywords = [
+        "dog", "puppy", "puppies", "pup", "canine",
+        "犬", "いぬ", "イヌ", "子犬", "仔犬",
+        "ခွေး", "ခွေးလေး"
+    ];
+    if (dogKeywords.some(w => lower.includes(w))) {
+        return "dog";
+    }
+
+    return null;
+}
+
+function selectPetType(petType) {
+    if (!petType) return;
+    currentPet = petType;
+    document.querySelectorAll('.pet-select-btn').forEach(btn => {
+        if (btn.getAttribute('data-pet') === petType) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    updateFirstAidUI();
+}
+
 checkBtn.addEventListener('click', () => {
     const text = inputEl.value.trim();
     if (!text) return;
+
+    // Detect pet type from user input and update currentPet if found
+    const detectedPet = detectPetTypeFromText(text);
+    if (detectedPet) {
+        selectPetType(detectedPet);
+    }
 
     showLoading();
 
