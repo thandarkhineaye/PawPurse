@@ -614,20 +614,20 @@ const TRANSLATIONS = {
             shock: "⚡ ရှော့ခ်ရခြင်း"
         },
         navTriage: "စစ်ဆေးရန်",
-        navPets: "ကျွန်ုပ်၏အိမ်မွေးတိရစ္ဆာန်များ",
-        myPetsTitle: "မှတ်ပုံတင်ထားသော အိမ်မွေးတိရစ္ဆာန်များ",
+        navPets: "ကိုယ့်ရဲ့အိမ်မွေးတိရစ္ဆာန်လေးများ",
+        myPetsTitle: "မှတ်ပုံတင်ထားသော အိမ်မွေးတိရစ္ဆာန်လေးများ",
         addPetBtn: "+ အိမ်မွေးတိရစ္ဆာန်အသစ်ထည့်ရန်",
         registerPetTitle: "အိမ်မွေးတိရစ္ဆာန်အသစ် မှတ်ပုံတင်ရန်",
-        petNamePlaceholder: "အိမ်မွေးတိရစ္ဆာန်အမည်",
+        petNamePlaceholder: "Pet name",
         addressPlaceholder: "ပိုင်ရှင်၏လိပ်စာ",
-        chipNumberPlaceholder: "မိုက်ခရိုချစ်ပ်နံပါတ်",
+        chipNumberPlaceholder: "Micro Chip Number",
         lastVaccinatedDateLabel: "နောက်ဆုံး ကာကွယ်ဆေးထိုးသည့်ရက်စွဲ",
         registerBtn: "မှတ်ပုံတင်မည်",
         cancelBtn: "ပယ်ဖျက်မည်",
         noPetsMessage: "မှတ်ပုံတင်ထားသော အိမ်မွေးတိရစ္ဆာန် မရှိသေးပါ။",
         petNameLabel: "အမည်:",
         petAddressLabel: "လိပ်စာ:",
-        petChipLabel: "ချစ်ပ်နံပါတ်:",
+        petChipLabel: "Micro Chip Number:",
         petVaccineLabel: "နောက်ဆုံးထိုးနှံမှု:",
         deletePetBtn: "ပယ်ဖျက်ရန်",
         petTypeLabel: "အိမ်မွေးတိရစ္ဆာန်အမျိုးအစား",
@@ -656,11 +656,11 @@ const TRANSLATIONS = {
         editPetBtn: "ပြင်ဆင်ရန်",
         editPetTitle: "အချက်အလက် ပြင်ဆင်ရန်",
         saveChangesBtn: "ပြင်ဆင်မှု သိမ်းဆည်းရန်",
-        navLibrary: "အိမ်မွေးတိရစ္ဆာန် စာကြည့်တိုက်",
-        libraryTitle: "အိမ်မွေးတိရစ္ဆာန် စာကြည့်တိုက်",
+        navLibrary: "အိမ်မွေးတိရစ္ဆာန်လေးများအကြောင်း",
+        libraryTitle: "အိမ်မွေးတိရစ္ဆာန်လေးများအကြောင်း",
         librarySearchPlaceholder: "မျိုးစိတ်အမည် ရှာဖွေရန် (ဥပမာ- ရွှေရောင် ရီထရီဗာ၊ ရှာမိစ်)...",
         librarySearchBtn: "ရှာဖွေမည်",
-        libraryNotFound: "စာကြည့်တိုက်တွင် ဤမျိုးစိတ်အား မတွေ့ရှိပါ။"
+        libraryNotFound: "စာရင်းထဲတွင် ဤမျိုးစိတ်အား မတွေ့ရှိပါ။"
     }
 };
 
@@ -3226,11 +3226,11 @@ async function loadBreedLibrary() {
         }
         const text = await response.text();
         const parsed = parseCSV(text);
-        
+
         // Remove header row
         const headers = parsed[0];
         const dataRows = parsed.slice(1);
-        
+
         // Map data rows to objects
         breedLibraryCache = dataRows.map(row => {
             const obj = {};
@@ -3239,7 +3239,7 @@ async function loadBreedLibrary() {
             });
             return obj;
         }).filter(item => item.id);
-        
+
         return breedLibraryCache;
     } catch (e) {
         console.error('Error loading breed library:', e);
@@ -3254,7 +3254,7 @@ function parseCSV(text) {
 
     for (let i = 0; i < text.length; i++) {
         const c = text[i];
-        const next = text[i+1];
+        const next = text[i + 1];
         if (c === '"') {
             if (inQuotes && next === '"') {
                 row[row.length - 1] += '"';
