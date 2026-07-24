@@ -261,9 +261,17 @@ const logoHome = document.getElementById('logo-home');
 const navTriageBtn = document.getElementById('nav-triage-btn');
 const navPetsBtn = document.getElementById('nav-pets-btn');
 const navClinicBtn = document.getElementById('nav-clinic-btn');
+const navLibraryBtn = document.getElementById('nav-library-btn');
 const myPetsState = document.getElementById('my-pets-state');
 const newPetState = document.getElementById('new-pet-state');
 const emergencyContactState = document.getElementById('emergency-contact-state');
+const petLibraryState = document.getElementById('pet-library-state');
+
+const libraryTitle = document.getElementById('library-title');
+const librarySearchInput = document.getElementById('library-search-input');
+const librarySearchBtn = document.getElementById('library-search-btn');
+const libraryResultContainer = document.getElementById('library-result-container');
+const libraryErrorMessage = document.getElementById('library-error-message');
 
 const emergencyContactTitle = document.getElementById('emergency-contact-title');
 const clinicDisplayContainer = document.getElementById('clinic-display-container');
@@ -441,7 +449,12 @@ const TRANSLATIONS = {
         genericBreedOpt: "General / Other Breed",
         editPetBtn: "Edit",
         editPetTitle: "Edit Pet Details",
-        saveChangesBtn: "Save Changes"
+        saveChangesBtn: "Save Changes",
+        navLibrary: "Pet Library",
+        libraryTitle: "Pet Library",
+        librarySearchPlaceholder: "Search breed name (e.g., Golden Retriever, Siamese)...",
+        librarySearchBtn: "Search",
+        libraryNotFound: "Breed not found in the library."
     },
     ja: {
         promptHeader: "ペットに何が起きていますか？",
@@ -539,7 +552,12 @@ const TRANSLATIONS = {
         genericBreedOpt: "一般 / その他の品種",
         editPetBtn: "編集",
         editPetTitle: "ペット情報の編集",
-        saveChangesBtn: "変更を保存"
+        saveChangesBtn: "変更を保存",
+        navLibrary: "ペット図鑑",
+        libraryTitle: "ペット図鑑",
+        librarySearchPlaceholder: "品種名を入力して検索 (例: 柴犬, シャム)...",
+        librarySearchBtn: "検索",
+        libraryNotFound: "該当する品種が見つかりませんでした。"
     },
     my: {
         promptHeader: "သင့်အိမ်မွေးတိရစ္ဆာန် ဘာဖြစ်နေသလဲ။",
@@ -637,7 +655,12 @@ const TRANSLATIONS = {
         genericBreedOpt: "အခြားမျိုးစိတ်",
         editPetBtn: "ပြင်ဆင်ရန်",
         editPetTitle: "အချက်အလက် ပြင်ဆင်ရန်",
-        saveChangesBtn: "ပြင်ဆင်မှု သိမ်းဆည်းရန်"
+        saveChangesBtn: "ပြင်ဆင်မှု သိမ်းဆည်းရန်",
+        navLibrary: "အိမ်မွေးတိရစ္ဆာန် စာကြည့်တိုက်",
+        libraryTitle: "အိမ်မွေးတိရစ္ဆာန် စာကြည့်တိုက်",
+        librarySearchPlaceholder: "မျိုးစိတ်အမည် ရှာဖွေရန် (ဥပမာ- ရွှေရောင် ရီထရီဗာ၊ ရှာမိစ်)...",
+        librarySearchBtn: "ရှာဖွေမည်",
+        libraryNotFound: "စာကြည့်တိုက်တွင် ဤမျိုးစိတ်အား မတွေ့ရှိပါ။"
     }
 };
 
@@ -1708,6 +1731,13 @@ function updateLanguageUI(lang) {
         if (labelDispAddress) labelDispAddress.textContent = strings.petAddressLabel || "Address:";
         if (labelDispPhone) labelDispPhone.textContent = strings.clinicPhoneLabel || "Phone Number:";
 
+        // Localize Library elements
+        if (navLibraryBtn) navLibraryBtn.textContent = strings.navLibrary || "Pet Library";
+        if (libraryTitle) libraryTitle.textContent = strings.libraryTitle || "Pet Library";
+        if (librarySearchInput) librarySearchInput.placeholder = strings.librarySearchPlaceholder || "Search breed name...";
+        if (librarySearchBtn) librarySearchBtn.textContent = strings.librarySearchBtn || "Search";
+        if (libraryErrorMessage) libraryErrorMessage.textContent = strings.libraryNotFound || "Breed not found in the library.";
+
         if (typeof renderClinic === 'function') {
             renderClinic();
         }
@@ -2528,7 +2558,7 @@ updateFirstAidUI();
 
 // Switch screen state utility
 function switchScreen(screenName) {
-    [landingState, resultState, myPetsState, newPetState, emergencyContactState].forEach(state => {
+    [landingState, resultState, myPetsState, newPetState, emergencyContactState, petLibraryState].forEach(state => {
         if (state) {
             state.classList.remove('active');
             state.classList.add('hidden');
@@ -2538,6 +2568,7 @@ function switchScreen(screenName) {
     navTriageBtn.classList.remove('active');
     navPetsBtn.classList.remove('active');
     if (navClinicBtn) navClinicBtn.classList.remove('active');
+    if (navLibraryBtn) navLibraryBtn.classList.remove('active');
 
     // Reset active body urgency background state when navigating to non-triage screens
     if (screenName !== 'triage' && screenName !== 'result') {
@@ -2564,6 +2595,9 @@ function switchScreen(screenName) {
         activeEl = emergencyContactState;
         if (navClinicBtn) navClinicBtn.classList.add('active');
         renderClinic();
+    } else if (screenName === 'library') {
+        activeEl = petLibraryState;
+        if (navLibraryBtn) navLibraryBtn.classList.add('active');
     }
 
     if (activeEl) {
@@ -3171,6 +3205,209 @@ if (cancelClinicBtn) {
         editingClinicId = null;
         if (clinicRegisterForm) clinicRegisterForm.reset();
         renderClinic();
+    });
+}
+
+// Pet Library implementation
+if (navLibraryBtn) {
+    navLibraryBtn.addEventListener('click', () => {
+        switchScreen('library');
+    });
+}
+
+let breedLibraryCache = null;
+
+async function loadBreedLibrary() {
+    if (breedLibraryCache) return breedLibraryCache;
+    try {
+        const response = await fetch('/data/breed_insight_library.csv');
+        if (!response.ok) {
+            throw new Error('Failed to fetch breed library csv');
+        }
+        const text = await response.text();
+        const parsed = parseCSV(text);
+        
+        // Remove header row
+        const headers = parsed[0];
+        const dataRows = parsed.slice(1);
+        
+        // Map data rows to objects
+        breedLibraryCache = dataRows.map(row => {
+            const obj = {};
+            headers.forEach((h, i) => {
+                obj[h.trim()] = row[i] ? row[i].trim() : '';
+            });
+            return obj;
+        }).filter(item => item.id);
+        
+        return breedLibraryCache;
+    } catch (e) {
+        console.error('Error loading breed library:', e);
+        return [];
+    }
+}
+
+function parseCSV(text) {
+    const lines = [];
+    let row = [""];
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const next = text[i+1];
+        if (c === '"') {
+            if (inQuotes && next === '"') {
+                row[row.length - 1] += '"';
+                i++;
+            } else {
+                inQuotes = !inQuotes;
+            }
+        } else if (c === ',' && !inQuotes) {
+            row.push('');
+        } else if ((c === '\r' || c === '\n') && !inQuotes) {
+            if (c === '\r' && next === '\n') {
+                i++;
+            }
+            lines.push(row);
+            row = [''];
+        } else {
+            row[row.length - 1] += c;
+        }
+    }
+    if (row.length > 1 || row[0] !== '') {
+        lines.push(row);
+    }
+    return lines;
+}
+
+function getCategoryEmoji(category) {
+    const catLower = (category || '').toLowerCase();
+    if (catLower.includes('dog')) return '🐶';
+    if (catLower.includes('cat')) return '🐱';
+    if (catLower.includes('bird')) return '🐦';
+    if (catLower.includes('rabbit') || catLower.includes('hare')) return '🐰';
+    return '🐾';
+}
+
+async function searchBreedLibrary() {
+    const query = (librarySearchInput ? librarySearchInput.value.trim() : '').toLowerCase();
+    if (!query) return;
+
+    if (libraryResultContainer) {
+        libraryResultContainer.innerHTML = '';
+        libraryResultContainer.classList.add('hidden');
+    }
+    if (libraryErrorMessage) {
+        libraryErrorMessage.classList.add('hidden');
+    }
+
+    const library = await loadBreedLibrary();
+    // Search by matching part of the breed name (case-insensitive)
+    const results = library.filter(breed => {
+        return (breed.breed_name || '').toLowerCase().includes(query);
+    });
+
+    if (results.length === 0) {
+        if (libraryErrorMessage) {
+            libraryErrorMessage.classList.remove('hidden');
+        }
+        return;
+    }
+
+    if (libraryResultContainer) {
+        libraryResultContainer.classList.remove('hidden');
+        const strings = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+
+        results.forEach(breed => {
+            const card = document.createElement('div');
+            card.className = 'pet-card';
+
+            const avatarHtml = getCategoryEmoji(breed.category);
+
+            card.innerHTML = `
+                <div class="pet-card-header">
+                    <div class="pet-card-title-group">
+                        <div class="pet-avatar" style="font-size: 22px;">
+                            ${avatarHtml}
+                        </div>
+                        <span class="pet-card-name">${escapeHtml(breed.breed_name)}</span>
+                    </div>
+                </div>
+                <div class="pet-card-details" style="margin-bottom: 8px;">
+                    <div class="pet-detail-item">
+                        <span class="pet-detail-label">Category:</span>
+                        <span class="pet-detail-val">${escapeHtml(breed.category)}</span>
+                    </div>
+                </div>
+                
+                <button class="breed-insights-toggle" data-target="insights-${breed.id}">
+                    ${strings.breedGuideToggle || '🐾 View Breed Insights'}
+                </button>
+                <div id="insights-${breed.id}" class="breed-insights-container hidden">
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.originTitle || 'Origin'}</span>
+                        <div class="breed-tag-row">
+                            <span class="breed-badge">${escapeHtml(breed.origin)}</span>
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.temperamentTitle || 'Temperament'}</span>
+                        <div class="breed-tag-row">
+                            ${(breed.temperament || '').split(',').map(tag => `<span class="breed-badge">${escapeHtml(tag.trim())}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.coatMaintenanceTitle || 'Coat Care'}</span>
+                        <div class="breed-tag-row">
+                            <span class="breed-badge highlight-red">${escapeHtml(breed.coat_care)}</span>
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.weightTitle || 'Ideal Weight'}</span>
+                        <div class="breed-tag-row">
+                            <span class="breed-badge highlight-green">${escapeHtml(breed.ideal_weight_guide)}</span>
+                        </div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.healthProsTitle || 'Key Strengths'}</span>
+                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">${escapeHtml(breed.key_strengths)}</div>
+                    </div>
+                    <div class="breed-insight-section">
+                        <span class="breed-insight-title">${strings.healthConsTitle || 'Health Risks'}</span>
+                        <div style="color: #c53030; font-size: 12px; margin-top: 2px;">${escapeHtml(breed.potential_health_risks)}</div>
+                    </div>
+                </div>
+            `;
+
+            const toggleBtn = card.querySelector('.breed-insights-toggle');
+            const container = card.querySelector(`#insights-${breed.id}`);
+            if (toggleBtn && container) {
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = container.classList.contains('hidden');
+                    if (isHidden) {
+                        container.classList.remove('hidden');
+                        toggleBtn.textContent = strings.breedGuideHide || '🐾 Hide Breed Insights';
+                    } else {
+                        container.classList.add('hidden');
+                        toggleBtn.textContent = strings.breedGuideToggle || '🐾 View Breed Insights';
+                    }
+                });
+            }
+
+            libraryResultContainer.appendChild(card);
+        });
+    }
+}
+
+if (librarySearchBtn) {
+    librarySearchBtn.addEventListener('click', searchBreedLibrary);
+}
+
+if (librarySearchInput) {
+    librarySearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchBreedLibrary();
+        }
     });
 }
 

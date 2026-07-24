@@ -24,6 +24,7 @@
                     <button id="nav-triage-btn" class="nav-btn active">Triage</button>
                     <button id="nav-pets-btn" class="nav-btn">My Pets</button>
                     <button id="nav-clinic-btn" class="nav-btn">Emergency Contact</button>
+                    <button id="nav-library-btn" class="nav-btn">Pet Library</button>
                 </nav>
             </div>
             <div class="lang-selector">
@@ -282,6 +283,28 @@
                 <div id="empty-clinic-message" class="empty-pets-message hidden"
                     style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 48px 24px;">
                     <p id="empty-clinic-p" style="margin: 0;">No emergency contact saved yet.</p>
+                </div>
+            </main>
+        </div>
+
+        <!-- Pet Library State -->
+        <div id="pet-library-state" class="screen-state hidden">
+            <main>
+                <div class="library-header" style="margin-bottom: 24px;">
+                    <h1 id="library-title" style="font-size: 28px; font-weight: 900; margin: 0 0 16px 0;">Pet Library</h1>
+                    <div class="search-box-container" style="display: flex; gap: 12px; max-width: 500px; width: 100%;">
+                        <input type="text" id="library-search-input" placeholder="Search breed name (e.g., Golden Retriever, Siamese)..." 
+                               style="background-color: var(--input-bg); border: 2px solid var(--input-border); border-radius: 12px; padding: 12px 16px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 16px; outline: none; transition: border-color 0.2s ease; flex: 1;">
+                        <button id="library-search-btn" class="primary-btn" style="height: 48px; padding: 0 24px; font-weight: 700; border-radius: 12px; cursor: pointer; border: none; background-color: var(--text-primary); color: var(--bg-base); font-family: 'Outfit', sans-serif; transition: opacity 0.2s ease;">Search</button>
+                    </div>
+                </div>
+
+                <!-- Result container -->
+                <div id="library-result-container" class="pets-grid hidden" style="margin-top: 24px;"></div>
+
+                <!-- Error message container -->
+                <div id="library-error-message" class="empty-pets-message hidden" style="margin-top: 24px; color: #c53030; border-color: rgba(229, 62, 62, 0.2); background-color: rgba(229, 62, 62, 0.02);">
+                    Breed not found in the library.
                 </div>
             </main>
         </div>
