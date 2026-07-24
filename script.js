@@ -3340,10 +3340,7 @@ async function searchBreedLibrary() {
                     </div>
                 </div>
                 
-                <button class="breed-insights-toggle" data-target="insights-${breed.id}">
-                    ${strings.breedGuideToggle || '🐾 View Breed Insights'}
-                </button>
-                <div id="insights-${breed.id}" class="breed-insights-container hidden">
+                <div id="insights-${breed.id}" class="breed-insights-container">
                     <div class="breed-insight-section">
                         <span class="breed-insight-title">${strings.originTitle || 'Origin'}</span>
                         <div class="breed-tag-row">
@@ -3378,21 +3375,6 @@ async function searchBreedLibrary() {
                     </div>
                 </div>
             `;
-
-            const toggleBtn = card.querySelector('.breed-insights-toggle');
-            const container = card.querySelector(`#insights-${breed.id}`);
-            if (toggleBtn && container) {
-                toggleBtn.addEventListener('click', () => {
-                    const isHidden = container.classList.contains('hidden');
-                    if (isHidden) {
-                        container.classList.remove('hidden');
-                        toggleBtn.textContent = strings.breedGuideHide || '🐾 Hide Breed Insights';
-                    } else {
-                        container.classList.add('hidden');
-                        toggleBtn.textContent = strings.breedGuideToggle || '🐾 View Breed Insights';
-                    }
-                });
-            }
 
             libraryResultContainer.appendChild(card);
         });
