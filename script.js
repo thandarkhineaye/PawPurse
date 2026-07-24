@@ -3220,7 +3220,7 @@ let breedLibraryCache = null;
 async function loadBreedLibrary() {
     if (breedLibraryCache) return breedLibraryCache;
     try {
-        const response = await fetch('/data/breed_insight_library.csv');
+        const response = await fetch('data/breed_insight_library.csv');
         if (!response.ok) {
             throw new Error('Failed to fetch breed library csv');
         }
