@@ -3221,18 +3221,26 @@ if (navLibraryBtn) {
 }
 
 let breedLibraryCacheEn = null;
+let breedLibraryCacheJa = null;
 let breedLibraryCacheMy = null;
 
 async function loadBreedLibrary() {
-    const isBurmese = (currentLang === 'my');
-    if (isBurmese) {
+    if (currentLang === 'my') {
         if (breedLibraryCacheMy) return breedLibraryCacheMy;
+    } else if (currentLang === 'ja') {
+        if (breedLibraryCacheJa) return breedLibraryCacheJa;
     } else {
         if (breedLibraryCacheEn) return breedLibraryCacheEn;
     }
 
     try {
-        const csvPath = isBurmese ? 'data/breed_insight_library_burmese.csv' : 'data/breed_insight_library.csv';
+        let csvPath = 'data/breed_insight_library.csv';
+        if (currentLang === 'my') {
+            csvPath = 'data/breed_insight_library_burmese.csv';
+        } else if (currentLang === 'ja') {
+            csvPath = 'data/breed_insight_library_japanese.csv';
+        }
+        
         const response = await fetch(csvPath);
         if (!response.ok) {
             throw new Error('Failed to fetch breed library csv: ' + csvPath);
@@ -3253,9 +3261,12 @@ async function loadBreedLibrary() {
             return obj;
         }).filter(item => item.id);
         
-        if (isBurmese) {
+        if (currentLang === 'my') {
             breedLibraryCacheMy = cache;
             return breedLibraryCacheMy;
+        } else if (currentLang === 'ja') {
+            breedLibraryCacheJa = cache;
+            return breedLibraryCacheJa;
         } else {
             breedLibraryCacheEn = cache;
             return breedLibraryCacheEn;
