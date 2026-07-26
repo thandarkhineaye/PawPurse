@@ -124,7 +124,7 @@ function classifySymptomsLocally(symptoms, language) {
                 urgency: "RED",
                 action_directive: "နီးစပ်ရာ အရေးပေါ် တိရစ္ဆာန်ဆေးကုခန်းသို့ ချက်ချင်း သွားပါ။ မစောင့်ဆိုင်းပါနှင့်။",
                 key_instructions: [
-                    "အိမ်မွေးတိရစ္ဆာန်ကို ငြိမ်ဝပ်အောင်ထားပြီး ဒဏ်ရာမတိုးစေရန် လှုပ်ရှားမှုကို ကန့်သတ်ပါ",
+                    "Pet ကို ငြိမ်ဝပ်အောင်ထားပြီး ဒဏ်ရာမတိုးစေရန် လှုပ်ရှားမှုကို ကန့်သတ်ပါ",
                     "အစာ၊ ရေ နှင့် ပါးစပ်မှတိုက်သော ဆေးဝါးများကို လုံးဝမကျွေးပါနှင့်",
                     "အနီးဆုံး ညဉ့်နက်ပိုင်း အရေးပေါ်ဆေးခန်းသို့ ချက်ချင်းသွားရန် ပြင်ဆင်ပါ",
                     "သင်ရောက်ရှိမည့်အကြောင်းကို ဆေးခန်းသို့ ကြိုတင်ဖုန်းဆက် အကြောင်းကြားပါ",
@@ -165,7 +165,7 @@ function classifySymptomsLocally(symptoms, language) {
                     "ရောဂါလက္ခဏာများ (အန်ခြင်း၊ နုံးခြင်း စသည်) ပိုဆိုးလာသလား အနီးကပ် စောင့်ကြည့်ပါ",
                     "၁၂ နာရီခန့် အစာမကျွေးဘဲ ထားပါ (ရေသန့်အနည်းငယ်စီကိုသာ လျက်စေပါ)",
                     "ယနေ့အတွင်း ပြသနိုင်ရန် သင့်ပုံမှန် တိရစ္ဆာန်ဆရာဝန် သို့မဟုတ် ဆေးခန်းသို့ ဆက်သွယ်ပါ",
-                    "အိမ်မွေးတိရစ္ဆာန်ကို အခြားတိရစ္ဆာန်များနှင့်ခွဲပြီး တိတ်ဆိတ်နွေးထွေးသောနေရာတွင် ထားပါ",
+                    "Pet ကို အခြားတိရစ္ဆာန်များနှင့်ခွဲပြီး တိတ်ဆိတ်နွေးထွေးသောနေရာတွင် ထားပါ",
                     "ဆရာဝန်ပြသချိန်တွင် ပြောပြနိုင်ရန် ရောဂါဖြစ်ပွားမှုအကြိမ်ရေကို မှတ်သားထားပါ"
                 ]
             };
@@ -200,7 +200,7 @@ function classifySymptomsLocally(symptoms, language) {
                 urgency: "GREEN",
                 action_directive: "အိမ်တွင် စောင့်ကြည့်ပါ။ အရေးပေါ်သွားရောက်ရန် မလိုအပ်ပါ။",
                 key_instructions: [
-                    "အိမ်မွေးတိရစ္ဆာန်ကို သက်တောင့်သက်သာဖြစ်စေပြီး စိတ်ဖိစီးမှုကင်းသော ပတ်ဝန်းကျင်တွင် ထားပါ",
+                    "Pet ကို သက်တောင့်သက်သာဖြစ်စေပြီး စိတ်ဖိစီးမှုကင်းသော ပတ်ဝန်းကျင်တွင် ထားပါ",
                     "ရေသန့်ပေးထားပါ၊ အစာစားချင်စိတ်ရှိပါက ပုံမှန်အစာကို ကျွေးနိုင်သည်",
                     "နောက်ထပ် ၂၄-၄၈ နာရီအထိ ရောဂါလက္ခဏာအသစ်များ ရှိမရှိ စောင့်ကြည့်ပါ",
                     "သွားဖုံးအရောင် (ပန်းရောင်ဖြစ်ရမည်) နှင့် တက်ကြွနိုးကြားမှု ရှိမရှိ စစ်ဆေးပါ",
@@ -560,7 +560,7 @@ const TRANSLATIONS = {
         libraryNotFound: "該当する品種が見つかりませんでした。"
     },
     my: {
-        promptHeader: "သင့်အိမ်မွေးတိရစ္ဆာန် ဘာဖြစ်နေသလဲ။",
+        promptHeader: "သင့်ရဲ့ Pet လေးဘာဖြစ်နေသလဲ။",
         accuracyNoticeText: "ရောဂါလက္ခဏာ အခြေအနေနှင့် သက်ဆိုင်ရာ ကိန်းဂဏန်းများ (ဥပမာ- ကိုယ်အပူချိန်၊ ကြာချိန်၊ အကြိမ်အရေအတွက်) ကို တိကျပြည့်စုံစွာ ထည့်သွင်းပေးပါ။",
         placeholder: "ရောဂါလက္ခဏာနှင့် အသေးစိတ်အချက်အလက်များ (ဥပမာ- လွန်ခဲ့သော ၂ နာရီက ခွေးချောကလက် စားမိခြင်း၊ ကြောင်တစ်မိနစ်လျှင် အသက်ရှူအကြိမ် ၄၀ ဖြင့် အသက်ရှူပြင်းခြင်း) ကို ဖော်ပြပါ...",
         checkBtn: "အရေးပေါ်အခြေအနေ စစ်ဆေးရန်",
@@ -568,7 +568,7 @@ const TRANSLATIONS = {
         errorBanner: "စစ်ဆေးမှုစနစ်သို့ ဆက်သွယ်၍မရပါ။ အသက်အန္တရာယ်ရှိသော အရေးပေါ်အခြေအနေဖြစ်ပါက ဆေးခန်းသို့ ချက်ချင်းသွားပါ။",
         disclaimer: "ဤကိရိယာသည် ရောဂါရှာဖွေခြင်းမပြုပါ။ တိရစ္ဆာန်ဆရာဝန်ပြသရန် အရေးကြီးပုံကို အကဲဖြတ်ရန် ကူညီပေးပါသည်။",
         resetBtn: "အသစ်ပြန်စစ်မည်",
-        selectPetLabel: "အိမ်မွေးတိရစ္ဆာန်ရွေးချယ်ရန်:",
+        selectPetLabel: "Pet ရွေးချယ်ရန်:",
         pets: {
             dog: "ခွေး",
             cat: "ကြောင်",
@@ -614,27 +614,27 @@ const TRANSLATIONS = {
             shock: "⚡ ရှော့ခ်ရခြင်း"
         },
         navTriage: "စစ်ဆေးရန်",
-        navPets: "ကိုယ့်ရဲ့အိမ်မွေးတိရစ္ဆာန်လေးများ",
-        myPetsTitle: "မှတ်ပုံတင်ထားသော အိမ်မွေးတိရစ္ဆာန်လေးများ",
-        addPetBtn: "+ အိမ်မွေးတိရစ္ဆာန်အသစ်ထည့်ရန်",
-        registerPetTitle: "အိမ်မွေးတိရစ္ဆာန်အသစ် မှတ်ပုံတင်ရန်",
+        navPets: "ကိုယ့်ရဲ့Pet လေးများ",
+        myPetsTitle: "မှတ်ပုံတင်ထားသော Pet လေးများ",
+        addPetBtn: "+ Pet အသစ်ထည့်ရန်",
+        registerPetTitle: "Pet အသစ် မှတ်ပုံတင်ရန်",
         petNamePlaceholder: "Pet name",
         addressPlaceholder: "ပိုင်ရှင်၏လိပ်စာ",
         chipNumberPlaceholder: "Micro Chip Number",
         lastVaccinatedDateLabel: "နောက်ဆုံး ကာကွယ်ဆေးထိုးသည့်ရက်စွဲ",
         registerBtn: "မှတ်ပုံတင်မည်",
         cancelBtn: "ပယ်ဖျက်မည်",
-        noPetsMessage: "မှတ်ပုံတင်ထားသော အိမ်မွေးတိရစ္ဆာန် မရှိသေးပါ။",
+        noPetsMessage: "မှတ်ပုံတင်ထားသော Pet  မရှိသေးပါ။",
         petNameLabel: "အမည်:",
         petAddressLabel: "လိပ်စာ:",
         petChipLabel: "Micro Chip Number:",
         petVaccineLabel: "နောက်ဆုံးထိုးနှံမှု:",
         deletePetBtn: "ပယ်ဖျက်ရန်",
-        petTypeLabel: "အိမ်မွေးတိရစ္ဆာန်အမျိုးအစား",
-        petPhotoLabel: "အိမ်မွေးတိရစ္ဆာန်ဓာတ်ပုံ",
+        petTypeLabel: "Pet အမျိုးအစား",
+        petPhotoLabel: "Pet ဓာတ်ပုံ",
         choosePhotoBtn: "ဓာတ်ပုံရွေးချယ်ရန်",
         optOther: "အခြား",
-        navClinic: "ဆက်သွယ်ရန်",
+        navClinic: "အရေးပေါ် ဆက်သွယ်ရန်",
         emergencyContactTitle: "အရေးပေါ် ဆက်သွယ်ရန်",
         clinicNameLabel: "ဆေးခန်းအမည်",
         clinicAddressLabel: "ဆေးခန်းလိပ်စာ",
@@ -656,8 +656,8 @@ const TRANSLATIONS = {
         editPetBtn: "ပြင်ဆင်ရန်",
         editPetTitle: "အချက်အလက် ပြင်ဆင်ရန်",
         saveChangesBtn: "ပြင်ဆင်မှု သိမ်းဆည်းရန်",
-        navLibrary: "အိမ်မွေးတိရစ္ဆာန်လေးများအကြောင်း",
-        libraryTitle: "အိမ်မွေးတိရစ္ဆာန်လေးများအကြောင်း",
+        navLibrary: "Pet လေးများအကြောင်း",
+        libraryTitle: "Pet လေးများအကြောင်း",
         librarySearchPlaceholder: "မျိုးစိတ်အမည် ရှာဖွေရန် (ဥပမာ- ရွှေရောင် ရီထရီဗာ၊ ရှာမိစ်)...",
         librarySearchBtn: "ရှာဖွေမည်",
         libraryNotFound: "စာရင်းထဲတွင် ဤမျိုးစိတ်အား မတွေ့ရှိပါ။"
@@ -2764,11 +2764,11 @@ function renderPets() {
                     </div>
                     <div class="breed-insight-section">
                         <span class="breed-insight-title">${strings.healthProsTitle || 'Key Strengths'}</span>
-                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">${escapeHtml(info.pros)}</div>
+                        <div style="color: var(--text-muted); font-size: 16px; margin-top: 2px;">${escapeHtml(info.pros)}</div>
                     </div>
                     <div class="breed-insight-section">
                         <span class="breed-insight-title">${strings.healthConsTitle || 'Health Risks'}</span>
-                        <div style="color: #c53030; font-size: 12px; margin-top: 2px;">${escapeHtml(info.cons)}</div>
+                        <div style="color: #c53030; font-size: 16px; margin-top: 2px;">${escapeHtml(info.cons)}</div>
                     </div>
                 </div>
             `;
@@ -3234,24 +3234,24 @@ async function loadBreedLibrary() {
     }
 
     try {
-        let csvPath = 'data/breed_insight_library.csv';
+        let csvPath = 'https://raw.githubusercontent.com/thandarkhineaye/PawPurse/main/data/breed_insight_library.csv';
         if (currentLang === 'my') {
-            csvPath = 'data/breed_insight_library_burmese.csv';
+            csvPath = 'https://raw.githubusercontent.com/thandarkhineaye/PawPurse/main/data/breed_insight_library_burmese.csv';
         } else if (currentLang === 'ja') {
-            csvPath = 'data/breed_insight_library_japanese.csv';
+            csvPath = 'https://raw.githubusercontent.com/thandarkhineaye/PawPurse/main/data/breed_insight_library_japanese.csv';
         }
-        
+
         const response = await fetch(csvPath);
         if (!response.ok) {
             throw new Error('Failed to fetch breed library csv: ' + csvPath);
         }
         const text = await response.text();
         const parsed = parseCSV(text);
-        
+
         // Remove header row
         const headers = parsed[0];
         const dataRows = parsed.slice(1);
-        
+
         // Map data rows to objects
         const cache = dataRows.map(row => {
             const obj = {};
@@ -3260,7 +3260,7 @@ async function loadBreedLibrary() {
             });
             return obj;
         }).filter(item => item.id);
-        
+
         if (currentLang === 'my') {
             breedLibraryCacheMy = cache;
             return breedLibraryCacheMy;
@@ -3335,9 +3335,9 @@ async function searchBreedLibrary() {
     // Search by matching part of the breed name, origin, temperament, or category (case-insensitive)
     const results = library.filter(breed => {
         return (breed.breed_name || '').toLowerCase().includes(query) ||
-               (breed.origin || '').toLowerCase().includes(query) ||
-               (breed.temperament || '').toLowerCase().includes(query) ||
-               (breed.category || '').toLowerCase().includes(query);
+            (breed.origin || '').toLowerCase().includes(query) ||
+            (breed.temperament || '').toLowerCase().includes(query) ||
+            (breed.category || '').toLowerCase().includes(query);
     });
 
     if (results.length === 0) {
@@ -3360,7 +3360,7 @@ async function searchBreedLibrary() {
             card.innerHTML = `
                 <div class="pet-card-header">
                     <div class="pet-card-title-group">
-                        <div class="pet-avatar" style="font-size: 22px;">
+                        <div class="pet-avatar" style="font-size: 28px;">
                             ${avatarHtml}
                         </div>
                         <span class="pet-card-name">${escapeHtml(breed.breed_name)}</span>
@@ -3400,11 +3400,11 @@ async function searchBreedLibrary() {
                     </div>
                     <div class="breed-insight-section">
                         <span class="breed-insight-title">${strings.healthProsTitle || 'Key Strengths'}</span>
-                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">${escapeHtml(breed.key_strengths)}</div>
+                        <div style="color: var(--text-muted); font-size: 16px; margin-top: 2px;">${escapeHtml(breed.key_strengths)}</div>
                     </div>
                     <div class="breed-insight-section">
                         <span class="breed-insight-title">${strings.healthConsTitle || 'Health Risks'}</span>
-                        <div style="color: #c53030; font-size: 12px; margin-top: 2px;">${escapeHtml(breed.potential_health_risks)}</div>
+                        <div style="color: #c53030; font-size: 16px; margin-top: 2px;">${escapeHtml(breed.potential_health_risks)}</div>
                     </div>
                 </div>
             `;
