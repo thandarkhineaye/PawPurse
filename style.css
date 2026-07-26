@@ -1950,3 +1950,131 @@ body.state-green .nav-btn.active {
     background: rgba(43, 182, 115, 0.18);
     border-color: rgba(43, 182, 115, 0.4);
 }
+
+/* Responsive media queries for all devices */
+
+/* Tablets & Small Desktops */
+@media (max-width: 860px) {
+    #app {
+        margin: 16px auto;
+        max-width: calc(100% - 32px);
+        padding: 28px 24px;
+        border-radius: 28px;
+    }
+}
+
+/* Tablets (portrait) & Mobile Landscape */
+@media (max-width: 768px) {
+    header.app-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+        padding-bottom: 18px;
+    }
+
+    .header-left {
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .app-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .logo {
+        margin-bottom: 8px;
+        justify-content: center;
+    }
+
+    .lang-selector {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Mobile Phones & Smaller Devices */
+@media (max-width: 600px) {
+    #app {
+        margin: 12px 10px;
+        max-width: calc(100% - 20px);
+        padding: 20px 16px;
+        border-radius: 20px;
+    }
+
+    #map {
+        height: 240px; /* Smaller map on mobile */
+    }
+
+    .first-aid-tabs-row {
+        gap: 6px;
+    }
+
+    .first-aid-tab {
+        padding: 6px 10px;
+        font-size: 15px;
+    }
+
+    .prompt-header {
+        font-size: 32px;
+        text-align: center;
+    }
+
+    .pet-buttons-row {
+        gap: 8px;
+    }
+
+    .pet-select-btn {
+        padding: 8px 14px;
+        font-size: 15px;
+        flex: 1; /* Stretch selector buttons symmetrically */
+        justify-content: center;
+    }
+
+    textarea {
+        padding: 14px;
+        font-size: 18px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .form-actions button {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    
+    .my-pets-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .my-pets-header button {
+        width: 100%;
+    }
+
+    .emergency-contact-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .emergency-contact-header button {
+        width: 100%;
+    }
+
+    .contact-actions {
+        flex-direction: column;
+    }
+    
+    .contact-actions button {
+        width: 100%;
+    }
+}
