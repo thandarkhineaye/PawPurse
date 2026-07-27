@@ -89,3 +89,9 @@ def test_agentic_pipeline_mock_execution(monkeypatch):
     assert "action_directive" in res
     assert "key_instructions" in res
 
+def test_mock_score_route():
+    scores = engine._mock_score_route("The cat ate a lily leaf")
+    assert scores["cat"] > scores["dog"]
+    assert scores["cat"] > scores["rabbit"]
+    assert scores["cat"] > scores["bird"]
+

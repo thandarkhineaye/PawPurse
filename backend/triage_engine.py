@@ -106,48 +106,55 @@ class TriageEngine:
             language = detect_language(symptoms)
 
         # -----------------
-        # STEP 1: ROUTER AGENT
+        # STEP 1: ROUTER AGENT (ORCHESTRATOR) WITH SUB-MULTI-AGENTS
         # -----------------
         species = "other"
-        routing_reasoning = ""
         
         if self.client:
             try:
-                router_prompt = (
-                    "You are a veterinary routing agent. Analyze the pet symptoms below and determine which species "
-                    "category they apply to.\n"
-                    "Choose exactly one of: 'dog', 'cat', 'rabbit', 'bird', or 'other'.\n\n"
-                    f"Symptoms: \"{symptoms}\""
-                )
-                router_response = self.client.interactions.create(
-                    model="gemini-3.5-flash",
-                    config={
-                        "response_mime_type": "application/json",
-                        "response_schema": {
-                            "type": "object",
-                            "properties": {
-                                "species": {"type": "string", "enum": ["dog", "cat", "rabbit", "bird", "other"]},
-                                "reasoning": {"type": "string"}
+                candidates = ["dog", "cat", "rabbit", "bird", "other"]
+                scores = {}
+                reasonings = {}
+                
+                for candidate in candidates:
+                    verifier_prompt = self._get_verifier_prompt(candidate, symptoms)
+                    response = self.client.interactions.create(
+                        model="gemini-3.5-flash",
+                        config={
+                            "response_mime_type": "application/json",
+                            "response_schema": {
+                                "type": "object",
+                                "properties": {
+                                    "confidence": {"type": "integer"},
+                                    "reason": {"type": "string"}
+                                },
+                                "required": ["confidence", "reason"]
                             },
-                            "required": ["species", "reasoning"]
+                            "thinking_level": "minimal"
                         },
-                        "thinking_level": "minimal"
-                    },
-                    prompt=router_prompt
-                )
-                text_out = self._extract_text(router_response)
-                router_data = json.loads(text_out)
-                species = router_data.get("species", "other")
-                routing_reasoning = router_data.get("reasoning", "")
-                print(f"[Router Agent] Species: {species} (Reasoning: {routing_reasoning})")
+                        prompt=verifier_prompt
+                    )
+                    text_out = self._extract_text(response)
+                    data = json.loads(text_out)
+                    confidence = max(0, min(10, int(data.get("confidence", 0))))
+                    reason = data.get("reason", "")
+                    scores[candidate] = confidence
+                    reasonings[candidate] = reason
+                    print(f"[Sub-Agent Verifier: {candidate.upper()}] Confidence: {confidence}/10 (Reason: {reason})")
+                
+                best_candidate = max(scores, key=scores.get)
+                if scores[best_candidate] >= 3:
+                    species = best_candidate
+                else:
+                    species = "other"
+                print(f"[Router Agent Orchestrator] Final Routed Species: {species.upper()} (Highest Score: {scores.get(species, 0)}/10)")
             except Exception as e:
-                print(f"[Router Agent] Error: {e}. Falling back to default routing.")
+                print(f"[Router Agent Orchestrator] Error during sub-agent routing: {e}. Falling back.")
                 species = self._fallback_route(symptoms)
         else:
-            # Mock router
-            species = self._fallback_route(symptoms)
-            routing_reasoning = "Mock mode keywords match"
-            print(f"[Router Agent Mock] Species: {species}")
+            species_scores = self._mock_score_route(symptoms)
+            species = max(species_scores, key=species_scores.get)
+            print(f"[Router Agent Mock Orchestrator] Scores: {species_scores} -> Selected: {species.upper()}")
 
         # -----------------
         # STEP 2: SPECIALIST AGENT
@@ -442,3 +449,76 @@ class TriageEngine:
                     "action_directive": "Monitor your pet at home. No urgent visit required.",
                     "key_instructions": ["Keep comfortable", "Observe for changes"]
                 }
+
+    def _get_verifier_prompt(self, species: str, symptoms: str) -> str:
+        instructions = {
+            "dog": (
+                "You are a canine symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
+                "the symptoms refer to a dog, puppy, or canine-specific issue.\n"
+                "Look for canine keywords (dog, puppy, canine, bark, fetch, breed names like Golden Retriever) "
+                "or canine-specific issues (e.g. chocolate toxicity, bloat/GDV).\n"
+                "Output a confidence score from 0 (completely unrelated to dogs) to 10 (definitely a dog) "
+                "and a brief reason.\n\n"
+                f"Symptoms: \"{symptoms}\""
+            ),
+            "cat": (
+                "You are a feline symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
+                "the symptoms refer to a cat, kitten, or feline-specific issue.\n"
+                "Look for feline keywords (cat, kitten, feline, purr, meow, scratch post, claws) "
+                "or feline-specific issues (e.g. lily exposure, urinary blockages/blocked cat).\n"
+                "Output a confidence score from 0 (completely unrelated to cats) to 10 (definitely a cat) "
+                "and a brief reason.\n\n"
+                f"Symptoms: \"{symptoms}\""
+            ),
+            "rabbit": (
+                "You are a lagomorph (rabbit) symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
+                "the symptoms refer to a rabbit, bunny, or lagomorph-specific issue.\n"
+                "Look for rabbit keywords (rabbit, bunny, lagomorph, floppy ears, thumping, hay) "
+                "or rabbit-specific issues (e.g. GI stasis, head tilt, lack of appetite for 12+ hours).\n"
+                "Output a confidence score from 0 (completely unrelated to rabbits) to 10 (definitely a rabbit) "
+                "and a brief reason.\n\n"
+                f"Symptoms: \"{symptoms}\""
+            ),
+            "bird": (
+                "You are an avian (bird) symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
+                "the symptoms refer to a bird, parrot, or avian-specific issue.\n"
+                "Look for avian keywords (bird, parrot, budgie, wings, feathers, cage, beak, bobbing) "
+                "or avian-specific issues (e.g. broken blood feather, open-mouth breathing, egg binding).\n"
+                "Output a confidence score from 0 (completely unrelated to birds) to 10 (definitely a bird) "
+                "and a brief reason.\n\n"
+                f"Symptoms: \"{symptoms}\""
+            ),
+            "other": (
+                "You are a general animal symptom verifier sub-agent. Your task is to evaluate if the symptoms "
+                "refer to a general animal or a species other than dogs, cats, rabbits, or birds.\n"
+                "Output a confidence score from 0 to 10 and a brief reason.\n\n"
+                f"Symptoms: \"{symptoms}\""
+            )
+        }
+        return instructions.get(species, instructions["other"])
+
+    def _mock_score_route(self, symptoms: str) -> dict:
+        lower_symptoms = symptoms.lower()
+        scores = {"dog": 0, "cat": 0, "rabbit": 0, "bird": 0, "other": 1}
+        
+        if any(w in lower_symptoms for w in ["dog", "canine", "puppy", "ခွေး", "犬"]):
+            scores["dog"] += 8
+        if any(w in lower_symptoms for w in ["chocolate", "bloat", "gdv", "bark"]):
+            scores["dog"] += 5
+            
+        if any(w in lower_symptoms for w in ["cat", "feline", "kitten", "ကြောင်", "猫"]):
+            scores["cat"] += 8
+        if any(w in lower_symptoms for w in ["lily", "lilies", "meow", "purr", "blocked"]):
+            scores["cat"] += 5
+            
+        if any(w in lower_symptoms for w in ["rabbit", "bunny", "lagomorph", "ယုန်", "うさぎ", "兎"]):
+            scores["rabbit"] += 8
+        if any(w in lower_symptoms for w in ["stasis", "head tilt", "thump"]):
+            scores["rabbit"] += 5
+            
+        if any(w in lower_symptoms for w in ["bird", "parrot", "avian", "ငှက်", "鳥"]):
+            scores["bird"] += 8
+        if any(w in lower_symptoms for w in ["feather", "cage", "beak", "bobbing"]):
+            scores["bird"] += 5
+            
+        return scores
