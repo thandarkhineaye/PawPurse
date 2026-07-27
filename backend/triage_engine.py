@@ -106,15 +106,19 @@ class TriageEngine:
             language = detect_language(symptoms)
 
         # -----------------
-        # STEP 1: ROUTER AGENT (ORCHESTRATOR) WITH SUB-MULTI-AGENTS
+        # STEP 1: ROUTER AGENT (ORCHESTRATOR) WITH MULTI-AGENT VERIFIERS & SPECIALISTS
         # -----------------
         species = "other"
+        assessment = ""
+        critical_factors = []
         
         if self.client:
             try:
                 candidates = ["dog", "cat", "rabbit", "bird", "other"]
                 scores = {}
                 reasonings = {}
+                assessments = {}
+                factors = {}
                 
                 for candidate in candidates:
                     verifier_prompt = self._get_verifier_prompt(candidate, symptoms)
@@ -126,9 +130,14 @@ class TriageEngine:
                                 "type": "object",
                                 "properties": {
                                     "confidence": {"type": "integer"},
-                                    "reason": {"type": "string"}
+                                    "reason": {"type": "string"},
+                                    "assessment": {"type": "string"},
+                                    "critical_factors": {
+                                        "type": "array",
+                                        "items": {"type": "string"}
+                                    }
                                 },
-                                "required": ["confidence", "reason"]
+                                "required": ["confidence", "reason", "assessment", "critical_factors"]
                             },
                             "thinking_level": "minimal"
                         },
@@ -140,64 +149,30 @@ class TriageEngine:
                     reason = data.get("reason", "")
                     scores[candidate] = confidence
                     reasonings[candidate] = reason
-                    print(f"[Sub-Agent Verifier: {candidate.upper()}] Confidence: {confidence}/10 (Reason: {reason})")
+                    assessments[candidate] = data.get("assessment", "")
+                    factors[candidate] = data.get("critical_factors", [])
+                    print(f"[Sub-Agent Verifier/Specialist: {candidate.upper()}] Confidence: {confidence}/10 (Reason: {reason})")
                 
                 best_candidate = max(scores, key=scores.get)
                 if scores[best_candidate] >= 3:
                     species = best_candidate
                 else:
                     species = "other"
-                print(f"[Router Agent Orchestrator] Final Routed Species: {species.upper()} (Highest Score: {scores.get(species, 0)}/10)")
+                
+                assessment = assessments[species]
+                critical_factors = factors[species]
+                print(f"[Router Agent Orchestrator] Routed Species: {species.upper()} (Highest Score: {scores.get(species, 0)}/10)")
             except Exception as e:
-                print(f"[Router Agent Orchestrator] Error during sub-agent routing: {e}. Falling back.")
+                print(f"[Router Agent Orchestrator] Error: {e}. Falling back to default routing.")
                 species = self._fallback_route(symptoms)
-        else:
-            species_scores = self._mock_score_route(symptoms)
-            species = max(species_scores, key=species_scores.get)
-            print(f"[Router Agent Mock Orchestrator] Scores: {species_scores} -> Selected: {species.upper()}")
-
-        # -----------------
-        # STEP 2: SPECIALIST AGENT
-        # -----------------
-        assessment = ""
-        critical_factors = []
-        
-        if self.client:
-            try:
-                specialist_prompt = self._get_specialist_prompt(species, symptoms)
-                specialist_response = self.client.interactions.create(
-                    model="gemini-3.5-flash",
-                    config={
-                        "response_mime_type": "application/json",
-                        "response_schema": {
-                            "type": "object",
-                            "properties": {
-                                "assessment": {"type": "string"},
-                                "critical_factors": {
-                                    "type": "array",
-                                    "items": {"type": "string"}
-                                }
-                            },
-                            "required": ["assessment", "critical_factors"]
-                        },
-                        "thinking_level": "minimal"
-                    },
-                    prompt=specialist_prompt
-                )
-                spec_text = self._extract_text(specialist_response)
-                spec_data = json.loads(spec_text)
-                assessment = spec_data.get("assessment", "")
-                critical_factors = spec_data.get("critical_factors", [])
-                print(f"[Specialist Agent: {species.upper()}] Completed analysis.")
-            except Exception as e:
-                print(f"[Specialist Agent: {species.upper()}] Error: {e}. Using safe fallback.")
                 assessment = f"General analysis for {species} symptoms."
                 critical_factors = ["Observe physical state", "Ensure breathing is unhindered"]
         else:
-            # Mock Specialist
+            species_scores = self._mock_score_route(symptoms)
+            species = max(species_scores, key=species_scores.get)
             assessment = f"Mocked {species.upper()} specialist analysis of symptoms."
             critical_factors = ["Symptom onset tracking", "Vital sign checks"]
-            print(f"[Specialist Agent Mock] Completed.")
+            print(f"[Router Agent Mock Orchestrator] Scores: {species_scores} -> Selected: {species.upper()}")
 
         # -----------------
         # STEP 3: URGENCY TRIAGE & SYNTHESIS AGENT
@@ -272,34 +247,7 @@ class TriageEngine:
             return "bird"
         return "other"
 
-    def _get_specialist_prompt(self, species: str, symptoms: str) -> str:
-        prompts = {
-            "dog": (
-                "You are a canine veterinary specialist. Dogs are susceptible to bloat, chocolate toxicity, "
-                "xylitol poisoning, heatstroke, or trauma from vehicle hits. Analyze these symptoms and provide "
-                f"an assessment.\nSymptoms: \"{symptoms}\""
-            ),
-            "cat": (
-                "You are a feline veterinary specialist. Cats hide pain well and are prone to urethral obstructions "
-                "(blocked cats), lily toxicity, and rapid open-mouth breathing. Analyze these symptoms and provide "
-                f"an assessment.\nSymptoms: \"{symptoms}\""
-            ),
-            "rabbit": (
-                "You are a lagomorph (rabbit) veterinary specialist. Rabbits are prey animals and hide illness. "
-                "GI stasis, lack of appetite for 12+ hours, limpness, and head tilt are severe emergencies. Analyze "
-                f"these symptoms and provide an assessment.\nSymptoms: \"{symptoms}\""
-            ),
-            "bird": (
-                "You are an avian veterinary specialist. Birds are fragile and hide illness. Respiratory distress "
-                "(open-mouth breathing, tail bobbing), egg binding, or bleeding from a broken feather are critical. "
-                f"Analyze these symptoms and provide an assessment.\nSymptoms: \"{symptoms}\""
-            ),
-            "other": (
-                "You are a general small animal veterinary specialist. Analyze these symptoms for this pet and "
-                f"provide a diagnostic urgency assessment.\nSymptoms: \"{symptoms}\""
-            )
-        }
-        return prompts.get(species, prompts["other"])
+    # _get_specialist_prompt has been merged into verifier prompts
 
     def _get_language_instruction(self, language: str) -> str:
         if language == "ja":
@@ -453,45 +401,51 @@ class TriageEngine:
     def _get_verifier_prompt(self, species: str, symptoms: str) -> str:
         instructions = {
             "dog": (
-                "You are a canine symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
-                "the symptoms refer to a dog, puppy, or canine-specific issue.\n"
-                "Look for canine keywords (dog, puppy, canine, bark, fetch, breed names like Golden Retriever) "
-                "or canine-specific issues (e.g. chocolate toxicity, bloat/GDV).\n"
-                "Output a confidence score from 0 (completely unrelated to dogs) to 10 (definitely a dog) "
-                "and a brief reason.\n\n"
+                "You are a canine specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
+                "1. Verification: Determine the likelihood that the symptoms refer to a dog, puppy, or canine issue. "
+                "Look for canine keywords (dog, puppy, canine, bark, fetch, breed names) or canine-specific issues "
+                "(e.g. chocolate toxicity, bloat/GDV). Output a confidence score from 0 to 10 and a brief reason.\n"
+                "2. Specialist Assessment: Perform a specialist veterinary assessment. Dogs are susceptible to bloat, "
+                "chocolate toxicity, xylitol poisoning, heatstroke, or trauma from vehicle hits. Provide an assessment "
+                "and list key critical factors.\n\n"
                 f"Symptoms: \"{symptoms}\""
             ),
             "cat": (
-                "You are a feline symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
-                "the symptoms refer to a cat, kitten, or feline-specific issue.\n"
-                "Look for feline keywords (cat, kitten, feline, purr, meow, scratch post, claws) "
-                "or feline-specific issues (e.g. lily exposure, urinary blockages/blocked cat).\n"
-                "Output a confidence score from 0 (completely unrelated to cats) to 10 (definitely a cat) "
-                "and a brief reason.\n\n"
+                "You are a feline specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
+                "1. Verification: Determine the likelihood that the symptoms refer to a cat, kitten, or feline issue. "
+                "Look for feline keywords (cat, kitten, feline, purr, meow, claws) or feline-specific issues "
+                "(e.g. lily exposure, urinary blockages/blocked cat). Output a confidence score from 0 to 10 and a brief reason.\n"
+                "2. Specialist Assessment: Perform a specialist veterinary assessment. Cats hide pain well and are prone "
+                "to urethral obstructions, lily toxicity, and rapid open-mouth breathing. Provide an assessment "
+                "and list key critical factors.\n\n"
                 f"Symptoms: \"{symptoms}\""
             ),
             "rabbit": (
-                "You are a lagomorph (rabbit) symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
-                "the symptoms refer to a rabbit, bunny, or lagomorph-specific issue.\n"
-                "Look for rabbit keywords (rabbit, bunny, lagomorph, floppy ears, thumping, hay) "
-                "or rabbit-specific issues (e.g. GI stasis, head tilt, lack of appetite for 12+ hours).\n"
-                "Output a confidence score from 0 (completely unrelated to rabbits) to 10 (definitely a rabbit) "
-                "and a brief reason.\n\n"
+                "You are a rabbit/lagomorph specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
+                "1. Verification: Determine the likelihood that the symptoms refer to a rabbit, bunny, or lagomorph issue. "
+                "Look for rabbit keywords (rabbit, bunny, floppy ears, thumping, hay) or rabbit-specific issues. "
+                "Output a confidence score from 0 to 10 and a brief reason.\n"
+                "2. Specialist Assessment: Perform a specialist veterinary assessment. Rabbits are prey animals and hide illness. "
+                "GI stasis, lack of appetite for 12+ hours, limpness, and head tilt are severe emergencies. Provide an "
+                "assessment and list key critical factors.\n\n"
                 f"Symptoms: \"{symptoms}\""
             ),
             "bird": (
-                "You are an avian (bird) symptom verifier sub-agent. Your only task is to evaluate the likelihood that "
-                "the symptoms refer to a bird, parrot, or avian-specific issue.\n"
-                "Look for avian keywords (bird, parrot, budgie, wings, feathers, cage, beak, bobbing) "
-                "or avian-specific issues (e.g. broken blood feather, open-mouth breathing, egg binding).\n"
-                "Output a confidence score from 0 (completely unrelated to birds) to 10 (definitely a bird) "
-                "and a brief reason.\n\n"
+                "You are an avian specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
+                "1. Verification: Determine the likelihood that the symptoms refer to a bird, parrot, or avian issue. "
+                "Look for avian keywords (bird, parrot, budgie, wings, feathers, cage, beak, bobbing). Output a confidence "
+                "score from 0 to 10 and a brief reason.\n"
+                "2. Specialist Assessment: Perform a specialist veterinary assessment. Birds are fragile and hide illness. "
+                "Respiratory distress (open-mouth breathing, tail bobbing), egg binding, or bleeding from a broken feather "
+                "are critical. Provide an assessment and list key critical factors.\n\n"
                 f"Symptoms: \"{symptoms}\""
             ),
             "other": (
-                "You are a general animal symptom verifier sub-agent. Your task is to evaluate if the symptoms "
-                "refer to a general animal or a species other than dogs, cats, rabbits, or birds.\n"
-                "Output a confidence score from 0 to 10 and a brief reason.\n\n"
+                "You are a general animal specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
+                "1. Verification: Determine the likelihood that the symptoms refer to a general or non-standard animal. "
+                "Output a confidence score from 0 to 10 and a brief reason.\n"
+                "2. Specialist Assessment: Perform a general specialist veterinary assessment of the symptoms and "
+                "list key critical factors.\n\n"
                 f"Symptoms: \"{symptoms}\""
             )
         }

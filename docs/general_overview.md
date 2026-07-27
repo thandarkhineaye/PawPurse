@@ -44,15 +44,16 @@ PawPurse separates presentation, API routing, and AI categorization into a light
                       |  (Security Proxy & Routing) |
                       +--------------+--------------+
                                      |
-               +---------------------+---------------------+
-               |                                           |
+                +---------------------+---------------------+
+                |                                           |
      Gemini API Key Available                       API Missing / Offline
-               v                                           v
+                v                                           v
 +-------------------------------+             +-----------------------------+
 |  Orchestrated Multi-Agent AI  |             |  Local Rule Engine Fallback |
 |  - Router Orchestrator        |             |  (Keyword Triage Pattern)   |
 |    └─ Parallel Verifiers      |             +-----------------------------+
-|  - Specialist Agent           |
+|       & Specialists           |
+|    (Dog/Cat/Rabbit/Bird/Other)|
 |  - Urgency Triage Synthesis   |
 +-------------------------------+
 ```

@@ -66,8 +66,8 @@ PawPurse is built as a mobile-first web application with a high-performance, lig
 |  Orchestrated Multi-Agent AI  |             |  Local Rule Engine Fallback |
 |  - Router Orchestrator        |             |  (Keyword Triage Pattern)   |
 |    └─ Parallel Verifiers      |             +-----------------------------+
+|       & Specialists           |
 |    (Dog/Cat/Rabbit/Bird/Other)|
-|  - Specialist Agent           |
 |  - Urgency Triage Synthesis   |
 +-------------------------------+
 ```
@@ -85,9 +85,8 @@ PawPurse leverages state-of-the-art Large Language Model (LLM) capabilities stru
 
 - **Model Selection**: Uses **`gemini-3.5-flash`** via the official Google GenAI SDK (`google-genai` >= 2.10.0) calling `client.interactions.create`.
 - **Multi-Agent Orchestration Flow**:
-  1. **Router Agent (Orchestrator)**: Coordinates the species categorizing step. Rather than a single routing prompt, it orchestrates five parallel verifier sub-agents (**Dog Verifier**, **Cat Verifier**, **Rabbit Verifier**, **Bird Verifier**, and **Other Verifier**). Each verifier analyzes the input symptoms independently and returns a confidence score (from `0` to `10`) along with its reasoning. The Orchestrator aggregates these scores and selects the species with the highest confidence (falling back to `'other'` if all scores are below `3`).
-  2. **Specialist Agent**: Applies specialist knowledge instructions matching the routed species. (For example, GDV/bloat and chocolate toxicities for dogs; urethral blockages and lilies for cats; GI stasis and head tilt for rabbits; or tail bobbing and breathing distress for birds).
-  3. **Urgency Triage (Synthesis) Agent**: Merges the symptoms, routed species, and specialist assessments to produce a final localized urgency directive.
+  1. **Router Orchestrator & Species Verifiers/Specialists**: Coordinates species routing and specialist assessment in parallel. Rather than a single routing prompt, it orchestrates five parallel sub-agents (**Dog**, **Cat**, **Rabbit**, **Bird**, and **Other**). Each verifier analyzes the input symptoms independently and returns a confidence score (from `0` to `10`), its reasoning, a specialist evaluation (e.g. canine bloat risks, feline urethral blockages), and critical factors. The Orchestrator aggregates these scores, routes to the species with the highest confidence, and extracts its pre-calculated specialist assessment.
+  2. **Urgency Triage (Synthesis) Agent**: Merges the raw symptoms, selected species, and the specialist assessments directly to produce a final localized urgency directive.
 - **Structured JSON Outputs**: Enforces strict schema constraints (`response_mime_type: "application/json"`) matching the schema of each agent.
 - **Latency-Optimized Configuration**: Utilizes `thinking_level: "minimal"` to minimize inference time across agent hops, keeping total API response latencies **under 2.5 seconds**.
 - **Non-Diagnostic Safety Guardrails**: Structured system prompts instruct all agents to evaluate urgency level (*RED*, *YELLOW*, or *GREEN*) while explicitly prohibiting disease diagnoses or medication suggestions.

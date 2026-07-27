@@ -14,16 +14,10 @@ PawPurse implements a structured multi-agent orchestration pipeline to classify 
  m  +-------+-------+
  p          |
  t          v
- o  +---------------+      Dog Verifier    -> score
- m  | Router Agent  | ---> Cat Verifier    -> score  ===> Select Highest Score
- s  | (Orchestrator)|      Rabbit Verifier -> score       (e.g., DOG)
-    +-------+-------+      Bird Verifier   -> score
-            |
-            v
-    +---------------+
-    |  Dog Agent    | ---> Species-Specific Context Assessment
-    | (Specialist)  |
-    +-------+-------+
+ o  +---------------+      Dog Verifier/Specialist    -> score + assessment
+ m  | Router Agent  | ---> Cat Verifier/Specialist    -> score + assessment  ===> Select Highest Score
+ s  | (Orchestrator)|      Rabbit Verifier/Specialist -> score + assessment       (e.g., DOG)
+    +-------+-------+      Bird Verifier/Specialist   -> score + assessment
             |
             v
     +---------------+
@@ -32,41 +26,30 @@ PawPurse implements a structured multi-agent orchestration pipeline to classify 
     +---------------+
 ```
 
-### 1. Router Agent (Orchestrator) & Verifier Sub-Agents
-When symptoms are submitted, the main Router Orchestrator invokes five specialized verifier sub-agents in parallel to check if the symptoms match their target species:
-*   **Dog Verifier Sub-Agent**: Analyzes symptoms for canine indicators (e.g. bark, puppy, GDV, chocolate, specific breed names).
-*   **Cat Verifier Sub-Agent**: Analyzes symptoms for feline indicators (e.g. meow, purr, kitten, lily exposure, urinary blockages).
-*   **Rabbit Verifier Sub-Agent**: Analyzes symptoms for lagomorph indicators (e.g. bunny, GI stasis, head tilt).
-*   **Bird Verifier Sub-Agent**: Analyzes symptoms for avian indicators (e.g. beak, cage, tail bobbing, feathers, blood feather).
-*   **Other Verifier Sub-Agent**: Serves as a general species verifier catch-all.
+### 1. Router Agent (Orchestrator) & Verifier/Specialist Sub-Agents
+When symptoms are submitted, the main Router Orchestrator invokes five parallel sub-agents to evaluate both species applicability (for routing) and diagnostic assessment:
+*   **Dog Verifier & Specialist**: Verifies canine indicators and assesses canine emergencies (GDV/bloat, chocolate poisoning, heatstroke).
+*   **Cat Verifier & Specialist**: Verifies feline indicators and assesses feline emergencies (urethral blockages, lily toxicity, feline dyspnea).
+*   **Rabbit Verifier & Specialist**: Verifies rabbit indicators and assesses rabbit emergencies (GI stasis, head tilt, limpness).
+*   **Bird Verifier & Specialist**: Verifies avian indicators and assesses avian emergencies (respiratory distress, broken blood feathers, egg binding).
+*   **Other Verifier & Specialist**: Handles general/non-standard pet emergency assessments.
 
-Each sub-agent returns a confidence score (from `0` to `10`) and its reasoning:
+Each sub-agent returns both confidence scores and specialist diagnostic assessment details in a unified JSON output:
 ```json
 {
   "confidence": 9,
-  "reason": "Mention of GDV/bloat and puppy strongly implies a dog."
-}
-```
-The Router Orchestrator aggregates these scores and selects the species with the highest rating. If all scores are below `3`, the system defaults to `"other"`.
-
-### 2. Specialist Agent
-The routed species string is sent to a species-specific Specialist Agent prompt. Each specialist analyzes the symptoms under the lens of that species' vulnerabilities:
-*   **Canine Specialist**: GDV/bloat, chocolate/xylitol poisoning, heatstroke, or trauma from dog fights.
-*   **Feline Specialist**: Urethral blockages (blocked cats), lily toxicity, and rapid open-mouth breathing (feline dyspnea).
-*   **Lagomorph Specialist**: GI stasis, head tilt (e.cuniculi), complete limpness, or lack of appetite for 12+ hours.
-*   **Avian Specialist**: Tail bobbing, open-mouth breathing (respiratory distress), broken blood feathers, or egg binding.
-*   **General Specialist**: General small animal emergency symptoms.
-
-The specialist returns its medical assessment and list of critical variables:
-```json
-{
+  "reason": "Mention of GDV/bloat and puppy strongly implies a dog.",
   "assessment": "High probability of canine chocolate toxicity.",
   "critical_factors": ["Ate dark chocolate", "Vomiting onset within 2 hours"]
 }
 ```
+The Router Orchestrator aggregates the confidence scores and selects the species with the highest rating. If all scores are below `3`, the system defaults to `"other"`.
+
+### 2. Merged Execution
+By combining the verification and specialist diagnostics into a single parallel call, the engine retrieves the pre-calculated specialist `assessment` and `critical_factors` directly from the selected species sub-agent's response. This eliminates a separate API call roundtrip, dropping latency from three sequential hops down to two.
 
 ### 3. Triage & Synthesis Agent
-The synthesis agent combines the raw symptoms, routed species, specialist assessment, and critical factors. It evaluates the parameters against strict urgency categories:
+The synthesis agent combines the raw symptoms, routed species, and the pre-calculated specialist assessment and critical factors from the winning verifier. It evaluates the parameters against strict urgency categories:
 *   **RED**: Life-threatening crisis requiring immediate vet intervention.
 *   **YELLOW**: Urgent care required; vet visit recommended within 24 hours.
 *   **GREEN**: Safe to monitor closely at home.
