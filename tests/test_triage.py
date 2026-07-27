@@ -73,3 +73,19 @@ def test_local_triage_heat_shock(monkeypatch):
     res_ja = engine.classify_symptoms("犬がヒートショックを起こした")
     assert res_ja["urgency"] == "RED"
 
+def test_agentic_router_detection(monkeypatch):
+    monkeypatch.setattr(engine, "client", None)
+    assert engine._fallback_route("My puppy is bleeding") == "dog"
+    assert engine._fallback_route("ခွေးလေး သွေးထွက်နေလို့") == "dog"
+    assert engine._fallback_route("猫が吐いた") == "cat"
+    assert engine._fallback_route("The bunny is very limp") == "rabbit"
+    assert engine._fallback_route("Avian tail bobbing observed") == "bird"
+    assert engine._fallback_route("My turtle has a soft shell") == "other"
+
+def test_agentic_pipeline_mock_execution(monkeypatch):
+    monkeypatch.setattr(engine, "client", None)
+    res = engine.classify_symptoms("My dog ate chocolate and is vomiting")
+    assert res["urgency"] == "RED" or res["urgency"] == "YELLOW"
+    assert "action_directive" in res
+    assert "key_instructions" in res
+
