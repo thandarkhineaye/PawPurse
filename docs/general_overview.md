@@ -64,6 +64,6 @@ PawPurse separates presentation, API routing, and AI categorization into a light
 
 *   **Frontend**: HTML5, ES6 Vanilla JavaScript, and Custom CSS3 variables (Zero build dependencies).
 *   **Backend Server**: FastAPI (Python 3.10+) running over a high-performance Uvicorn ASGI server.
-*   **AI SDK**: Google GenAI Python SDK (`google-genai`) targeting `gemini-3.5-flash` with JSON output schemas and latency optimization.
+*   **AI Framework**: Google Agent Development Kit (ADK) (`google-adk`) utilizing `gemini-2.5-flash` model via the `google-generativeai` SDK.
 *   **Maps Engine**: Leaflet.js library using OpenStreetMap tile servers for dynamic local vet maps.
 *   **Deployment Blueprint**: Render blueprint spec (`render.yaml`) using a lightweight multi-stage Docker container built with the `uv` package compiler.

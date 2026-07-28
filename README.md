@@ -34,7 +34,7 @@ When a pet experiences sudden symptoms—such as bleeding, choking, or lethargy�
   - **YELLOW (Urgent Attention)**: Serious symptom requiring prompt veterinary care within 24 hours.
   - **GREEN (Monitor / Non-Urgent)**: Non-critical symptom; safe to monitor closely at home.
 - **⚡ Crisis Design System**: High-contrast, ambient color transitions (pulsing red, warning yellow, steady green) and ultra-legible typography designed for stressful situations.
-- **🤖 Powered by Gemini 3.5 Flash**: Fast response time (p95 < 2s) using Google's `google-genai` SDK with strict JSON response constraints.
+- **🤖 Powered by Gemini 2.5 Flash (ADK)**: Fast response time using Google's Agent Development Kit (`google-adk`) with multi-agent Router and Specialist workflows.
 - **🌐 Multi-Language Support**: Automatic detection and localized responses for **English**, **Japanese (日本語)**, and **Burmese (မြန်မာ)**.
 - **🛡️ Safe Local Fallback**: Rule-based keyword matching fallback ensures the triage app functions reliably even if network connectivity or Gemini API availability is compromised.
 - **🔒 Privacy-First & Ephemeral**: Zero database storage. Symptom inputs are processed in-memory and never persisted.
@@ -63,19 +63,18 @@ PawPurse is built as a mobile-first web application with a high-performance, lig
      Gemini API Key Available                       API Missing / Offline
                 v                                           v
 +-------------------------------+             +-----------------------------+
-|  Orchestrated Multi-Agent AI  |             |  Local Rule Engine Fallback |
-|  - Router Orchestrator        |             |  (Keyword Triage Pattern)   |
-|    └─ Parallel Verifiers      |             +-----------------------------+
-|       & Specialists           |
-|    (Dog/Cat/Rabbit/Bird/Other)|
-|  - Urgency Triage Synthesis   |
+|  Google ADK Agents            |             |  Local Rule Engine Fallback |
+|  - pawpurse_router_agent      |             |  (Keyword Triage Pattern)   |
+|    └─ Specialist Agent Run    |             +-----------------------------+
+|       (Dog/Cat/Rabbit/Bird/   |
+|        Other Specialist)      |
 +-------------------------------+
 ```
 
 - **Frontend**: HTML5, ES6 Vanilla JavaScript, Custom CSS3 Design Tokens (Zero build-step dependency).
 - **Backend API**: Python FastAPI + Uvicorn ASGI Server.
-- **AI Engine**: `google-genai` SDK targeting `gemini-3.5-flash` using structured interactions.
-- **Environment & Package Management**: [`uv`](https://github.com/astral-sh/uv) for fast dependency locking and execution.
+- **AI Engine**: Google Agent Development Kit (`google-adk`) targeting `gemini-2.5-flash` using Router and Specialist workflows.
+- **Environment & Package Management**: [`uv`](https://github.com/astral-sh/uv) for dependency locking and execution.
 
 ---
 

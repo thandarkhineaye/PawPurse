@@ -75,12 +75,12 @@ def test_local_triage_heat_shock(monkeypatch):
 
 def test_agentic_router_detection(monkeypatch):
     monkeypatch.setattr(engine, "client", None)
-    assert engine._fallback_route("My puppy is bleeding") == "dog"
-    assert engine._fallback_route("ခွေးလေး သွေးထွက်နေလို့") == "dog"
-    assert engine._fallback_route("猫が吐いた") == "cat"
-    assert engine._fallback_route("The bunny is very limp") == "rabbit"
-    assert engine._fallback_route("Avian tail bobbing observed") == "bird"
-    assert engine._fallback_route("My turtle has a soft shell") == "other"
+    assert engine._fallback_route("My puppy is bleeding") == "dog_triage_agent"
+    assert engine._fallback_route("ခွေးလေး သွေးထွက်နေလို့") == "dog_triage_agent"
+    assert engine._fallback_route("猫が吐いた") == "cat_triage_agent"
+    assert engine._fallback_route("The bunny is very limp") == "rabbit_triage_agent"
+    assert engine._fallback_route("Avian tail bobbing observed") == "bird_triage_agent"
+    assert engine._fallback_route("My turtle has a soft shell") == "other_triage_agent"
 
 def test_agentic_pipeline_mock_execution(monkeypatch):
     monkeypatch.setattr(engine, "client", None)
@@ -91,7 +91,7 @@ def test_agentic_pipeline_mock_execution(monkeypatch):
 
 def test_mock_score_route():
     scores = engine._mock_score_route("The cat ate a lily leaf")
-    assert scores["cat"] > scores["dog"]
-    assert scores["cat"] > scores["rabbit"]
-    assert scores["cat"] > scores["bird"]
+    assert scores["cat_triage_agent"] > scores["dog_triage_agent"]
+    assert scores["cat_triage_agent"] > scores["rabbit_triage_agent"]
+    assert scores["cat_triage_agent"] > scores["bird_triage_agent"]
 

@@ -4,9 +4,9 @@ This document explains the inner workings, data structures, and styling guidelin
 
 ---
 
-## 🧠 Multi-Agent AI Orchestration
+## 🧠 Multi-Agent AI Orchestration (Google ADK)
 
-PawPurse implements a structured multi-agent orchestration pipeline to classify pet symptoms. By breaking down classification into discrete roles, each agent operates with narrow context and strict instructions, resulting in high triage precision.
+PawPurse implements a multi-agent orchestration pipeline using the **Google Agent Development Kit (ADK)** framework. By defining specialized Agent roles, the engine benefits from structured prompt logic and robust session management.
 
 ```
  s  +---------------+
@@ -14,54 +14,47 @@ PawPurse implements a structured multi-agent orchestration pipeline to classify 
  m  +-------+-------+
  p          |
  t          v
- o  +---------------+      Dog Verifier/Specialist    -> score + assessment
- m  | Router Agent  | ---> Cat Verifier/Specialist    -> score + assessment  ===> Select Highest Score
- s  | (Orchestrator)|      Rabbit Verifier/Specialist -> score + assessment       (e.g., DOG)
-    +-------+-------+      Bird Verifier/Specialist   -> score + assessment
+ o  +---------------------+
+ m  | pawpurse_router     | ---> Identifies targeted species agent name
+ s  | _agent              |      (dog_triage_agent, cat_triage_agent, etc.)
+    +-------+-------------+
             |
             v
-    +---------------+
-    | Synthesis/    | ---> Final Urgency Rating (RED / YELLOW / GREEN)
-    | Triage Agent  |      Localized Directive & Critical First-Aid List
-    +---------------+
+    +---------------------+      Dog Specialist 🐶  -> triage JSON
+    | Selected Specialist | ---> Cat Specialist 🐱  -> triage JSON
+    | Agent (via Runner)  |      Rabbit Specialist 🐰 -> triage JSON
+    +---------------------+      Bird Specialist 🦜  -> triage JSON
+            |                    Other Specialist 🐾  -> triage JSON
+            v
+    +---------------------+
+    | Output Parsing &    | ---> Map to PawPurse UI contract:
+    | Mapping Layer       |      - urgency (RED/YELLOW/GREEN)
+    +---------------------+      - action_directive (next_step)
+                                 - key_instructions (summary + call_clinic alert)
 ```
 
-### 1. Router Agent (Orchestrator) & Verifier/Specialist Sub-Agents
-When symptoms are submitted, the main Router Orchestrator invokes five parallel sub-agents to evaluate both species applicability (for routing) and diagnostic assessment:
-*   **Dog Verifier & Specialist**: Verifies canine indicators and assesses canine emergencies (GDV/bloat, chocolate poisoning, heatstroke).
-*   **Cat Verifier & Specialist**: Verifies feline indicators and assesses feline emergencies (urethral blockages, lily toxicity, feline dyspnea).
-*   **Rabbit Verifier & Specialist**: Verifies rabbit indicators and assesses rabbit emergencies (GI stasis, head tilt, limpness).
-*   **Bird Verifier & Specialist**: Verifies avian indicators and assesses avian emergencies (respiratory distress, broken blood feathers, egg binding).
-*   **Other Verifier & Specialist**: Handles general/non-standard pet emergency assessments.
+### 1. Router Agent (`pawpurse_router_agent`)
+When symptoms are submitted, the query is routed first to the ADK Router Agent. It analyzes the symptom text to select the appropriate specialist agent name. If the query does not match any specific pet or is ambiguous, it routes to `other_triage_agent`.
 
-Each sub-agent returns both confidence scores and specialist diagnostic assessment details in a unified JSON output:
+### 2. Specialist Worker Agents
+The selected specialist agent is invoked via the ADK `Runner` running on an `InMemorySessionService`:
+*   **Dog Specialist (`dog_triage_agent`)**: Applies rules for GDV/bloat in deep-chested breeds, ingestion toxicities, parvovirus, limping, and seizures.
+*   **Cat Specialist (`cat_triage_agent`)**: Applies rules for male urinary blockages, feline dyspnea, lily toxicity, pale/blue gums, and hepatic lipidosis.
+*   **Rabbit Specialist (`rabbit_triage_agent`)**: Applies rules for GI stasis timing, E. cuniculi head tilts, bruxism pain, flystrike, and cecotropes.
+*   **Bird Specialist (`bird_triage_agent`)**: Applies rules for cage floor fluffing, tail bobbing, non-stick PTFE toxicosis, egg binding, and mate regurgitation.
+*   **Other Specialist (`other_triage_agent`)**: Handles generic or non-standard pet urgency assessments.
+
+### 3. Triage Output Contract & Synthesis
+Each specialist agent conforms to the same structural contract, outputting a JSON block at the end of its response:
 ```json
 {
-  "confidence": 9,
-  "reason": "Mention of GDV/bloat and puppy strongly implies a dog.",
-  "assessment": "High probability of canine chocolate toxicity.",
-  "critical_factors": ["Ate dark chocolate", "Vomiting onset within 2 hours"]
+  "urgency": "RED" | "YELLOW" | "GREEN",
+  "summary": "One-sentence plain-English summary of the situation.",
+  "next_step": "Single concrete action the owner should take right now.",
+  "call_clinic": true | false
 }
 ```
-The Router Orchestrator aggregates the confidence scores and selects the species with the highest rating. If all scores are below `3`, the system defaults to `"other"`.
-
-### 2. Merged Execution
-By combining the verification and specialist diagnostics into a single parallel call, the engine retrieves the pre-calculated specialist `assessment` and `critical_factors` directly from the selected species sub-agent's response. This eliminates a separate API call roundtrip, dropping latency from three sequential hops down to two.
-
-### 3. Triage & Synthesis Agent
-The synthesis agent combines the raw symptoms, routed species, and the pre-calculated specialist assessment and critical factors from the winning verifier. It evaluates the parameters against strict urgency categories:
-*   **RED**: Life-threatening crisis requiring immediate vet intervention.
-*   **YELLOW**: Urgent care required; vet visit recommended within 24 hours.
-*   **GREEN**: Safe to monitor closely at home.
-
-It outputs the final structured JSON returned to the client:
-```json
-{
-  "urgency": "RED",
-  "action_directive": "Go to the nearest emergency clinic immediately. Do not wait.",
-  "key_instructions": ["Keep the dog calm", "Transport immediately"]
-}
-```
+The translation and localization module instructs the worker agent via dynamic prompt query-steering to write the `summary` and `next_step` fields in the target language (English, Japanese, or Burmese) while keeping the `urgency` value in English for frontend CSS binding. The parsed JSON maps to `action_directive` and `key_instructions`.
 
 ---
 

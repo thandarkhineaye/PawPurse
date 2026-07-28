@@ -1,6 +1,10 @@
 import os
 import json
-from google import genai
+import google.generativeai as genai
+from google.adk.agents import Agent
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai.types import Content, Part
 from pydantic import BaseModel
 
 class TriageResult(BaseModel):
@@ -95,177 +99,276 @@ def parse_response(response_text: str, language: str | None = None) -> dict:
 
 class TriageEngine:
     def __init__(self, api_key: str | None = None):
-        self.api_key = api_key or os.environ.get("GEMINI_API_KEY")
+        self.api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if self.api_key:
-            self.client = genai.Client(api_key=self.api_key)
+            import google.generativeai as genai
+            genai.configure(api_key=self.api_key)
+            os.environ["GOOGLE_API_KEY"] = self.api_key
+            self.client = True
         else:
             self.client = None
+
+        self.session_service = InMemorySessionService()
+        self.MY_USER_ID = "pawpurse_user_001"
+
+        self.TRIAGE_OUTPUT_CONTRACT = """
+IMPORTANT — always end your response with a JSON block wrapped in triple-backtick
+json fences, shaped exactly like this (no extra keys):
+
+```json
+{
+  "urgency": "RED",
+  "summary": "One-sentence plain-English summary of the situation.",
+  "next_step": "Single concrete action the owner should take right now.",
+  "call_clinic": true
+}
+```
+
+Urgency rules:
+  RED    → life-threatening; owner must act within minutes (go to ER now / call immediately)
+  YELLOW → concerning but not immediately life-threatening; see a vet today
+  GREEN  → low risk; monitor at home, routine vet visit if no improvement in 48 h
+
+Never diagnose. Never prescribe. Score urgency only.
+"""
+
+        self.dog_agent = Agent(
+            name="dog_triage_agent",
+            model="gemini-2.5-flash",
+            description="Emergency urgency triage specialist for dogs.",
+            instruction=f"""
+You are PawPurse's Dog Emergency Triage Specialist 🐶.
+
+Your ONLY job is to score the urgency of a dog owner's described emergency
+(RED / YELLOW / GREEN) and tell them the single next step. You do NOT diagnose,
+prescribe medication, or provide treatment plans.
+
+Dog-specific knowledge to apply:
+- Bloat (GDV) in deep-chested breeds (Great Dane, Boxer, Weimaraner) → always RED
+- Chocolate, xylitol, grapes/raisins, macadamia nuts ingestion → RED
+- Parvovirus signs (bloody vomit + diarrhea in unvaccinated puppy) → RED
+- Limping without weight-bearing → YELLOW
+- Single vomit with normal behaviour → GREEN
+- Seizure lasting > 5 min or cluster seizures → RED
+
+{self.TRIAGE_OUTPUT_CONTRACT}
+""",
+        )
+
+        self.cat_agent = Agent(
+            name="cat_triage_agent",
+            model="gemini-2.5-flash",
+            description="Emergency urgency triage specialist for cats.",
+            instruction=f"""
+You are PawPurse's Cat Emergency Triage Specialist 🐱.
+
+Your ONLY job is to score the urgency of a cat owner's described emergency
+(RED / YELLOW / GREEN) and tell them the single next step. You do NOT diagnose,
+prescribe medication, or provide treatment plans.
+
+Cat-specific knowledge to apply:
+- Urinary blockage in male cats (straining, crying, no urine output) → RED
+- Open-mouth breathing / laboured breathing in cat → RED (cats are obligate nasal breathers)
+- Lily ingestion (any part of plant) → RED (acute kidney failure)
+- Pale or blue gums → RED
+- Not eating for > 48 h → YELLOW (hepatic lipidosis risk)
+- Hiding + lethargy without other signs → YELLOW
+- Single hairball episode with normal behaviour → GREEN
+
+{self.TRIAGE_OUTPUT_CONTRACT}
+""",
+        )
+
+        self.rabbit_agent = Agent(
+            name="rabbit_triage_agent",
+            model="gemini-2.5-flash",
+            description="Emergency urgency triage specialist for rabbits.",
+            instruction=f"""
+You are PawPurse's Rabbit Emergency Triage Specialist 🐰.
+
+Your ONLY job is to score the urgency of a rabbit owner's described emergency
+(RED / YELLOW / GREEN) and tell them the single next step. You do NOT diagnose,
+prescribe medication, or provide treatment plans.
+
+Rabbit-specific knowledge to apply:
+- GI stasis (no droppings > 4–6 h, not eating) → RED (rabbits can deteriorate in hours)
+- Head tilt (E. cuniculi suspect) → YELLOW-to-RED depending on progression
+- Teeth grinding loudly (bruxism) → YELLOW (pain signal)
+- Flystrike (maggots on skin) → RED
+- Soft cecotropes left uneaten → YELLOW
+- Normal cecotrope eating behaviour mistaken for "eating poop" → GREEN
+
+{self.TRIAGE_OUTPUT_CONTRACT}
+""",
+        )
+
+        self.bird_agent = Agent(
+            name="bird_triage_agent",
+            model="gemini-2.5-flash",
+            description="Emergency urgency triage specialist for pet birds (parrots, budgies, cockatiels, finches).",
+            instruction=f"""
+You are PawPurse's Bird Emergency Triage Specialist 🦜.
+
+Your ONLY job is to score the urgency of a bird owner's described emergency
+(RED / YELLOW / GREEN) and tell them the single next step. You do NOT diagnose,
+prescribe medication, or provide treatment plans.
+
+Bird-specific knowledge to apply:
+- Fluffed feathers + sitting on cage floor → RED (birds hide illness; floor-sitting = critical)
+- Open-mouth breathing / tail-bobbing → RED
+- Avocado, chocolate, caffeine, xylitol ingestion → RED
+- Teflon/non-stick fumes (PTFE toxicosis) → RED (can kill within minutes)
+- Egg binding in hen (straining, fluffed, on floor) → RED
+- Regurgitation to a mirror or toy (mate-feeding behaviour) → GREEN
+- Single loose dropping, otherwise normal → GREEN
+
+{self.TRIAGE_OUTPUT_CONTRACT}
+""",
+        )
+
+        self.other_agent = Agent(
+            name="other_triage_agent",
+            model="gemini-2.5-flash",
+            description="Emergency urgency triage specialist for other animals.",
+            instruction=f"""
+You are PawPurse's General Pet Emergency Triage Specialist 🐾.
+
+Your ONLY job is to score the urgency of a pet owner's described emergency
+(RED / YELLOW / GREEN) and tell them the single next step. You do NOT diagnose,
+prescribe medication, or provide treatment plans.
+
+General pet knowledge to apply:
+- Severe bleeding, gasping, or unconsciousness -> always RED urgency.
+- Extreme lethargy, limpness, not moving -> RED urgency.
+- Minor cuts, scratching, slight swelling -> YELLOW urgency.
+- Mild symptoms, scratching, normal eating and alertness -> GREEN urgency.
+
+{self.TRIAGE_OUTPUT_CONTRACT}
+""",
+        )
+
+        self.router_agent = Agent(
+            name="pawpurse_router_agent",
+            model="gemini-2.5-flash",
+            description="Routes a pet emergency query to the correct species specialist.",
+            instruction="""
+You are PawPurse's triage router.
+
+Read the owner's message and decide which specialist should handle it.
+Return ONLY the exact agent name — nothing else, no punctuation, no explanation.
+
+Available specialists:
+  dog_triage_agent    → for dogs
+  cat_triage_agent    → for cats
+  rabbit_triage_agent → for rabbits (and guinea pigs as fallback)
+  bird_triage_agent   → for birds (parrots, budgies, cockatiels, canaries, finches)
+  other_triage_agent  → for other animals (reptiles, fish, turtles, general animals)
+
+If the species is ambiguous or not in the list above, return: other_triage_agent
+""",
+        )
+
+        self.worker_agents = {
+            "dog_triage_agent":    self.dog_agent,
+            "cat_triage_agent":    self.cat_agent,
+            "rabbit_triage_agent": self.rabbit_agent,
+            "bird_triage_agent":   self.bird_agent,
+            "other_triage_agent":  self.other_agent,
+        }
 
     def classify_symptoms(self, symptoms: str, language: str | None = None) -> dict:
         if not language:
             language = detect_language(symptoms)
 
-        # -----------------
-        # STEP 1: ROUTER AGENT (ORCHESTRATOR) WITH MULTI-AGENT VERIFIERS & SPECIALISTS
-        # -----------------
-        species = "other"
-        assessment = ""
-        critical_factors = []
-        
         if self.client:
             try:
-                candidates = ["dog", "cat", "rabbit", "bird", "other"]
-                scores = {}
-                reasonings = {}
-                assessments = {}
-                factors = {}
-                
-                for candidate in candidates:
-                    verifier_prompt = self._get_verifier_prompt(candidate, symptoms)
-                    response = self.client.interactions.create(
-                        model="gemini-3.5-flash",
-                        config={
-                            "response_mime_type": "application/json",
-                            "response_schema": {
-                                "type": "object",
-                                "properties": {
-                                    "confidence": {"type": "integer"},
-                                    "reason": {"type": "string"},
-                                    "assessment": {"type": "string"},
-                                    "critical_factors": {
-                                        "type": "array",
-                                        "items": {"type": "string"}
-                                    }
-                                },
-                                "required": ["confidence", "reason", "assessment", "critical_factors"]
-                            },
-                            "thinking_level": "minimal"
-                        },
-                        prompt=verifier_prompt
-                    )
-                    text_out = self._extract_text(response)
-                    data = json.loads(text_out)
-                    confidence = max(0, min(10, int(data.get("confidence", 0))))
-                    reason = data.get("reason", "")
-                    scores[candidate] = confidence
-                    reasonings[candidate] = reason
-                    assessments[candidate] = data.get("assessment", "")
-                    factors[candidate] = data.get("critical_factors", [])
-                    print(f"[Sub-Agent Verifier/Specialist: {candidate.upper()}] Confidence: {confidence}/10 (Reason: {reason})")
-                
-                best_candidate = max(scores, key=scores.get)
-                if scores[best_candidate] >= 3:
-                    species = best_candidate
-                else:
-                    species = "other"
-                
-                assessment = assessments[species]
-                critical_factors = factors[species]
-                print(f"[Router Agent Orchestrator] Routed Species: {species.upper()} (Highest Score: {scores.get(species, 0)}/10)")
+                import asyncio
+                # Run the async ADK pipeline in a synchronous wrapper
+                triage = asyncio.run(self._run_adk_pipeline(symptoms, language))
+                return triage
             except Exception as e:
-                print(f"[Router Agent Orchestrator] Error: {e}. Falling back to default routing.")
-                species = self._fallback_route(symptoms)
-                assessment = f"General analysis for {species} symptoms."
-                critical_factors = ["Observe physical state", "Ensure breathing is unhindered"]
-        else:
-            species_scores = self._mock_score_route(symptoms)
-            species = max(species_scores, key=species_scores.get)
-            assessment = f"Mocked {species.upper()} specialist analysis of symptoms."
-            critical_factors = ["Symptom onset tracking", "Vital sign checks"]
-            print(f"[Router Agent Mock Orchestrator] Scores: {species_scores} -> Selected: {species.upper()}")
-
-        # -----------------
-        # STEP 3: URGENCY TRIAGE & SYNTHESIS AGENT
-        # -----------------
-        if self.client:
-            try:
-                # Build localized prompt with Specialist context
-                lang_instruction = self._get_language_instruction(language)
-                synthesis_prompt = (
-                    "You are a veterinary urgency triage synthesis agent. Synthesize a final urgency level "
-                    "and instructions using the raw symptoms, the routed species, and the Specialist Agent's assessment.\n\n"
-                    f"Species: {species.upper()}\n"
-                    f"Symptoms: \"{symptoms}\"\n"
-                    f"Specialist Assessment: {assessment}\n"
-                    f"Specialist Critical Factors: {json.dumps(critical_factors)}\n\n"
-                    "Categorize into exactly one of three urgency levels:\n"
-                    "- RED: Extreme Urgency - Life-Threatening Crisis\n"
-                    "- YELLOW: Urgent Attention - Vet Visit Required\n"
-                    "- GREEN: Monitor - Non-Urgent\n\n"
-                    f"{lang_instruction}"
-                )
-                
-                triage_response = self.client.interactions.create(
-                    model="gemini-3.5-flash",
-                    config={
-                        "response_mime_type": "application/json",
-                        "response_schema": {
-                            "type": "object",
-                            "properties": {
-                                "urgency": {"type": "string", "enum": ["RED", "YELLOW", "GREEN"]},
-                                "action_directive": {"type": "string"},
-                                "key_instructions": {
-                                    "type": "array",
-                                    "items": {"type": "string"}
-                                }
-                            },
-                            "required": ["urgency", "action_directive", "key_instructions"]
-                        },
-                        "thinking_level": "minimal"
-                    },
-                    prompt=synthesis_prompt
-                )
-                triage_text = self._extract_text(triage_response)
-                triage_data = parse_response(triage_text, language)
-                print(f"[Triage Agent] Final Triage: {triage_data.get('urgency')}")
-                return triage_data
-            except Exception as e:
-                print(f"[Triage Agent] Error: {e}. Falling back to keyword triage.")
+                print(f"[TriageEngine ADK Error] {e}. Falling back to keyword triage.")
                 return self._fallback_triage(symptoms, language)
         else:
-            # Mock Triage Synthesis
-            triage_data = self._fallback_triage(symptoms, language)
-            print(f"[Triage Agent Mock] Final Triage: {triage_data.get('urgency')}")
-            return triage_data
+            return self._fallback_triage(symptoms, language)
 
-    def _extract_text(self, response) -> str:
-        if hasattr(response, "steps") and response.steps:
-            last_step = response.steps[-1]
-            if hasattr(last_step, "content") and last_step.content:
-                return last_step.content[0].text
-        return "{}"
+    async def _run_adk_pipeline(self, query: str, language: str) -> dict:
+        import json, re
 
-    def _fallback_route(self, symptoms: str) -> str:
-        lower_symptoms = symptoms.lower()
-        if any(w in lower_symptoms for w in ["dog", "canine", "puppy", "ခွေး", "犬"]):
-            return "dog"
-        if any(w in lower_symptoms for w in ["cat", "feline", "kitten", "ကြောင်", "猫"]):
-            return "cat"
-        if any(w in lower_symptoms for w in ["rabbit", "bunny", "lagomorph", "ယုန်", "うさぎ", "兎"]):
-            return "rabbit"
-        if any(w in lower_symptoms for w in ["bird", "parrot", "avian", "ငှက်", "鳥"]):
-            return "bird"
-        return "other"
-
-    # _get_specialist_prompt has been merged into verifier prompts
-
-    def _get_language_instruction(self, language: str) -> str:
-        if language == "ja":
-            return (
-                "You must respond in Japanese. The fields 'action_directive' and 'key_instructions' "
-                "in the JSON response must be translated and written in Japanese. "
-                "However, the value of the 'urgency' field must remain in English as 'RED', 'YELLOW', or 'GREEN'."
-            )
-        elif language == "my":
-            return (
-                "You must respond in Burmese. The fields 'action_directive' and 'key_instructions' "
-                "in the JSON response must be translated and written in Burmese. "
-                "However, the value of the 'urgency' field must remain in English as 'RED', 'YELLOW', or 'GREEN'."
-            )
-        return (
-            "You must respond in English. The fields 'action_directive' and 'key_instructions' "
-            "in the JSON response must be in English. The 'urgency' field value must be 'RED', 'YELLOW', or 'GREEN'."
+        # Step 1: Route
+        router_session = await self.session_service.create_session(
+            app_name=self.router_agent.name, user_id=self.MY_USER_ID
         )
+        chosen_route = await self._run_agent_async(self.router_agent, query, router_session)
+        chosen_route = chosen_route.strip().strip("'\"")
+
+        if chosen_route not in self.worker_agents:
+            chosen_route = "other_triage_agent"
+
+        print(f"🚦 Router Agent → Selected specialist: {chosen_route.upper()}")
+
+        # Step 2: Triage with Specialist
+        specialist = self.worker_agents[chosen_route]
+        specialist_session = await self.session_service.create_session(
+            app_name=specialist.name, user_id=self.MY_USER_ID
+        )
+
+        # Dynamic query steering for localization translation mapping
+        lang_map = {"ja": "Japanese", "my": "Burmese", "en": "English"}
+        target_lang = lang_map.get(language, "English")
+
+        steered_query = (
+            f"Symptom description: \"{query}\"\n\n"
+            f"Generate the 'summary' and 'next_step' fields in the final JSON response in: {target_lang}. "
+            f"The 'urgency' field must remain in English ('RED', 'YELLOW', or 'GREEN')."
+        )
+
+        raw_response = await self._run_agent_async(specialist, steered_query, specialist_session)
+        print(f"[Specialist Agent: {chosen_route.upper()}] Completed analysis.")
+
+        # Step 3: Parse response JSON
+        triage = {"urgency": "YELLOW", "summary": raw_response, "next_step": "Please consult a vet.", "call_clinic": True}
+        match = re.search(r"```json\s*(\{.*?\})\s*```", raw_response, re.DOTALL)
+        if not match:
+            match = re.search(r"(\{.*?\})", raw_response, re.DOTALL)
+
+        if match:
+            try:
+                triage = json.loads(match.group(1))
+            except json.JSONDecodeError:
+                pass
+
+        action_directive = triage.get("next_step", "Please consult a vet.")
+        key_instructions = [triage.get("summary", "Symptom check completed.")]
+        if triage.get("call_clinic"):
+            if language == "ja":
+                key_instructions.append("ただちに近くの救急動物病院に連絡してください。")
+            elif language == "my":
+                key_instructions.append("အနီးဆုံး အရေးပေါ် တိရစ္ဆာန်ဆေးကုခန်းသို့ ချက်ချင်း ဖုန်းခေါ်ဆိုပါ။")
+            else:
+                key_instructions.append("Contact your nearest emergency veterinary clinic immediately.")
+
+        return {
+            "urgency": triage.get("urgency", "YELLOW"),
+            "action_directive": action_directive,
+            "key_instructions": key_instructions
+        }
+
+    async def _run_agent_async(self, agent: Agent, query: str, session) -> str:
+        runner = Runner(
+            agent=agent,
+            session_service=self.session_service,
+            app_name=agent.name,
+        )
+        final = ""
+        async for event in runner.run_async(
+            user_id=self.MY_USER_ID,
+            session_id=session.id,
+            new_message=Content(parts=[Part(text=query)], role="user"),
+        ):
+            if event.is_final_response():
+                final = event.content.parts[0].text
+        return final
 
     def _fallback_triage(self, symptoms: str, language: str) -> dict:
         lower_symptoms = symptoms.lower()
@@ -277,6 +380,8 @@ class TriageEngine:
             "bleed", "blood", "chok", "breath", "unconscious", "collapse", "seizure", "convulsion", "paralyz", 
             "poison", "toxic", "chocolate", "lily", "lilies", "teflon", "smoke", "heatstroke", "heat shock", "stasis", "limp", 
             "fracture", "broken", "unresponsive", "gasp", "pant", "blue", "pale", "bloat", "fit",
+            "xylitol", "grapes", "raisins", "macadamia", "parvovirus", "blockage", "straining", "crying",
+            "fluffed", "cage floor", "tail-bobbing", "avocado", "egg binding", "flystrike", "maggots",
             "accident", "hit by car", "run over", "fell from", "dog attack", "animal attack", "trauma", "crash", "collision", "hit by", "struck by",
             "eye bleed", "bleeding eye", "eye bleeding", "proptosis", "eye pop", "eyeball pop", "eye puncture", "blindness",
             "ear torn", "torn ear", "ear bleeding", "bleeding ear", "ear cut off",
@@ -284,7 +389,7 @@ class TriageEngine:
             "severe burn", "chemical burn", "deep wound", "skin torn", "torn skin", "deep puncture", "laceration"
         ]
         yellow_en = [
-            "vomit", "diarrhea", "pain",
+            "vomit", "diarrhea", "pain", "not eating", "hiding", "lethargy", "head tilt", "teeth grinding", "bruxism", "cecotropes",
             "eye scratch", "scratched eye", "swollen eye", "eye discharge", "eye squint", "squinting eye", "eye red", "red eye", "cloudy eye", "watery eye", "eye shut", "closed eye",
             "ear discharge", "head shaking", "shaking head", "scratching ear", "ear scratch", "ear hematoma", "smelly ear", "ear smell", "ear red", "red ear", "swollen ear", "ear infection",
             "nasal discharge", "nose discharge", "sneezing blood", "bloody sneeze", "nose swelling", "swollen nose", "yellow snot", "green snot",
@@ -398,81 +503,40 @@ class TriageEngine:
                     "key_instructions": ["Keep comfortable", "Observe for changes"]
                 }
 
-    def _get_verifier_prompt(self, species: str, symptoms: str) -> str:
-        instructions = {
-            "dog": (
-                "You are a canine specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
-                "1. Verification: Determine the likelihood that the symptoms refer to a dog, puppy, or canine issue. "
-                "Look for canine keywords (dog, puppy, canine, bark, fetch, breed names) or canine-specific issues "
-                "(e.g. chocolate toxicity, bloat/GDV). Output a confidence score from 0 to 10 and a brief reason.\n"
-                "2. Specialist Assessment: Perform a specialist veterinary assessment. Dogs are susceptible to bloat, "
-                "chocolate toxicity, xylitol poisoning, heatstroke, or trauma from vehicle hits. Provide an assessment "
-                "and list key critical factors.\n\n"
-                f"Symptoms: \"{symptoms}\""
-            ),
-            "cat": (
-                "You are a feline specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
-                "1. Verification: Determine the likelihood that the symptoms refer to a cat, kitten, or feline issue. "
-                "Look for feline keywords (cat, kitten, feline, purr, meow, claws) or feline-specific issues "
-                "(e.g. lily exposure, urinary blockages/blocked cat). Output a confidence score from 0 to 10 and a brief reason.\n"
-                "2. Specialist Assessment: Perform a specialist veterinary assessment. Cats hide pain well and are prone "
-                "to urethral obstructions, lily toxicity, and rapid open-mouth breathing. Provide an assessment "
-                "and list key critical factors.\n\n"
-                f"Symptoms: \"{symptoms}\""
-            ),
-            "rabbit": (
-                "You are a rabbit/lagomorph specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
-                "1. Verification: Determine the likelihood that the symptoms refer to a rabbit, bunny, or lagomorph issue. "
-                "Look for rabbit keywords (rabbit, bunny, floppy ears, thumping, hay) or rabbit-specific issues. "
-                "Output a confidence score from 0 to 10 and a brief reason.\n"
-                "2. Specialist Assessment: Perform a specialist veterinary assessment. Rabbits are prey animals and hide illness. "
-                "GI stasis, lack of appetite for 12+ hours, limpness, and head tilt are severe emergencies. Provide an "
-                "assessment and list key critical factors.\n\n"
-                f"Symptoms: \"{symptoms}\""
-            ),
-            "bird": (
-                "You are an avian specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
-                "1. Verification: Determine the likelihood that the symptoms refer to a bird, parrot, or avian issue. "
-                "Look for avian keywords (bird, parrot, budgie, wings, feathers, cage, beak, bobbing). Output a confidence "
-                "score from 0 to 10 and a brief reason.\n"
-                "2. Specialist Assessment: Perform a specialist veterinary assessment. Birds are fragile and hide illness. "
-                "Respiratory distress (open-mouth breathing, tail bobbing), egg binding, or bleeding from a broken feather "
-                "are critical. Provide an assessment and list key critical factors.\n\n"
-                f"Symptoms: \"{symptoms}\""
-            ),
-            "other": (
-                "You are a general animal specialist and symptom verifier agent. Evaluate the symptoms under two aspects:\n"
-                "1. Verification: Determine the likelihood that the symptoms refer to a general or non-standard animal. "
-                "Output a confidence score from 0 to 10 and a brief reason.\n"
-                "2. Specialist Assessment: Perform a general specialist veterinary assessment of the symptoms and "
-                "list key critical factors.\n\n"
-                f"Symptoms: \"{symptoms}\""
-            )
-        }
-        return instructions.get(species, instructions["other"])
+    def _fallback_route(self, symptoms: str) -> str:
+        lower_symptoms = symptoms.lower()
+        if any(w in lower_symptoms for w in ["dog", "canine", "puppy", "ခွေး", "犬"]):
+            return "dog_triage_agent"
+        if any(w in lower_symptoms for w in ["cat", "feline", "kitten", "ကြောင်", "猫"]):
+            return "cat_triage_agent"
+        if any(w in lower_symptoms for w in ["rabbit", "bunny", "lagomorph", "ယုန်", "うさぎ", "兎"]):
+            return "rabbit_triage_agent"
+        if any(w in lower_symptoms for w in ["bird", "parrot", "avian", "ငှက်", "鳥"]):
+            return "bird_triage_agent"
+        return "other_triage_agent"
 
     def _mock_score_route(self, symptoms: str) -> dict:
         lower_symptoms = symptoms.lower()
-        scores = {"dog": 0, "cat": 0, "rabbit": 0, "bird": 0, "other": 1}
+        scores = {"dog_triage_agent": 0, "cat_triage_agent": 0, "rabbit_triage_agent": 0, "bird_triage_agent": 0, "other_triage_agent": 1}
         
         if any(w in lower_symptoms for w in ["dog", "canine", "puppy", "ခွေး", "犬"]):
-            scores["dog"] += 8
+            scores["dog_triage_agent"] += 8
         if any(w in lower_symptoms for w in ["chocolate", "bloat", "gdv", "bark"]):
-            scores["dog"] += 5
+            scores["dog_triage_agent"] += 5
             
         if any(w in lower_symptoms for w in ["cat", "feline", "kitten", "ကြောင်", "猫"]):
-            scores["cat"] += 8
+            scores["cat_triage_agent"] += 8
         if any(w in lower_symptoms for w in ["lily", "lilies", "meow", "purr", "blocked"]):
-            scores["cat"] += 5
+            scores["cat_triage_agent"] += 5
             
         if any(w in lower_symptoms for w in ["rabbit", "bunny", "lagomorph", "ယုန်", "うさぎ", "兎"]):
-            scores["rabbit"] += 8
+            scores["rabbit_triage_agent"] += 8
         if any(w in lower_symptoms for w in ["stasis", "head tilt", "thump"]):
-            scores["rabbit"] += 5
+            scores["rabbit_triage_agent"] += 5
             
         if any(w in lower_symptoms for w in ["bird", "parrot", "avian", "ငှက်", "鳥"]):
-            scores["bird"] += 8
+            scores["bird_triage_agent"] += 8
         if any(w in lower_symptoms for w in ["feather", "cage", "beak", "bobbing"]):
-            scores["bird"] += 5
+            scores["bird_triage_agent"] += 5
             
         return scores
